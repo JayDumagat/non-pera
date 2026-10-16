@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="26" y1="14" x2="535" y2="354" gradientUnits="userSpaceOnUse"><stop stop-color="#142f68"/><stop offset="1" stop-color="#3479ed"/></linearGradient>
+    <linearGradient id="orb" x1="384" y1="83" x2="540" y2="253" gradientUnits="userSpaceOnUse"><stop stop-color="#9cbcff" stop-opacity=".42"/><stop offset="1" stop-color="#d9e5ff" stop-opacity=".06"/></linearGradient>
+    <linearGradient id="shade" x1="0" y1="170" x2="0" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#10234C" stop-opacity="0"/><stop offset="1" stop-color="#10234C" stop-opacity=".72"/></linearGradient>
+  </defs>
+  <rect width="560" height="360" rx="24" fill="url(#bg)"/>
+  <circle cx="462" cy="112" r="98" fill="url(#orb)"/>
+  <circle cx="462" cy="112" r="69" stroke="#D7E4FF" stroke-opacity=".22"/>
+  <circle cx="462" cy="112" r="41" stroke="#D7E4FF" stroke-opacity=".22"/>
+  <path d="M355 234c28-15 40-5 65-27s39 8 61-22 35-4 54-27" stroke="#C7D9FF" stroke-width="4" stroke-linecap="round" stroke-opacity=".7"/>
+  <circle cx="535" cy="158" r="6" fill="#fff"/>
+  <rect x="0" y="170" width="480" height="190" fill="url(#shade)"/>
+  <text x="34" y="188" fill="#D9E6FF" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="1.8">SPONSORED  ·  BRIGHTPATH FUNDS</text>
+  <text x="34" y="231" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="700">Make room for</text>
+  <text x="34" y="261" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="700">long-term growth</text>
+  <text x="34" y="294" fill="#E4ECFF" font-family="Arial,sans-serif" font-size="20">Explore diversified options for your</text>
+  <text x="34" y="319" fill="#E4ECFF" font-family="Arial,sans-serif" font-size="20">investing journey.</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="39" y1="5" x2="543" y2="355" gradientUnits="userSpaceOnUse"><stop stop-color="#07556A"/><stop offset="1" stop-color="#398CA4"/></linearGradient>
+    <linearGradient id="coin" x1="380" y1="77" x2="500" y2="223" gradientUnits="userSpaceOnUse"><stop stop-color="#BDE5D6" stop-opacity=".9"/><stop offset="1" stop-color="#A9DCD0" stop-opacity=".16"/></linearGradient>
+    <linearGradient id="shade" x1="0" y1="170" x2="0" y2="360" gradientUnits="userSpaceOnUse"><stop stop-color="#063E51" stop-opacity="0"/><stop offset="1" stop-color="#063E51" stop-opacity=".76"/></linearGradient>
+  </defs>
+  <rect width="560" height="360" rx="24" fill="url(#bg)"/>
+  <circle cx="451" cy="140" r="82" fill="url(#coin)"/>
+  <circle cx="451" cy="140" r="58" stroke="#E1F7ED" stroke-opacity=".6" stroke-width="2"/>
+  <path d="M451 109v62m-17-45c0-8 7-14 17-14s17 6 17 14-7 14-17 14-17 6-17 14 7 14 17 14 17-6 17-14" stroke="#F2FFF9" stroke-width="5" stroke-linecap="round"/>
+  <path d="M361 236c26-20 45-20 69-1s42 15 69-5 43-18 62-5" stroke="#C1EFE1" stroke-width="3" stroke-linecap="round" stroke-opacity=".65"/>
+  <rect x="0" y="170" width="480" height="190" fill="url(#shade)"/>
+  <text x="34" y="188" fill="#CFF1E6" font-family="Arial,sans-serif" font-size="16" font-weight="700" letter-spacing="1.8">SPONSORED  ·  EVERGREEN ASSET CO.</text>
+  <text x="34" y="231" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="700">Your next chapter</text>
+  <text x="34" y="261" fill="#fff" font-family="Arial,sans-serif" font-size="25" font-weight="700">starts with a plan</text>
+  <text x="34" y="294" fill="#E2F5EF" font-family="Arial,sans-serif" font-size="20">Discover tools for a thoughtful</text>
+  <text x="34" y="319" fill="#E2F5EF" font-family="Arial,sans-serif" font-size="20">investment plan.</text>
+</svg>

@@ -1,0 +1,118 @@
+@import 'tailwindcss';
+
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+@keyframes sponsored-ad-enter {
+  from { opacity: 0.35; transform: scale(1.015); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.sponsored-ad-image {
+  animation: sponsored-ad-enter 360ms ease-out both;
+}
+
+.scroll-pane {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scroll-pane::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sponsored-ad-image { animation: none; }
+}
+
+[data-theme='night'] {
+  color-scheme: dark;
+  background-color: #111319 !important;
+}
+
+[data-theme='night'] main {
+  background-color: #111319 !important;
+}
+
+[data-theme='night'] aside,
+[data-theme='night'] header,
+[data-theme='night'] nav[aria-label='Main navigation'] {
+  background-color: #171b23 !important;
+  border-color: #2a2f3a !important;
+}
+
+[data-theme='night'] footer {
+  border-color: #2a2f3a !important;
+  color: #a2a6b0 !important;
+}
+
+[data-theme='night'] section[data-tone='white'] {
+  background-color: #1c202a !important;
+  border-color: #2b303c !important;
+}
+
+[data-theme='night'] section[data-tone='soft'] {
+  background-color: #20242e !important;
+  border-color: #2b303c !important;
+}
+
+[data-theme='night'] section[data-tone='forest'] {
+  background-color: #2563eb !important;
+  border-color: #60a5fa !important;
+}
+
+[data-theme='night'] [class*='bg-white'] {
+  background-color: #1c202a !important;
+}
+
+[data-theme='night'] section[data-tone='forest'] [class*='bg-white/10'] {
+  background-color: rgb(255 255 255 / 10%) !important;
+}
+
+[data-theme='night'] [class*='bg-[#f'],
+[data-theme='night'] [class*='bg-[#e'] {
+  background-color: #20242e !important;
+}
+
+[data-theme='night'] [class*='text-[#'] {
+  color: #b5b9c2 !important;
+}
+
+[data-theme='night'] [class*='text-white'] {
+  color: #f4f5f8 !important;
+}
+
+[data-theme='night'] main h1,
+[data-theme='night'] main h2,
+[data-theme='night'] main h3 {
+  color: #e4e7ec !important;
+}
+
+[data-theme='night'] [class*='border-[#'],
+[data-theme='night'] tr {
+  border-color: #303540 !important;
+}
+
+[data-theme='night'] input,
+[data-theme='night'] textarea {
+  color: #e4e7ec !important;
+  border-color: #353a46;
+}
+
+[data-theme='night'] input::placeholder,
+[data-theme='night'] textarea::placeholder {
+  color: #7f8490 !important;
+}
