@@ -1,0 +1,8 @@
+{
+  "name": "Morrow — Invest with clarity",
+  "description": "A wealth and portfolio investment management dashboard with asset allocation, fund tracking, performance benchmarks, and financial education.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

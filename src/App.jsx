@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Navigate, NavLink as RouterNavLink, Route, Routes, useNavigate } from 'react-router-dom'
+import { Navigate, NavLink as RouterNavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
   ArrowRight,
+  ArrowUpDown,
   Bell,
   BookOpen,
   BriefcaseBusiness,
   Check,
+  CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -14,6 +16,7 @@ import {
   Clock,
   ExternalLink,
   FileText,
+  Filter,
   Home,
   LayoutGrid,
   LockKeyhole,
@@ -31,7 +34,9 @@ import {
   Sun,
   TrendingUp,
   UserRound,
+  Users,
   WalletCards,
+  X,
 } from 'lucide-react'
 
 const navigationSections = [
@@ -46,6 +51,10 @@ const navigationSections = [
     { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
     { id: 'profile', label: 'Profile', icon: 'profile' },
   ] },
+]
+
+const traderNavigationSections = [
+  { label: 'Agent Desk', items: [{ id: 'clients', label: 'Clients', icon: 'users', badge: '5' }] },
 ]
 
 const navigation = navigationSections.flatMap((section) => section.items)
@@ -108,15 +117,15 @@ const rangePointCounts = { '1W': 5, '1M': 7, '3M': 9, '1Y': 11, ALL: 13 }
 const rangeReturnMultipliers = { '1W': 0.22, '1M': 1, '3M': 2.6, '1Y': 6, ALL: 10 }
 
 const investmentAccounts = [
-  { id: 'account-1', category: 'equities', name: 'Account 1', accountNumber: '•••• 1842', value: 9422.16, monthlyReturn: 5.2, color: '#2563eb' },
-  { id: 'account-2', category: 'equities', name: 'Account 2', accountNumber: '•••• 2957', value: 6218.4, monthlyReturn: 4.4, color: '#0f9f83' },
-  { id: 'account-3', category: 'equities', name: 'Account 3', accountNumber: '•••• 4038', value: 1599.44, monthlyReturn: 7.6, color: '#8b5cf6' },
-  { id: 'account-4', category: 'uitfs', name: 'Account 4', accountNumber: '•••• 5174', value: 2180.5, monthlyReturn: 3.8, color: '#0891b2' },
-  { id: 'account-5', category: 'uitfs', name: 'Account 5', accountNumber: '•••• 6281', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
-  { id: 'account-6', category: 'mutual-fund', name: 'Account 6', accountNumber: '•••• 7390', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
-  { id: 'account-7', category: 'mutual-fund', name: 'Account 7', accountNumber: '•••• 8426', value: 1080, monthlyReturn: 5.6, color: '#db2777' },
-  { id: 'account-8', category: 'others', name: 'Account 8', accountNumber: '•••• 9513', value: 900, monthlyReturn: 1.1, color: '#64748b' },
-  { id: 'account-9', category: 'others', name: 'Account 9', accountNumber: '•••• 0674', value: 300, monthlyReturn: 2.2, color: '#7c3aed' },
+  { id: 'account-1', category: 'equities', name: 'Margin', accountNumber: 'JOHALEM-101-1-01-001', value: 9422.16, monthlyReturn: 5.2, color: '#2563eb' },
+  { id: 'account-2', category: 'equities', name: 'Discretionary', accountNumber: 'JOHALEM-102-2-01-002', value: 6218.4, monthlyReturn: 4.4, color: '#0f9f83' },
+  { id: 'account-3', category: 'equities', name: 'Broker-Assisted', accountNumber: 'JOHALEM-103-1-02-003', value: 1599.44, monthlyReturn: 7.6, color: '#8b5cf6' },
+  { id: 'account-4', category: 'uitfs', name: 'Discretionary UITF', accountNumber: 'JOHALEM-201-1-01-004', value: 2180.5, monthlyReturn: 3.8, color: '#0891b2' },
+  { id: 'account-5', category: 'uitfs', name: 'Broker-Assisted UITF', accountNumber: 'JOHALEM-202-2-01-005', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
+  { id: 'account-6', category: 'mutual-fund', name: 'Discretionary Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
+  { id: 'account-7', category: 'mutual-fund', name: 'Broker-Assisted Fund', accountNumber: 'JOHALEM-302-2-02-007', value: 1080, monthlyReturn: 5.6, color: '#db2777' },
+  { id: 'account-8', category: 'others', name: 'Margin Fixed Income', accountNumber: 'JOHALEM-401-1-01-008', value: 900, monthlyReturn: 1.1, color: '#64748b' },
+  { id: 'account-9', category: 'others', name: 'Discretionary Trust', accountNumber: 'JOHALEM-402-2-01-009', value: 300, monthlyReturn: 2.2, color: '#7c3aed' },
 ]
 
 const categoryBenchmarks = {
@@ -125,6 +134,22 @@ const categoryBenchmarks = {
   uitfs: { name: 'UITF market benchmark', monthlyReturn: 2.8, color: '#818a9b' },
   'mutual-fund': { name: 'Mutual fund benchmark', monthlyReturn: 3.3, color: '#818a9b' },
   others: { name: 'Fixed income benchmark', monthlyReturn: 1.6, color: '#818a9b' },
+}
+
+const categoryPeraBalances = {
+  overall: { value: 18450, change: '+3.85%', changeAmount: 684.2 },
+  equities: { value: 13100, change: '+4.10%', changeAmount: 516.4 },
+  uitfs: { value: 2450, change: '+3.20%', changeAmount: 76.1 },
+  'mutual-fund': { value: 1900, change: '+3.80%', changeAmount: 69.7 },
+  others: { value: 1000, change: '+2.20%', changeAmount: 22.0 },
+}
+
+const categoryCashBalances = {
+  overall: { nonPera: 3260.5, pera: 1850 },
+  equities: { nonPera: 2150, pera: 1200 },
+  uitfs: { nonPera: 520.5, pera: 350 },
+  'mutual-fund': { nonPera: 390, pera: 200 },
+  others: { nonPera: 200, pera: 100 },
 }
 
 function formatReturn(value) {
@@ -226,6 +251,9 @@ const iconComponents = {
   terms: FileText,
   privacy: ShieldCheck,
   signout: LogOut,
+  users: Users,
+  orders: ArrowUpDown,
+  filter: Filter,
 }
 
 function Icon({ name, size = 20, className = '' }) {
@@ -269,71 +297,157 @@ function SidebarLink({ item, mobile = false, collapsed = false }) {
   )
 }
 
-function Sidebar({ collapsed, onToggle }) {
+function Sidebar({ collapsed, onToggle, isTraderView }) {
+  const sections = isTraderView ? traderNavigationSections : navigationSections
   return (
-    <aside className={`scroll-pane relative hidden shrink-0 flex-col overflow-y-auto border-r border-[#e8e9ec] bg-white py-7 transition-[width,padding] duration-200 lg:flex ${collapsed ? 'w-[76px] px-2' : 'w-[248px] px-5'}`}>
-      <div className={`mb-10 px-1 ${collapsed ? 'flex justify-center' : 'flex'}`}>
+    <aside className={`relative z-30 hidden shrink-0 flex-col border-r border-[#e8e9ec] bg-white py-7 transition-[width,padding] duration-200 lg:flex ${collapsed ? 'w-[76px] px-2' : 'w-[248px] px-5'}`}>
+      <div className={`mb-6 px-1 ${collapsed ? 'flex justify-center' : 'flex'}`}>
         <Brand compact={collapsed} />
       </div>
-      <button type="button" aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!collapsed} aria-controls="primary-navigation" title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'} onClick={onToggle} className="absolute -right-[18px] top-7 z-30 flex size-9 items-center justify-center rounded-full border border-[#e8e9ec] bg-white text-[#717580] shadow-sm transition hover:text-[#2563eb]">
-        <Icon name={collapsed ? 'expand' : 'collapse'} size={18} />
+
+      <button
+        type="button"
+        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        aria-expanded={!collapsed}
+        aria-controls="primary-navigation"
+        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        onClick={onToggle}
+        className="absolute -right-[18px] top-7 z-40 flex size-9 items-center justify-center rounded-full border border-[#c4cad4] bg-white text-[#525866] shadow-md transition hover:border-[#2563eb] hover:bg-[#f8f9fa] hover:text-[#2563eb] hover:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]"
+      >
+        <Icon name={collapsed ? 'expand' : 'collapse'} size={17} />
       </button>
-      <nav id="primary-navigation" className={`flex flex-col ${collapsed ? 'gap-4' : 'gap-6'}`} aria-label="Main navigation">
-        {navigationSections.map((section) => <div key={section.label} className={collapsed ? 'border-t border-[#edeef0] pt-3 first:border-0 first:pt-0' : ''}>
-          {!collapsed && <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#a1a4aa]">{section.label}</p>}
-          <div className="flex flex-col gap-1">{section.items.map((item) => <SidebarLink key={item.id} item={item} collapsed={collapsed} />)}</div>
-        </div>)}
-      </nav>
-      <div className="mt-auto">
-        {collapsed ? <div className="mb-1 flex justify-center rounded-xl bg-[#f3f5f7] p-3" title="Demo account" aria-label="Demo account"><span className="size-2 rounded-full bg-[#7b88a3]" /></div> : <div className="rounded-2xl bg-[#f3f5f7] p-4">
-          <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-[#586071]"><span className="size-1.5 rounded-full bg-[#7b88a3]" />Demo account</div>
-          <p className="text-xs leading-5 text-[#848891]">Explore the experience with sample data. No real transactions are made.</p>
-        </div>}
-        <RouterNavLink to="/profile" aria-label={collapsed ? 'Alex Johnson, Balanced risk profile' : undefined} title={collapsed ? 'Alex Johnson' : undefined} className={`mt-5 flex rounded-xl p-2 text-left hover:bg-[#f5f6f8] ${collapsed ? 'justify-center' : 'items-center gap-3'}`}>
-          {!collapsed && <span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[#343946]">Alex Johnson</span><span className="block text-xs text-[#989ba1]">Balanced risk profile</span></span>}
-          <Avatar />
-        </RouterNavLink>
-        <nav aria-label="Settings and help" className={`mt-3 flex flex-col gap-1 border-t border-[#edeef0] pt-3 ${collapsed ? 'items-center' : ''}`}>
-          {sidebarUtilityLinks.map((item) => <SidebarLink key={item.id} item={item} collapsed={collapsed} />)}
+      <div className="scroll-pane flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <nav id="primary-navigation" className={`flex flex-col ${collapsed ? 'gap-4' : 'gap-6'}`} aria-label="Main navigation">
+          {sections.map((section) => <div key={section.label} className={collapsed ? 'border-t border-[#edeef0] pt-3 first:border-0 first:pt-0' : ''}>
+            {!collapsed && <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#a1a4aa]">{section.label}</p>}
+            <div className="flex flex-col gap-1">{section.items.map((item) => <SidebarLink key={item.id} item={item} collapsed={collapsed} />)}</div>
+          </div>)}
         </nav>
+        <div className="mt-auto pt-6">
+          <nav aria-label="Settings and help" className={`flex flex-col gap-1 border-t border-[#edeef0] pt-3 ${collapsed ? 'items-center' : ''}`}>
+            {sidebarUtilityLinks.map((item) => <SidebarLink key={item.id} item={item} collapsed={collapsed} />)}
+          </nav>
+        </div>
       </div>
     </aside>
   )
 }
 
-function Header({ darkMode, setDarkMode }) {
+function Header({ darkMode, setDarkMode, isTraderView }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false)
   const navigate = useNavigate()
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
+
   return (
     <header className="relative z-20 flex items-center justify-between gap-3 border-b border-[#e8e9ec] bg-white px-4 py-3 sm:px-8 lg:px-10 lg:py-4">
-      <div className="min-w-0">
-        <p className="truncate text-sm font-semibold text-[#333948] sm:text-base">{greeting}, Alex</p>
+      <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+        {!isTraderView && (
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-[#333948] sm:text-base">{`${greeting}, Alex`}</p>
+            <p className="hidden text-[10px] text-[#8e94a0] sm:block">Balanced risk profile · Personal Portfolio</p>
+          </div>
+        )}
+
+        {/* View Switcher Dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            aria-label="Switch between Investor View and Trader/Agent View"
+            aria-expanded={roleMenuOpen}
+            onClick={() => {
+              setRoleMenuOpen(!roleMenuOpen)
+              setNotificationsOpen(false)
+              setUserOpen(false)
+            }}
+            className="flex items-center gap-1.5 rounded-xl border border-[#d2d6df] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-semibold text-[#343b49] shadow-2xs transition hover:border-[#2563eb] hover:bg-white sm:gap-2 sm:px-3 sm:py-2"
+          >
+            <span className={`size-2 shrink-0 rounded-full ${isTraderView ? 'bg-[#0f9f83]' : 'bg-[#2563eb]'}`} />
+            <span className="truncate max-w-[100px] sm:max-w-none text-[11px] sm:text-xs">
+              {isTraderView ? 'Trader / Agent View' : 'Investor View'}
+            </span>
+            <ChevronDown size={13} className="text-[#848c9b]" />
+          </button>
+
+          {roleMenuOpen && (
+            <div
+              className="absolute left-0 top-full mt-2 w-64 rounded-2xl border border-[#e4e7ed] bg-white p-2 shadow-xl z-50"
+              role="menu"
+              aria-label="Select view mode"
+            >
+              <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#9aa0ac]">Switch Portal View</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setRoleMenuOpen(false)
+                  navigate('/home')
+                }}
+                className={`flex w-full items-start gap-3 rounded-xl p-2.5 text-left transition ${!isTraderView ? 'bg-[#eff5ff] text-[#1d4ed8]' : 'text-[#424855] hover:bg-[#f6f7f9]'}`}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#2563eb]/10 text-[#2563eb]">
+                  <UserRound size={16} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold">Investor View</span>
+                    {!isTraderView && <Check size={14} className="text-[#2563eb]" />}
+                  </div>
+                  <span className="mt-0.5 block text-[10px] text-[#868d99]">Personal portfolio, PERA &amp; cash</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setRoleMenuOpen(false)
+                  navigate('/clients')
+                }}
+                className={`mt-1 flex w-full items-start gap-3 rounded-xl p-2.5 text-left transition ${isTraderView ? 'bg-[#ecfdf5] text-[#065f46]' : 'text-[#424855] hover:bg-[#f6f7f9]'}`}
+              >
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0f9f83]/10 text-[#0f9f83]">
+                  <BriefcaseBusiness size={16} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold">Trader / Agent View</span>
+                    {isTraderView && <Check size={14} className="text-[#059669]" />}
+                  </div>
+                  <span className="mt-0.5 block text-[10px] text-[#868d99]">Clients, advisory chat &amp; orders blotter</span>
+                </div>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         <button type="button" aria-label={darkMode ? 'Switch to day mode' : 'Switch to night mode'} aria-pressed={darkMode} onClick={() => setDarkMode(!darkMode)} className="flex size-9 items-center justify-center rounded-xl text-[#717580] transition hover:bg-[#f2f3f5] hover:text-[#2563eb] sm:size-10">
           <Icon name={darkMode ? 'sun' : 'moon'} size={19} />
         </button>
         <div className="relative">
-          <button type="button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(!notificationsOpen); setUserOpen(false) }} className="relative flex size-9 items-center justify-center rounded-xl text-[#717580] transition hover:bg-[#f2f3f5] hover:text-[#2563eb] sm:size-10">
+          <button type="button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(!notificationsOpen); setUserOpen(false); setRoleMenuOpen(false) }} className="relative flex size-9 items-center justify-center rounded-xl text-[#717580] transition hover:bg-[#f2f3f5] hover:text-[#2563eb] sm:size-10">
             <Icon name="bell" size={19} /><span className="absolute right-2 top-2 size-2 rounded-full border-2 border-white bg-[#cb8750]" />
           </button>
           {notificationsOpen && <div className="absolute right-0 top-full mt-3 w-[290px] overflow-hidden rounded-2xl border border-[#e7e9ec] bg-white shadow-xl sm:w-[330px]" role="menu" aria-label="Notifications">
             <div className="flex items-center justify-between border-b border-[#edeef0] px-4 py-3"><div><p className="text-sm font-semibold text-[#3d4351]">Notifications</p><p className="mt-0.5 text-[10px] text-[#999da4]">You have 2 new updates</p></div><span className="rounded-full bg-[#f5ebdf] px-2 py-1 text-[9px] font-bold text-[#a87543]">2 new</span></div>
-            <button type="button" onClick={() => { navigate('/learn'); setNotificationsOpen(false) }} className="flex w-full gap-3 border-b border-[#f0f1f2] p-4 text-left hover:bg-[#f8f9fa]"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#edf0f4] text-[#5f6d8a]"><Icon name="learn" size={17} /></span><span><span className="block text-xs font-semibold text-[#464c59]">New in Learn</span><span className="mt-1 block text-[10px] leading-4 text-[#92969e]">Two new guides are ready for you.</span><span className="mt-1 block text-[9px] text-[#a1a4aa]">Today</span></span></button>
-            <button type="button" onClick={() => { navigate('/portfolio'); setNotificationsOpen(false) }} className="flex w-full gap-3 p-4 text-left hover:bg-[#f8f9fa]"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1e9] text-[#aa8354]"><Icon name="portfolio" size={17} /></span><span><span className="block text-xs font-semibold text-[#464c59]">Your weekly summary</span><span className="mt-1 block text-[10px] leading-4 text-[#92969e]">Your portfolio is up 1.2% this week.</span><span className="mt-1 block text-[9px] text-[#a1a4aa]">Yesterday</span></span></button>
+            <button type="button" onClick={() => { navigate(isTraderView ? '/clients' : '/learn'); setNotificationsOpen(false) }} className="flex w-full gap-3 border-b border-[#f0f1f2] p-4 text-left hover:bg-[#f8f9fa]"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#edf0f4] text-[#5f6d8a]"><Icon name={isTraderView ? 'users' : 'learn'} size={17} /></span><span><span className="block text-xs font-semibold text-[#464c59]">{isTraderView ? 'Client Order Queued' : 'New in Learn'}</span><span className="mt-1 block text-[10px] leading-4 text-[#92969e]">{isTraderView ? 'Sofia Romero queued a buy order on SMPH.' : 'Two new guides are ready for you.'}</span><span className="mt-1 block text-[9px] text-[#a1a4aa]">Today</span></span></button>
+            <button type="button" onClick={() => { navigate(isTraderView ? '/clients' : '/portfolio'); setNotificationsOpen(false) }} className="flex w-full gap-3 p-4 text-left hover:bg-[#f8f9fa]"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1e9] text-[#aa8354]"><Icon name="portfolio" size={17} /></span><span><span className="block text-xs font-semibold text-[#464c59]">{isTraderView ? 'Desk Execution Complete' : 'Your weekly summary'}</span><span className="mt-1 block text-[10px] leading-4 text-[#92969e]">{isTraderView ? 'BDO order executed for Marcus Tan.' : 'Your portfolio is up 1.2% this week.'}</span><span className="mt-1 block text-[9px] text-[#a1a4aa]">Yesterday</span></span></button>
           </div>}
         </div>
         <span aria-hidden="true" className="mx-2 h-7 w-px bg-[#e2e4e8] sm:mx-3" />
         <div className="relative">
-          <button type="button" aria-label="Open user menu" aria-expanded={userOpen} onClick={() => { setUserOpen(!userOpen); setNotificationsOpen(false) }} className="flex items-center gap-2 rounded-xl p-1 transition hover:bg-[#f5f6f7] sm:gap-3 sm:pr-2">
-            <span className="hidden min-w-0 text-left sm:block"><span className="block max-w-32 truncate text-xs font-semibold text-[#404653]">Alex Johnson</span><span className="mt-1 block text-[10px] text-[#8f939b]">Balanced risk profile</span></span>
+          <button type="button" aria-label="Open user menu" aria-expanded={userOpen} onClick={() => { setUserOpen(!userOpen); setNotificationsOpen(false); setRoleMenuOpen(false) }} className="flex items-center gap-2 rounded-xl p-1 transition hover:bg-[#f5f6f7] sm:gap-3 sm:pr-2">
+            <span className="hidden min-w-0 text-left sm:block"><span className="block max-w-32 truncate text-xs font-semibold text-[#404653]">Alex Johnson</span><span className="mt-1 block text-[10px] text-[#8f939b]">{isTraderView ? 'Broker #CRN-84920' : 'Balanced risk profile'}</span></span>
             <Avatar className="size-9 sm:size-10" iconSize={19} />
           </button>
           {userOpen && <div className="absolute right-0 top-full mt-3 w-[260px] rounded-2xl border border-[#e7e9ec] bg-white p-2 shadow-xl" role="menu" aria-label="User menu">
-            <div className="flex items-center justify-between gap-3 border-b border-[#edeef0] px-3 py-3"><span><span className="block text-xs font-semibold text-[#404653]">Alex Johnson</span><span className="mt-1 block text-[10px] text-[#4f596c]">Balanced risk profile</span><span className="mt-1 block text-[10px] text-[#8f939b]">alex.johnson@example.com</span></span><Avatar className="size-10" /></div>
+            <div className="flex items-center justify-between gap-3 border-b border-[#edeef0] px-3 py-3"><span><span className="block text-xs font-semibold text-[#404653]">Alex Johnson</span><span className="mt-1 block text-[10px] text-[#4f596c]">{isTraderView ? 'Licensed Broker · Institutional' : 'Balanced risk profile'}</span><span className="mt-1 block text-[10px] text-[#8f939b]">alex.johnson@example.com</span></span><Avatar className="size-10" /></div>
+            <button type="button" onClick={() => { navigate(isTraderView ? '/home' : '/clients'); setUserOpen(false) }} className="w-full rounded-lg px-3 py-2 text-left text-xs font-medium text-[#2563eb] hover:bg-[#eff5ff] flex items-center justify-between">
+              <span>{isTraderView ? 'Switch to Investor View' : 'Switch to Trader View'}</span>
+              <ArrowRight size={13} />
+            </button>
             <button type="button" onClick={() => { navigate('/profile'); setUserOpen(false) }} className="w-full rounded-lg px-3 py-2.5 text-left text-xs font-medium text-[#5d626c] hover:bg-[#f5f6f7]">Profile and preferences</button>
           </div>}
         </div>
@@ -342,8 +456,11 @@ function Header({ darkMode, setDarkMode }) {
   )
 }
 
-function MobileNavigation() {
-  return <nav className="flex gap-1 overflow-x-auto border-b border-[#e8e9ec] bg-white px-3 py-2 lg:hidden" aria-label="Main navigation">{navigation.map((item) => <SidebarLink key={item.id} item={item} mobile />)}</nav>
+function MobileNavigation({ isTraderView }) {
+  const items = isTraderView
+    ? traderNavigationSections.flatMap((section) => section.items)
+    : navigation
+  return <nav className="flex gap-1 overflow-x-auto border-b border-[#e8e9ec] bg-white px-3 py-2 lg:hidden" aria-label="Main navigation">{items.map((item) => <SidebarLink key={item.id} item={item} mobile />)}</nav>
 }
 
 function PageIntro({ title, subtitle, action }) {
@@ -466,19 +583,57 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
 
   return (
     <section aria-label={`${categoryData.label} accounts`}>
-      <div className="flex items-center justify-between gap-3">
-        <div><h3 className="text-sm font-semibold text-[#343a48]">{categoryData.id === 'overall' ? 'All investment accounts' : `${categoryData.label} accounts`}</h3><p className="mt-1 text-xs text-[#989ca4]">{accounts.length} accounts · Select one to compare with its benchmark</p></div>
-        <div className="flex shrink-0 items-center gap-2">
-          <button type="button" onClick={() => scrollAccounts(-1)} aria-label="Scroll accounts left" className="flex size-9 items-center justify-center rounded-full border border-[#e7e9ed] text-[#687184] transition hover:bg-[#f5f7fa] hover:text-[#2563eb]"><ChevronLeft size={17} /></button>
-          <button type="button" onClick={() => scrollAccounts(1)} aria-label="Scroll accounts right" className="flex size-9 items-center justify-center rounded-full border border-[#e7e9ed] text-[#687184] transition hover:bg-[#f5f7fa] hover:text-[#2563eb]"><ChevronRight size={17} /></button>
+      <div className="group relative">
+        <button
+          type="button"
+          onClick={() => scrollAccounts(-1)}
+          aria-label="Scroll accounts left"
+          className="absolute left-1 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8eaee] bg-white/85 text-[#7b8190] shadow-xs backdrop-blur-xs transition hover:bg-white hover:text-[#2563eb] hover:shadow-sm dark:border-[#2f3542] dark:bg-[#1f232d]/85 dark:text-[#9ea3b0] dark:hover:bg-[#1f232d] dark:hover:text-[#60a5fa]"
+        >
+          <ChevronLeft size={14} />
+        </button>
+
+        <div
+          ref={scrollRef}
+          className="scroll-pane flex w-full snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth pb-1"
+          aria-label="Scrollable investment accounts"
+        >
+          {accounts.map((account) => (
+            <button
+              key={account.id}
+              type="button"
+              aria-pressed={selectedAccountId === account.id}
+              onClick={() => onSelectAccount(selectedAccountId === account.id ? null : account.id)}
+              className={`w-[164px] shrink-0 snap-start rounded-xl border p-2 text-left transition ${
+                selectedAccountId === account.id
+                  ? 'border-[#7aa8ff] bg-[#f2f7ff] shadow-[0_0_0_1px_rgba(59,130,246,0.12)]'
+                  : 'border-[#e9ebef] bg-white hover:border-[#c8d9f7] hover:bg-[#fbfdff]'
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: account.color }} />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-[11px] font-semibold text-[#454b58]">{account.name}</span>
+                  <span className="mt-0.5 block truncate text-[8.5px] font-mono tracking-tight text-[#989da7]">{account.accountNumber}</span>
+                </span>
+              </span>
+              <span className="mt-1.5 block text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
+              <span className="mt-1 flex items-center justify-between gap-1.5">
+                <span className="text-[9px] text-[#9399a5]">{range} return</span>
+                <span className="text-[9.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
+              </span>
+            </button>
+          ))}
         </div>
-      </div>
-      <div ref={scrollRef} className="scroll-pane mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto scroll-smooth pb-1" aria-label="Scrollable investment accounts">
-        {accounts.map((account) => <button key={account.id} type="button" aria-pressed={selectedAccountId === account.id} onClick={() => onSelectAccount(selectedAccountId === account.id ? null : account.id)} className={`w-[190px] shrink-0 snap-start rounded-xl border p-2.5 text-left transition ${selectedAccountId === account.id ? 'border-[#7aa8ff] bg-[#f2f7ff] shadow-[0_0_0_1px_rgba(59,130,246,0.12)]' : 'border-[#e9ebef] bg-white hover:border-[#c8d9f7] hover:bg-[#fbfdff]'}`}>
-          <span className="flex items-center gap-2"><span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: account.color }} /><span className="min-w-0"><span className="block truncate text-[11px] font-semibold text-[#454b58]">{account.name}</span><span className="mt-0.5 block truncate text-[9px] text-[#989da7]">Acct. {account.accountNumber}</span></span></span>
-          <span className="mt-2 block text-[13px] font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
-          <span className="mt-1 flex items-center justify-between gap-2"><span className="text-[9px] text-[#9399a5]">{range} return</span><span className="text-[10px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span></span>
-        </button>)}
+
+        <button
+          type="button"
+          onClick={() => scrollAccounts(1)}
+          aria-label="Scroll accounts right"
+          className="absolute right-1 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8eaee] bg-white/85 text-[#7b8190] shadow-xs backdrop-blur-xs transition hover:bg-white hover:text-[#2563eb] hover:shadow-sm dark:border-[#2f3542] dark:bg-[#1f232d]/85 dark:text-[#9ea3b0] dark:hover:bg-[#1f232d] dark:hover:text-[#60a5fa]"
+        >
+          <ChevronRight size={14} />
+        </button>
       </div>
     </section>
   )
@@ -525,30 +680,162 @@ function ActivityList({ limit }) {
 }
 
 function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId }) {
-  const selectedData = portfolioCategories.find((item) => item.id === selectedCategory)
+  const selectedData = portfolioCategories.find((item) => item.id === selectedCategory) || portfolioCategories[0]
+  const selectedPera = categoryPeraBalances[selectedCategory] || categoryPeraBalances.overall
+  const selectedCash = categoryCashBalances[selectedCategory] || categoryCashBalances.overall
+  const [balanceView, setBalanceView] = useState(() => {
+    try {
+      return window.localStorage.getItem('morrow-balance-view') || 'assets'
+    } catch {
+      return 'assets'
+    }
+  })
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('morrow-balance-view', balanceView)
+    } catch {
+      // ignore
+    }
+  }, [balanceView])
+
+  const [showChart, setShowChart] = useState(() => {
+    try {
+      const saved = window.localStorage.getItem('morrow-show-chart')
+      return saved !== null ? JSON.parse(saved) : false
+    } catch {
+      return false
+    }
+  })
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('morrow-show-chart', JSON.stringify(showChart))
+    } catch {
+      // ignore
+    }
+  }, [showChart])
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-stretch">
-        <Card className="min-w-0 p-5 sm:p-6">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <p className="text-xs font-medium text-[#969aa1]">Total portfolio value</p>
-              <p className="mt-2 text-[30px] font-semibold tracking-tight text-[#343a48] sm:text-[34px]">{formatPeso(24680.5)}</p>
-              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1"><Change value={portfolioCategories[0].change} /><span className="text-[11px] font-medium text-[#7e8490]">+{formatPeso(portfolioCategories[0].changeAmount)} this month</span></div>
-            </div>
-            {selectedCategory !== 'overall' && <div className="ml-auto text-right">
-              <p className="text-xs font-medium text-[#969aa1]">{selectedData.label} value</p>
-              <p className="mt-2 text-[30px] font-semibold tracking-tight text-[#343a48] sm:text-[34px]">{formatPeso(selectedData.value)}</p>
-              <div className="mt-2 flex flex-wrap items-center justify-end gap-x-4 gap-y-1"><Change value={selectedData.change} /><span className="text-[11px] font-medium text-[#7e8490]">+{formatPeso(selectedData.changeAmount)} this month</span></div>
-            </div>}
-          </div>
-          <div className="mt-6 min-w-0">
-            <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} />
-          </div>
-        </Card>
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-start">
+        <div className="min-w-0 space-y-4">
+          <Card className="min-w-0 p-5 sm:p-6">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <button
+                  type="button"
+                  aria-expanded={showChart}
+                  aria-label="Toggle to view chart"
+                  title="Toggle to view chart"
+                  onClick={() => setShowChart(!showChart)}
+                  className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
+                    showChart
+                      ? 'text-[#2563eb] dark:text-[#60a5fa]'
+                      : 'text-[#555c6b] dark:text-[#9da3b1]'
+                  }`}
+                >
+                  <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
+                  <span>Toggle to view chart</span>
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
+                </button>
+              </div>
 
-        <Card className="flex min-h-[360px] flex-col p-4 sm:p-5">
+              <div className="flex items-center rounded-xl bg-[#f2f4f7] p-1" role="tablist" aria-label="Balance view toggle">
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={balanceView === 'assets'}
+                  onClick={() => setBalanceView('assets')}
+                  className={`flex flex-col items-center justify-center rounded-lg px-3 py-1 text-center text-xs font-semibold leading-tight transition ${
+                    balanceView === 'assets'
+                      ? 'bg-white text-[#2563eb] shadow-sm'
+                      : 'text-[#7e8490] hover:text-[#343a48]'
+                  }`}
+                >
+                  <span>Total Assets</span>
+                  <span className={`text-[10px] font-normal ${balanceView === 'assets' ? 'text-[#2563eb]' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={balanceView === 'cash'}
+                  onClick={() => setBalanceView('cash')}
+                  className={`flex h-full items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    balanceView === 'cash'
+                      ? 'bg-white text-[#2563eb] shadow-sm'
+                      : 'text-[#7e8490] hover:text-[#343a48]'
+                  }`}
+                >
+                  Available Cash
+                </button>
+              </div>
+            </div>
+
+            {balanceView === 'assets' ? (
+              <div className="grid grid-cols-2 items-start gap-3 sm:gap-6">
+                <div className="border-y border-transparent py-3.5 sm:py-5">
+                  <p className="text-xs font-medium text-[#969aa1]">
+                    {selectedCategory === 'overall' ? 'Total portfolio value' : `Total ${selectedData.label} value`}
+                  </p>
+                  <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
+                    {formatPeso(selectedData.value)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                    <Change value={selectedData.change} />
+                    <span className="text-[11px] font-medium text-[#7e8490]">
+                      +{formatPeso(selectedData.changeAmount)} this month
+                    </span>
+                  </div>
+                </div>
+
+                <div className="rounded-2xl border border-[#e5e7eb] bg-[#f4f6f8] p-3.5 text-right shadow-xs sm:p-5">
+                  <p className="text-xs font-medium text-[#969aa1]">
+                    {selectedCategory === 'overall' ? 'Total PERA asset' : `Total PERA asset (${selectedData.label})`}
+                  </p>
+                  <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
+                    {formatPeso(selectedPera.value)}
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center justify-end gap-x-3 gap-y-1 sm:gap-x-4">
+                    <Change value={selectedPera.change} />
+                    <span className="text-[11px] font-medium text-[#7e8490]">
+                      +{formatPeso(selectedPera.changeAmount)} this month
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 items-start gap-3 sm:gap-6">
+                <div className="border-y border-transparent py-3.5 sm:py-5">
+                  <p className="text-xs font-medium text-[#969aa1]">
+                    {selectedCategory === 'overall' ? 'Total available cash' : `Available cash (${selectedData.label})`}
+                  </p>
+                  <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
+                    {formatPeso(selectedCash.nonPera)}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-[#e5e7eb] bg-[#f4f6f8] p-3.5 text-right shadow-xs sm:p-5">
+                  <p className="text-xs font-medium text-[#969aa1]">
+                    {selectedCategory === 'overall' ? 'Total available cash (PERA)' : `Available cash (${selectedData.label} · PERA)`}
+                  </p>
+                  <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
+                    {formatPeso(selectedCash.pera)}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {showChart && (
+              <div className="mt-4 min-w-0 border-t border-[#edeef0] pt-4">
+                <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} />
+              </div>
+            )}
+          </Card>
+
+          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
+        </div>
+
+        <Card className="flex max-h-[360px] flex-col p-4 sm:p-5">
           <h3 className="mb-3 text-xs font-semibold text-[#555c6a]">Categories</h3>
           <div role="tablist" aria-label="Portfolio categories" className="scroll-pane min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain">
             {portfolioCategories.map((category) => <button key={category.id} type="button" role="tab" aria-selected={selectedCategory === category.id} onClick={() => { setSelectedCategory(category.id); setSelectedAccountId(null) }} className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-3 text-left transition ${selectedCategory === category.id ? 'bg-[#eff5ff] text-[#2563eb]' : 'text-[#777f8d] hover:bg-[#f8f9fb] hover:text-[#46536d]'}`}>
@@ -558,7 +845,6 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
           </div>
         </Card>
       </div>
-    <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
     </div>
   )
 }
@@ -876,9 +1162,1183 @@ function CommunityRightRail() {
   )
 }
 
+const initialClientsData = [
+  {
+    id: 'client-1',
+    name: 'Sofia Romero',
+    accountNumber: 'CGSI-HNW-9041',
+    category: 'High Net Worth',
+    riskProfile: 'Growth',
+    avatar: 'SR',
+    color: 'bg-[#dbeafe] text-[#1e40af]',
+    portfolioValue: 4820500,
+    monthlyReturn: 14.2,
+    cash: 642800,
+    pera: 400000,
+    status: 'Active',
+    pendingOrderCount: 1,
+    unreadCount: 1,
+    lastActive: '10m ago',
+    holdings: [
+      { ticker: 'SMPH', name: 'SM Prime Holdings', shares: 35000, avgCost: 29.50, currentPrice: 32.80, value: 1148000, gain: 11.18, type: 'Equities' },
+      { ticker: 'BDO', name: 'BDO Unibank', shares: 9200, avgCost: 142.00, currentPrice: 154.50, value: 1421400, gain: 8.80, type: 'Equities' },
+      { ticker: 'ALI', name: 'Ayala Land Inc.', shares: 28000, avgCost: 31.00, currentPrice: 34.20, value: 957600, gain: 10.32, type: 'Equities' },
+      { ticker: 'FMETF', name: 'First Metro ETF', shares: 6000, avgCost: 104.20, currentPrice: 108.50, value: 651000, gain: 4.12, type: 'UITF / ETF' },
+    ],
+    orders: [
+      { id: 'ORD-9841', side: 'BUY', ticker: 'SMPH', shares: 5000, price: 32.50, type: 'LIMIT', status: 'PENDING', date: 'Today, 10:14 AM' },
+      { id: 'ORD-9780', side: 'BUY', ticker: 'BDO', shares: 1200, price: 151.00, type: 'MARKET', status: 'EXECUTED', date: 'Yesterday' },
+      { id: 'ORD-9512', side: 'DIVIDEND', ticker: 'ALI', shares: 28000, price: 0.42, type: 'REINVEST', status: 'EXECUTED', date: 'Oct 08, 2026' },
+    ],
+    messages: [
+      { id: 'm1', sender: 'Sofia Romero', isClient: true, text: 'Hi Alex, looking over my monthly summary. Should we allocate more cash into SMPH before the REIT dividend cutoff?', time: '9:42 AM' },
+      { id: 'm2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Good morning Sofia! Yes, SMPH is holding solid support at ₱32.00 with dividend yields expected at 4.2%. I recommend queuing 5,000 shares at a ₱32.50 limit.', time: '10:05 AM' },
+      { id: 'm3', sender: 'Sofia Romero', isClient: true, text: 'Sounds like a great plan. Please queue the 5,000 shares order for me.', time: '10:12 AM' },
+      { id: 'm4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Order ORD-9841 queued on PSE: Buy 5,000 SMPH @ ₱32.50 Limit. Will notify you as soon as the fill executes.', time: '10:14 AM' },
+    ],
+  },
+  {
+    id: 'client-2',
+    name: 'Marcus Tan',
+    accountNumber: 'CGSI-DISC-7712',
+    category: 'Discretionary Equities',
+    riskProfile: 'Balanced',
+    avatar: 'MT',
+    color: 'bg-[#d1fae5] text-[#065f46]',
+    portfolioValue: 2140800,
+    monthlyReturn: 9.8,
+    cash: 310000,
+    pera: 200000,
+    status: 'Active',
+    pendingOrderCount: 0,
+    unreadCount: 1,
+    lastActive: '1h ago',
+    holdings: [
+      { ticker: 'AC', name: 'Ayala Corporation', shares: 1800, avgCost: 615.00, currentPrice: 642.00, value: 1155600, gain: 4.39, type: 'Equities' },
+      { ticker: 'ICT', name: 'Intl Container Terminal', shares: 2200, avgCost: 285.00, currentPrice: 307.00, value: 675400, gain: 7.71, type: 'Equities' },
+    ],
+    orders: [
+      { id: 'ORD-8920', side: 'BUY', ticker: 'ICT', shares: 500, price: 302.00, type: 'LIMIT', status: 'EXECUTED', date: 'Oct 11, 2026' },
+      { id: 'ORD-8812', side: 'SELL', ticker: 'TEL', shares: 250, price: 1350.00, type: 'LIMIT', status: 'EXECUTED', date: 'Oct 04, 2026' },
+    ],
+    messages: [
+      { id: 'm1', sender: 'Marcus Tan', isClient: true, text: 'Hello Alex, please send me the latest UITF fund factsheet when convenient.', time: 'Yesterday' },
+      { id: 'm2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Sent over via your portal documents! Let me know if you want to increase monthly DCA allocations.', time: 'Yesterday' },
+    ],
+  },
+  {
+    id: 'client-3',
+    name: 'Elena Bautista',
+    accountNumber: 'CGSI-PERA-5520',
+    category: 'PERA Tax-Exempt',
+    riskProfile: 'Conservative',
+    avatar: 'EB',
+    color: 'bg-[#f3e8ff] text-[#6b21a8]',
+    portfolioValue: 980400,
+    monthlyReturn: 6.4,
+    cash: 125500,
+    pera: 400000,
+    status: 'Review',
+    pendingOrderCount: 1,
+    unreadCount: 0,
+    lastActive: '3h ago',
+    holdings: [
+      { ticker: 'BND', name: 'Total Bond ETF', shares: 8200, avgCost: 51.50, currentPrice: 53.20, value: 436240, gain: 3.30, type: 'Fixed Income' },
+      { ticker: 'TEL', name: 'PLDT Inc.', shares: 300, avgCost: 1320.00, currentPrice: 1385.00, value: 415500, gain: 4.92, type: 'Equities' },
+    ],
+    orders: [
+      { id: 'ORD-7640', side: 'BUY', ticker: 'BND', shares: 1000, price: 53.00, type: 'LIMIT', status: 'PENDING', date: 'Today, 8:30 AM' },
+    ],
+    messages: [
+      { id: 'm1', sender: 'Elena Bautista', isClient: true, text: 'Alex, received my BIR 5% tax credit receipt for 2025 contributions. Thank you for processing!', time: 'Oct 09' },
+    ],
+  },
+  {
+    id: 'client-4',
+    name: 'David Lim',
+    accountNumber: 'CGSI-MRGN-3304',
+    category: 'Margin Account',
+    riskProfile: 'Aggressive',
+    avatar: 'DL',
+    color: 'bg-[#fef3c7] text-[#92400e]',
+    portfolioValue: 3450000,
+    monthlyReturn: 18.7,
+    cash: 850000,
+    pera: 0,
+    status: 'Active',
+    pendingOrderCount: 2,
+    unreadCount: 0,
+    lastActive: 'Yesterday',
+    holdings: [
+      { ticker: 'NVDA', name: 'Nvidia Corp. CDR', shares: 2500, avgCost: 480.00, currentPrice: 560.00, value: 1400000, gain: 16.67, type: 'Global Equities' },
+      { ticker: 'MONDE', name: 'Monde Nissin', shares: 120000, avgCost: 9.80, currentPrice: 10.50, value: 1260000, gain: 7.14, type: 'Equities' },
+    ],
+    orders: [
+      { id: 'ORD-6512', side: 'BUY', ticker: 'NVDA', shares: 500, price: 550.00, type: 'LIMIT', status: 'PENDING', date: 'Yesterday' },
+      { id: 'ORD-6510', side: 'SELL', ticker: 'MONDE', shares: 20000, price: 10.70, type: 'LIMIT', status: 'PENDING', date: 'Oct 10' },
+    ],
+    messages: [
+      { id: 'm1', sender: 'David Lim', isClient: true, text: 'Margin ratio looks good at 32%. Keeping the limit sell order on MONDE open.', time: 'Oct 10' },
+    ],
+  },
+  {
+    id: 'client-5',
+    name: 'Patricia Cruz',
+    accountNumber: 'CGSI-TRST-1188',
+    category: 'Discretionary Trust',
+    riskProfile: 'Moderate',
+    avatar: 'PC',
+    color: 'bg-[#fce7f3] text-[#9d174d]',
+    portfolioValue: 1260000,
+    monthlyReturn: 5.1,
+    cash: 94000,
+    pera: 150000,
+    status: 'Active',
+    pendingOrderCount: 0,
+    unreadCount: 0,
+    lastActive: '2d ago',
+    holdings: [
+      { ticker: 'GLO', name: 'Globe Telecom', shares: 450, avgCost: 1720.00, currentPrice: 1790.00, value: 805500, gain: 4.07, type: 'Equities' },
+      { ticker: 'UITF-BPI', name: 'Balanced Growth Fund', shares: 28000, avgCost: 12.80, currentPrice: 13.40, value: 375200, gain: 4.69, type: 'Mutual Fund' },
+    ],
+    orders: [
+      { id: 'ORD-5410', side: 'BUY', ticker: 'GLO', shares: 100, price: 1750.00, type: 'MARKET', status: 'EXECUTED', date: 'Sep 28' },
+    ],
+    messages: [
+      { id: 'm1', sender: 'Patricia Cruz', isClient: true, text: 'Confirming our quarterly trust allocation review next Tuesday at 2 PM.', time: 'Oct 08' },
+    ],
+  },
+]
+
+function ClientsPage() {
+  const [clients, setClients] = useState(initialClientsData)
+  const [selectedClientId, setSelectedClientId] = useState('client-1')
+  const [leftTab, setLeftTab] = useState('clients')
+  const [orderFilter, setOrderFilter] = useState('ALL')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('ALL')
+  const [activeTab, setActiveTab] = useState('holdings')
+  const [chatMode, setChatMode] = useState('live')
+  const [replyText, setReplyText] = useState('')
+  const [orderModalOpen, setOrderModalOpen] = useState(false)
+  const [orderTicker, setOrderTicker] = useState('SMPH')
+  const [orderSide, setOrderSide] = useState('BUY')
+  const [orderShares, setOrderShares] = useState(1000)
+  const [orderPrice, setOrderPrice] = useState(32.50)
+  const [orderType, setOrderType] = useState('LIMIT')
+  const [toastMessage, setToastMessage] = useState(null)
+
+  const selectedClient = clients.find((c) => c.id === selectedClientId) || clients[0]
+
+  // All client orders across desk
+  const allDeskOrders = useMemo(() => {
+    return clients.flatMap((client) =>
+      client.orders.map((o) => ({
+        ...o,
+        clientId: client.id,
+        clientName: client.name,
+        clientAvatar: client.avatar,
+        clientColor: client.color,
+        accountNumber: client.accountNumber,
+      }))
+    )
+  }, [clients])
+
+  const pendingOrdersCount = useMemo(() => {
+    return allDeskOrders.filter((o) => o.status === 'PENDING').length
+  }, [allDeskOrders])
+
+  const filteredClients = clients.filter((client) => {
+    const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.accountNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.holdings.some((h) => h.ticker.toLowerCase().includes(searchQuery.toLowerCase()))
+
+    if (!matchesSearch) return false
+    if (categoryFilter === 'HNW') return client.category.includes('High Net Worth')
+    if (categoryFilter === 'DISC') return client.category.includes('Discretionary')
+    if (categoryFilter === 'ORDERS') return client.orders.some((o) => o.status === 'PENDING')
+    return true
+  })
+
+  const triggerToast = (msg) => {
+    setToastMessage(msg)
+    window.setTimeout(() => setToastMessage(null), 3500)
+  }
+
+  const handleSendMessage = (e) => {
+    e.preventDefault()
+    if (!replyText.trim()) return
+
+    const newMsg = {
+      id: String(Date.now()),
+      sender: 'Alex Johnson (Agent)',
+      isClient: false,
+      text: replyText.trim(),
+      time: 'Just now',
+    }
+
+    setClients((prev) =>
+      prev.map((c) => (c.id === selectedClient.id ? { ...c, messages: [...c.messages, newMsg] } : c))
+    )
+    setReplyText('')
+  }
+
+  const handlePlaceOrder = (e) => {
+    e.preventDefault()
+    const sharesNum = Number(orderShares)
+    const priceNum = Number(orderPrice)
+    if (!sharesNum || sharesNum <= 0 || !priceNum || priceNum <= 0) return
+
+    const newOrder = {
+      id: `ORD-${Math.floor(1000 + Math.random() * 9000)}`,
+      side: orderSide,
+      ticker: orderTicker.toUpperCase(),
+      shares: sharesNum,
+      price: priceNum,
+      type: orderType,
+      status: 'PENDING',
+      date: 'Just now',
+    }
+
+    const advisoryNote = {
+      id: String(Date.now()),
+      sender: 'Alex Johnson (Agent)',
+      isClient: false,
+      text: `Client order submitted: ${orderSide} ${sharesNum.toLocaleString()} ${newOrder.ticker} @ ₱${priceNum.toFixed(2)} (${orderType}). Order ID: ${newOrder.id}`,
+      time: 'Just now',
+    }
+
+    setClients((prev) =>
+      prev.map((c) =>
+        c.id === selectedClient.id
+          ? {
+              ...c,
+              orders: [newOrder, ...c.orders],
+              messages: [...c.messages, advisoryNote],
+              pendingOrderCount: c.pendingOrderCount + 1,
+            }
+          : c
+      )
+    )
+
+    setOrderModalOpen(false)
+    triggerToast(`Order ${newOrder.id} successfully queued for ${selectedClient.name}`)
+  }
+
+  const handleCancelOrder = (orderId) => {
+    setClients((prev) =>
+      prev.map((c) =>
+        c.id === selectedClient.id
+          ? {
+              ...c,
+              orders: c.orders.map((o) => (o.id === orderId ? { ...o, status: 'CANCELLED' } : o)),
+              pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
+            }
+          : c
+      )
+    )
+    triggerToast(`Order ${orderId} has been cancelled.`)
+  }
+
+  const openOrderModalForHolding = (holding) => {
+    setOrderTicker(holding.ticker)
+    setOrderPrice(holding.currentPrice)
+    setOrderShares(500)
+    setOrderSide('BUY')
+    setOrderModalOpen(true)
+  }
+
+  return (
+    <div className="space-y-4">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-[#1e293b] px-4 py-3 text-xs font-semibold text-white shadow-xl animate-fade-in">
+          <CheckCircle2 size={16} className="text-[#34d399]" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Page Header */}
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-[#262c3a] sm:text-[28px]">
+            Clients
+          </h1>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setOrderTicker('SMPH')
+              setOrderPrice(32.50)
+              setOrderShares(1000)
+              setOrderSide('BUY')
+              setOrderModalOpen(true)
+            }}
+            className="flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-[#1d4ed8]"
+          >
+            <Plus size={15} />
+            <span>Place Client Order</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 3-Panel Layout: Left (Clients), Middle (Financials & Orders), Right (Messaging) */}
+      <Card className="grid min-h-[720px] overflow-hidden rounded-2xl border border-[#e8eaed] bg-white xl:grid-cols-[280px_minmax(0,1fr)_340px] 2xl:grid-cols-[300px_minmax(0,1fr)_360px] lg:grid-cols-[260px_minmax(0,1fr)]">
+        {/* Panel 1: Clients & Orders Tabs (Left) */}
+        <div className="flex flex-col border-b border-[#edeef0] lg:border-b-0 lg:border-r">
+          {/* Top Tabs: Clients vs Orders with Badges */}
+          <div className="border-b border-[#edeef0] bg-white p-2.5">
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setLeftTab('clients')}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  leftTab === 'clients' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
+              >
+                <Users size={13} />
+                <span>Clients</span>
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${
+                  leftTab === 'clients' ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#4b5563]'
+                }`}>
+                  {clients.length}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setLeftTab('orders')}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  leftTab === 'orders' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
+              >
+                <ArrowUpDown size={13} />
+                <span>Orders</span>
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${
+                  leftTab === 'orders'
+                    ? 'bg-[#2563eb] text-white'
+                    : pendingOrdersCount > 0
+                    ? 'bg-[#fef3c7] text-[#92400e]'
+                    : 'bg-[#e5e7eb] text-[#4b5563]'
+                }`}>
+                  {allDeskOrders.length}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Search & Filter Header */}
+          <div className="border-b border-[#edeef0] p-3">
+            <label className="flex items-center gap-2 rounded-xl bg-[#f5f6f7] px-3 py-2 text-[#9b9ea5]">
+              <Search size={14} />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={leftTab === 'clients' ? 'Search clients or ticker...' : 'Filter orders by ticker or ID...'}
+                className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
+              />
+            </label>
+
+            {leftTab === 'clients' ? (
+              <div className="mt-2.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
+                {[
+                  { id: 'ALL', label: `All (${clients.length})` },
+                  { id: 'HNW', label: 'HNW' },
+                  { id: 'DISC', label: 'Discretionary' },
+                  { id: 'ORDERS', label: 'With Orders' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setCategoryFilter(f.id)}
+                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${
+                      categoryFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-2.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
+                {[
+                  { id: 'ALL', label: `All (${allDeskOrders.length})` },
+                  { id: 'PENDING', label: `Pending (${pendingOrdersCount})` },
+                  { id: 'BUY', label: 'Buys' },
+                  { id: 'SELL', label: 'Sells' },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setOrderFilter(f.id)}
+                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${
+                      orderFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* List Content: Clients View vs Orders View */}
+          <div className="scroll-pane flex-1 overflow-y-auto divide-y divide-[#f2f4f6]">
+            {leftTab === 'clients' ? (
+              filteredClients.length > 0 ? (
+                filteredClients.map((client) => {
+                  const isSelected = client.id === selectedClient.id
+                  return (
+                    <button
+                      key={client.id}
+                      type="button"
+                      onClick={() => setSelectedClientId(client.id)}
+                      className={`w-full p-3.5 text-left transition hover:bg-[#f9fafb] ${isSelected ? 'bg-[#f0f5ff]' : 'bg-white'}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl font-bold text-xs ${client.color}`}>
+                          {client.avatar}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="truncate text-xs font-semibold text-[#2c3342]">{client.name}</span>
+                            <span className="shrink-0 text-[10px] font-bold text-[#059669]">+{client.monthlyReturn}%</span>
+                          </div>
+                          <div className="mt-0.5 flex items-center gap-1.5 text-[10px] text-[#8c929e]">
+                            <span>{client.accountNumber}</span>
+                            <span>·</span>
+                            <span className="truncate">{client.riskProfile}</span>
+                          </div>
+                          <div className="mt-1.5 flex items-center justify-between text-[11px]">
+                            <span className="font-semibold text-[#374151]">{formatPeso(client.portfolioValue)}</span>
+                            {client.pendingOrderCount > 0 ? (
+                              <span className="rounded-full bg-[#fef3c7] px-1.5 py-0.5 text-[9px] font-bold text-[#92400e]">
+                                {client.pendingOrderCount} pending
+                              </span>
+                            ) : (
+                              <span className="text-[10px] text-[#9ca3af]">{client.lastActive}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  )
+                })
+              ) : (
+                <div className="p-6 text-center text-xs text-[#9ca3af]">No clients match the current filter.</div>
+              )
+            ) : (
+              /* Left Tab 2: Orders List across clients */
+              allDeskOrders
+                .filter((order) => {
+                  const query = searchQuery.toLowerCase()
+                  const matches =
+                    order.id.toLowerCase().includes(query) ||
+                    order.ticker.toLowerCase().includes(query) ||
+                    order.clientName.toLowerCase().includes(query)
+                  if (!matches) return false
+                  if (orderFilter === 'PENDING') return order.status === 'PENDING'
+                  if (orderFilter === 'BUY') return order.side === 'BUY'
+                  if (orderFilter === 'SELL') return order.side === 'SELL'
+                  return true
+                })
+                .map((order) => {
+                  const isSelected = order.clientId === selectedClient.id
+                  return (
+                    <button
+                      key={`${order.clientId}-${order.id}`}
+                      type="button"
+                      onClick={() => {
+                        setSelectedClientId(order.clientId)
+                        setActiveTab('orders')
+                      }}
+                      className={`w-full p-3 text-left transition hover:bg-[#f9fafb] ${isSelected ? 'bg-[#f0f5ff]' : 'bg-white'}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex items-center gap-1.5">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              order.side === 'BUY'
+                                ? 'bg-[#dcfce7] text-[#15803d]'
+                                : order.side === 'SELL'
+                                ? 'bg-[#fee2e2] text-[#b91c1c]'
+                                : 'bg-[#e0e7ff] text-[#4338ca]'
+                            }`}
+                          >
+                            {order.side}
+                          </span>
+                          <span className="font-bold text-xs text-[#1e293b]">{order.ticker}</span>
+                          <span className="font-mono text-[10px] text-[#8e94a0]">({order.shares.toLocaleString()} @ ₱{order.price.toFixed(2)})</span>
+                        </div>
+                        <span
+                          className={`rounded-md px-1.5 py-0.5 text-[8px] font-bold ${
+                            order.status === 'EXECUTED'
+                              ? 'bg-[#ecfdf5] text-[#059669]'
+                              : order.status === 'PENDING'
+                              ? 'bg-[#fef3c7] text-[#92400e]'
+                              : 'bg-[#f1f5f9] text-[#64748b]'
+                          }`}
+                        >
+                          {order.status}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 flex items-center justify-between text-[10px] text-[#6b7280]">
+                        <span className="font-medium text-[#475467] truncate max-w-[140px]">{order.clientName}</span>
+                        <span className="font-mono text-[9px] text-[#9ca3af]">{order.id}</span>
+                      </div>
+                    </button>
+                  )
+                })
+            )}
+          </div>
+        </div>
+
+        {/* Panel 2: Client Financial Information, Holdings & Order Blotter (Middle - Largest) */}
+        <div className="flex min-w-0 flex-1 flex-col border-b border-[#edeef0] xl:border-b-0 xl:border-r">
+          {/* Client Summary Top Bar */}
+          <div className="border-b border-[#edeef0] bg-[#fafbfc] p-4 sm:p-5">
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-3">
+                <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
+                  {selectedClient.avatar}
+                </span>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
+                    <span className="rounded-md bg-[#e0f2fe] px-2 py-0.5 text-[9px] font-bold uppercase text-[#0369a1]">
+                      KYC Verified
+                    </span>
+                    <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9px] font-medium text-[#4b5563]">
+                      {selectedClient.category}
+                    </span>
+                  </div>
+                  <p className="mt-0.5 text-xs text-[#8a909d]">
+                    Account #{selectedClient.accountNumber} · Risk Rating: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => triggerToast(`Exported formal CGSI statement for ${selectedClient.name}`)}
+                  className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9]"
+                >
+                  Export Statement
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrderTicker('SMPH')
+                    setOrderPrice(32.50)
+                    setOrderShares(1000)
+                    setOrderSide('BUY')
+                    setOrderModalOpen(true)
+                  }}
+                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1d4ed8]"
+                >
+                  <Plus size={14} />
+                  <span>Trade</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Financial Stats Grid */}
+            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Total Portfolio</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.portfolioValue)}</p>
+                <p className="mt-0.5 text-[10px] font-semibold text-[#059669]">+{selectedClient.monthlyReturn}% monthly</p>
+              </div>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Available Cash</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash)}</p>
+                <p className="mt-0.5 text-[10px] text-[#6b7280]">Buying power</p>
+              </div>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">PERA Allocation</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.pera)}</p>
+                <p className="mt-0.5 text-[10px] text-[#059669]">Tax-exempt</p>
+              </div>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Active Orders</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{selectedClient.orders.length} orders</p>
+                <p className="mt-0.5 text-[10px] text-[#d97706]">{selectedClient.pendingOrderCount} pending fills</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Middle Tabs: Holdings & Financials vs Orders Blotter */}
+          <div className="flex border-b border-[#edeef0] bg-[#fafbfc] px-5 text-xs font-semibold">
+            {[
+              { id: 'holdings', label: 'Holdings & Financials', badge: selectedClient.holdings.length },
+              { id: 'orders', label: 'Orders Blotter', badge: selectedClient.orders.length },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex items-center gap-1.5 py-3 px-3 transition ${activeTab === tab.id ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]' : 'text-[#6b7280] hover:text-[#2563eb]'}`}
+              >
+                <span>{tab.label}</span>
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] ${activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'}`}>
+                  {tab.badge}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Middle Tab 1: Holdings & Financials */}
+          {activeTab === 'holdings' && (
+            <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Equities</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">₱3,527,000.00</p>
+                  <p className="mt-0.5 text-[10px] text-[#2563eb]">73.2% allocation</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">UITFs &amp; Funds</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">₱651,000.00</p>
+                  <p className="mt-0.5 text-[10px] text-[#059669]">13.5% allocation</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Liquid Cash</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">{formatPeso(selectedClient.cash)}</p>
+                  <p className="mt-0.5 text-[10px] text-[#d97706]">13.3% buying power</p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
+                <table className="w-full min-w-[540px] text-left">
+                  <thead>
+                    <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
+                      <th className="px-3.5 py-2.5">Security</th>
+                      <th className="px-2.5 py-2.5">Type</th>
+                      <th className="px-2.5 py-2.5 text-right">Shares</th>
+                      <th className="px-2.5 py-2.5 text-right">Avg Cost</th>
+                      <th className="px-2.5 py-2.5 text-right">Price</th>
+                      <th className="px-2.5 py-2.5 text-right">Market Value</th>
+                      <th className="px-2.5 py-2.5 text-right">Return</th>
+                      <th className="px-3 py-2.5 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f2f4f6] text-xs">
+                    {selectedClient.holdings.map((h) => (
+                      <tr key={h.ticker} className="hover:bg-[#f9fafb] transition">
+                        <td className="px-3.5 py-3">
+                          <span className="font-bold text-[#1e293b]">{h.ticker}</span>
+                          <span className="block text-[10px] text-[#8e94a0]">{h.name}</span>
+                        </td>
+                        <td className="px-2.5 py-3 text-[#64748b]">{h.type}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{h.shares.toLocaleString()}</td>
+                        <td className="px-2.5 py-3 text-right text-[#64748b]">₱{h.avgCost.toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-right font-semibold text-[#1e293b]">₱{h.currentPrice.toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(h.value)}</td>
+                        <td className="px-2.5 py-3 text-right">
+                          <span className={`font-semibold ${h.gain >= 0 ? 'text-[#059669]' : 'text-[#dc2626]'}`}>
+                            {h.gain >= 0 ? '+' : ''}{h.gain.toFixed(2)}%
+                          </span>
+                        </td>
+                        <td className="px-3 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => openOrderModalForHolding(h)}
+                            className="rounded-lg bg-[#eff6ff] px-2.5 py-1 text-[11px] font-semibold text-[#2563eb] hover:bg-[#dbeafe] transition"
+                          >
+                            Trade
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Middle Tab 2: Orders Blotter */}
+          {activeTab === 'orders' && (
+            <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-[#1f2937]">Client Order Book</h3>
+                  <p className="text-[11px] text-[#8e94a0]">Execution records for {selectedClient.name}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOrderTicker('SMPH')
+                    setOrderPrice(32.50)
+                    setOrderShares(1000)
+                    setOrderSide('BUY')
+                    setOrderModalOpen(true)
+                  }}
+                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition"
+                >
+                  <Plus size={14} />
+                  <span>New Order</span>
+                </button>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
+                <table className="w-full min-w-[540px] text-left">
+                  <thead>
+                    <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
+                      <th className="px-3.5 py-2.5">Order ID</th>
+                      <th className="px-2.5 py-2.5">Side</th>
+                      <th className="px-2.5 py-2.5">Ticker</th>
+                      <th className="px-2.5 py-2.5 text-right">Quantity</th>
+                      <th className="px-2.5 py-2.5 text-right">Price</th>
+                      <th className="px-2.5 py-2.5">Type</th>
+                      <th className="px-2.5 py-2.5">Status</th>
+                      <th className="px-2.5 py-2.5">Timestamp</th>
+                      <th className="px-3.5 py-2.5 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f2f4f6] text-xs">
+                    {selectedClient.orders.map((o) => (
+                      <tr key={o.id} className="hover:bg-[#f9fafb] transition">
+                        <td className="px-3.5 py-3 font-mono text-[11px] font-semibold text-[#475467]">{o.id}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              o.side === 'BUY'
+                                ? 'bg-[#dcfce7] text-[#15803d]'
+                                : o.side === 'SELL'
+                                ? 'bg-[#fee2e2] text-[#b91c1c]'
+                                : 'bg-[#e0e7ff] text-[#4338ca]'
+                            }`}
+                          >
+                            {o.side}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3 font-bold text-[#1e293b]">{o.ticker}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{o.shares.toLocaleString()}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{o.price.toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-[#64748b]">{o.type}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              o.status === 'EXECUTED'
+                                ? 'bg-[#ecfdf5] text-[#059669]'
+                                : o.status === 'PENDING'
+                                ? 'bg-[#fef3c7] text-[#92400e]'
+                                : 'bg-[#f1f5f9] text-[#64748b]'
+                            }`}
+                          >
+                            {o.status}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{o.date}</td>
+                        <td className="px-3.5 py-3 text-right">
+                          {o.status === 'PENDING' ? (
+                            <button
+                              type="button"
+                              onClick={() => handleCancelOrder(o.id)}
+                              className="text-[11px] font-semibold text-[#dc2626] hover:underline"
+                            >
+                              Cancel
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-[#9ca3af]">—</span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Panel 3: Messaging Panel (Right - Similar size to Panel 1, with Historical & Live tabs) */}
+        <div className="flex flex-col bg-[#fafbfc]">
+          {/* Messaging Panel Header & Tabs */}
+          <div className="border-b border-[#edeef0] bg-white p-3.5">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <MessageCircle size={16} className="text-[#2563eb]" />
+                <h3 className="text-xs font-bold text-[#1e293b]">Client Messages</h3>
+              </div>
+              <span className="flex items-center gap-1 text-[10px] text-[#059669] font-medium">
+                <span className="size-1.5 rounded-full bg-[#059669] animate-pulse" />
+                Live Desk
+              </span>
+            </div>
+
+            {/* Chat Mode Tabs: Historical vs Live */}
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setChatMode('live')}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  chatMode === 'live' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
+              >
+                <span className="size-1.5 rounded-full bg-[#10b981]" />
+                <span>Live Chat</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatMode('historical')}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  chatMode === 'historical' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
+              >
+                <Clock size={12} />
+                <span>Historical</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Chat Messages Body */}
+          <div className="scroll-pane flex-1 space-y-3 overflow-y-auto p-3.5">
+            {chatMode === 'historical' ? (
+              <div className="space-y-3">
+                <div className="text-center">
+                  <span className="rounded-full bg-[#edf0f4] px-2.5 py-0.5 text-[9px] font-medium text-[#717784]">
+                    Historical Consultations &amp; Logs
+                  </span>
+                </div>
+
+                {/* Historical records */}
+                <div className="rounded-xl border border-[#e4e7ed] bg-white p-3 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-[10px] text-[#8e94a0]">
+                    <span className="font-bold text-[#475467]">Quarterly Review</span>
+                    <span>Sep 18, 2026</span>
+                  </div>
+                  <p className="text-[11px] text-[#333b49] leading-relaxed">
+                    Client confirmed rebalancing 15% from cash into SMPH and FMETF after dividend record date.
+                  </p>
+                  <span className="inline-block rounded-md bg-[#ecfdf5] px-1.5 py-0.5 text-[9px] font-semibold text-[#047857]">
+                    Resolution: Executed
+                  </span>
+                </div>
+
+                <div className="rounded-xl border border-[#e4e7ed] bg-white p-3 space-y-1.5 text-xs">
+                  <div className="flex items-center justify-between text-[10px] text-[#8e94a0]">
+                    <span className="font-bold text-[#475467]">BIR PERA Consultation</span>
+                    <span>Aug 24, 2026</span>
+                  </div>
+                  <p className="text-[11px] text-[#333b49] leading-relaxed">
+                    Advised client regarding annual statutory limit for personal equity retirement account. Document signed.
+                  </p>
+                  <span className="inline-block rounded-md bg-[#e0f2fe] px-1.5 py-0.5 text-[9px] font-semibold text-[#0369a1]">
+                    Tax Form 1701 Qualified
+                  </span>
+                </div>
+
+                {/* Past client messages */}
+                <div className="pt-1 border-t border-[#edeef0]">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#9ca3af] mb-2">Archive Thread</p>
+                  <div className="space-y-2">
+                    {selectedClient.messages.slice(0, 2).map((msg) => (
+                      <div key={`hist-${msg.id}`} className="rounded-lg bg-[#f4f6f8] p-2 text-[11px]">
+                        <div className="flex items-center justify-between text-[9px] text-[#8e94a0] mb-0.5">
+                          <span className="font-semibold text-[#4b5563]">{msg.sender}</span>
+                          <span>{msg.time}</span>
+                        </div>
+                        <p className="text-[#475467]">{msg.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Live Chat Stream */
+              <div className="space-y-3">
+                <div className="text-center">
+                  <span className="rounded-full bg-[#ecfdf5] px-2.5 py-0.5 text-[9px] font-semibold text-[#065f46]">
+                    Active Session with {selectedClient.name}
+                  </span>
+                </div>
+
+                {selectedClient.messages.map((msg) => {
+                  const isAgent = !msg.isClient
+                  return (
+                    <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
+                      <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
+                        <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
+                        <span>·</span>
+                        <span>{msg.time}</span>
+                      </div>
+                      <div
+                        className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${
+                          isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
+                        }`}
+                      >
+                        <p>{msg.text}</p>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Reply Suggestions */}
+          {chatMode === 'live' && (
+            <div className="border-t border-[#edeef0] bg-white px-3 py-1.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
+              {[
+                'Execution confirmed on PSE.',
+                'Sending dividend forecast.',
+                'PERA tax deduction applied.',
+              ].map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => setReplyText(chip)}
+                  className="shrink-0 rounded-lg border border-[#e0e4ec] bg-[#f8f9fa] px-2 py-0.5 text-[#475467] transition hover:border-[#2563eb] hover:bg-white hover:text-[#2563eb]"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Chat Input */}
+          <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 border-t border-[#edeef0] bg-white p-2.5">
+            <input
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Add note to historical log...'}
+              className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-3 py-2 text-xs text-[#374151] outline-none placeholder:text-[#a0a5ad]"
+            />
+            <button
+              type="submit"
+              aria-label="Send message"
+              className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"
+            >
+              <Send size={14} />
+            </button>
+          </form>
+        </div>
+      </Card>
+
+      {/* Place Order Modal */}
+      {orderModalOpen && (
+        <Modal title={`Place Order · ${selectedClient.name}`} onClose={() => setOrderModalOpen(false)}>
+          <form onSubmit={handlePlaceOrder} className="mt-3 space-y-4">
+            <div className="rounded-xl bg-[#f8f9fb] p-3 border border-[#e5e7eb] flex items-center justify-between text-xs">
+              <div>
+                <span className="text-[#8e94a0]">Client Account:</span>{' '}
+                <span className="font-semibold text-[#1e293b]">{selectedClient.name} ({selectedClient.accountNumber})</span>
+              </div>
+              <span className="font-bold text-[#059669]">{formatPeso(selectedClient.cash)} Cash</span>
+            </div>
+
+            {/* Side: Buy / Sell */}
+            <div>
+              <label className="block text-[11px] font-semibold text-[#475467] mb-1.5">Order Side</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOrderSide('BUY')}
+                  className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'BUY' ? 'bg-[#15803d] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
+                >
+                  BUY
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderSide('SELL')}
+                  className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'SELL' ? 'bg-[#b91c1c] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
+                >
+                  SELL
+                </button>
+              </div>
+            </div>
+
+            {/* Ticker & Shares */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">PSE Ticker Symbol</label>
+                <select
+                  value={orderTicker}
+                  onChange={(e) => {
+                    const sym = e.target.value
+                    setOrderTicker(sym)
+                    if (sym === 'SMPH') setOrderPrice(32.80)
+                    if (sym === 'BDO') setOrderPrice(154.50)
+                    if (sym === 'ALI') setOrderPrice(34.20)
+                    if (sym === 'FMETF') setOrderPrice(108.50)
+                    if (sym === 'AC') setOrderPrice(642.00)
+                    if (sym === 'ICT') setOrderPrice(307.00)
+                    if (sym === 'NVDA') setOrderPrice(560.00)
+                    if (sym === 'BND') setOrderPrice(53.20)
+                  }}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                >
+                  <option value="SMPH">SMPH · SM Prime Holdings</option>
+                  <option value="BDO">BDO · BDO Unibank</option>
+                  <option value="ALI">ALI · Ayala Land Inc.</option>
+                  <option value="FMETF">FMETF · First Metro ETF</option>
+                  <option value="AC">AC · Ayala Corporation</option>
+                  <option value="ICT">ICT · International Container</option>
+                  <option value="NVDA">NVDA · Nvidia Corp CDR</option>
+                  <option value="BND">BND · Total Bond Fund</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Quantity (Shares)</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={orderShares}
+                  onChange={(e) => setOrderShares(e.target.value)}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                />
+              </div>
+            </div>
+
+            {/* Order Type & Price */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Order Type</label>
+                <select
+                  value={orderType}
+                  onChange={(e) => setOrderType(e.target.value)}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                >
+                  <option value="LIMIT">Limit Order</option>
+                  <option value="MARKET">Market Order</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Execution Price (₱)</label>
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.05"
+                  value={orderPrice}
+                  onChange={(e) => setOrderPrice(e.target.value)}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                />
+              </div>
+            </div>
+
+            {/* Estimated Total */}
+            <div className="rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3 flex items-center justify-between">
+              <span className="text-xs text-[#64748b]">Estimated Order Value</span>
+              <span className="text-sm font-bold text-[#1e293b]">
+                {formatPeso(Number(orderShares || 0) * Number(orderPrice || 0))}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setOrderModalOpen(false)}
+                className="rounded-xl border border-[#d2d6df] px-4 py-2 text-xs font-semibold text-[#525866] hover:bg-[#f6f7f9]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-xl bg-[#2563eb] px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1d4ed8]"
+              >
+                Submit Order to PSE
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
+  )
+}
+
+function AnnouncementBanner() {
+  const [visible, setVisible] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+
+  if (!visible) return null
+
+  return (
+    <>
+      <aside
+        aria-label="Important announcement"
+        className="mb-4 flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#dbe3f0] bg-[#f0f4fc] px-3.5 py-2 text-xs text-[#31394a] shadow-xs sm:mb-5 sm:px-4"
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-white shadow-2xs">
+            <Sparkles size={13} strokeWidth={2.2} />
+          </span>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="rounded-md border border-[#d0dcf5] bg-white/80 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e40af]">
+              Announcement
+            </span>
+            <span className="truncate font-semibold text-[#222938]">
+              Updated 2026 PSE continuous trading schedule &amp; PERA contribution guidelines
+            </span>
+            <span className="hidden text-[#657085] xl:inline">
+              — Personal Equity maximum tax-credit limits are now in effect.
+            </span>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="rounded-lg px-2 py-1 text-[11px] font-semibold text-[#2563eb] transition hover:bg-[#e2ecfd]"
+          >
+            Details
+          </button>
+          <span className="h-3.5 w-px bg-[#d5deed]" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={() => setVisible(false)}
+            aria-label="Dismiss announcement"
+            className="flex size-6 items-center justify-center rounded-lg text-[#7c8698] transition hover:bg-[#e2ecfd] hover:text-[#202738]"
+          >
+            <X size={14} strokeWidth={2.2} />
+          </button>
+        </div>
+      </aside>
+
+      {showModal && (
+        <Modal title="2026 Market & PERA Contribution Guidelines" onClose={() => setShowModal(false)}>
+          <div className="mt-2 space-y-3.5 text-xs leading-relaxed text-[#525a6b]">
+            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+              <p className="text-sm font-semibold text-[#1e293b]">Philippine Stock Exchange (PSE) Schedule</p>
+              <p className="mt-1 text-[#64748b]">Continuous trading sessions run Monday to Friday from 9:30 AM to 3:00 PM PHT. Pre-open starts at 9:00 AM.</p>
+            </div>
+            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+              <p className="text-sm font-semibold text-[#1e293b]">PERA Tax-Exempt Contribution Limits</p>
+              <p className="mt-1 text-[#64748b]">Under Republic Act No. 9505, annual contributions up to ₱200,000 for local residents (₱400,000 for Overseas Filipino Workers) qualify for a 5% income tax credit and tax-free investment earnings upon retirement.</p>
+            </div>
+            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+              <p className="text-sm font-semibold text-[#1e293b]">Zero Custody Surcharges</p>
+              <p className="mt-1 text-[#64748b]">Caballes-Go Securities charges zero custody maintenance fees for all verified PERA and non-PERA retail portfolios.</p>
+            </div>
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
+  )
+}
+
 function App() {
   const [darkMode, setDarkMode] = useState(() => window.localStorage.getItem('morrow-theme') === 'night')
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const location = useLocation()
+  const isClientsPage = location.pathname.startsWith('/clients')
 
   useEffect(() => {
     window.localStorage.setItem('morrow-theme', darkMode ? 'night' : 'day')
@@ -887,16 +2347,18 @@ function App() {
   return (
     <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
       <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
-        <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} />
+        <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} isTraderView={isClientsPage} />
         <main className="flex min-w-0 flex-1 flex-col bg-[#fbfbfc] xl:h-screen xl:min-h-0 xl:overflow-hidden">
-          <Header darkMode={darkMode} setDarkMode={setDarkMode} />
-          <MobileNavigation />
+          <Header darkMode={darkMode} setDarkMode={setDarkMode} isTraderView={isClientsPage} />
+          <MobileNavigation isTraderView={isClientsPage} />
           <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9 xl:min-h-0 xl:overflow-hidden">
-            <div className="grid w-full items-start gap-6 xl:h-full xl:min-h-0 xl:grid-cols-[minmax(0,1fr)_280px] xl:grid-rows-1 xl:items-stretch 2xl:gap-8">
+            <div className={`grid w-full items-start gap-6 xl:h-full xl:min-h-0 ${isClientsPage ? 'grid-cols-1' : 'xl:grid-cols-[minmax(0,1fr)_280px]'} xl:grid-rows-1 xl:items-stretch 2xl:gap-8`}>
               <div className="min-w-0 scroll-pane xl:min-h-0 xl:overflow-y-auto xl:overscroll-contain xl:pr-2">
+                {!isClientsPage && <AnnouncementBanner />}
                 <Routes>
                   <Route path="/" element={<Navigate to="/home" replace />} />
                   <Route path="/home" element={<HomePage />} />
+                  <Route path="/clients" element={<ClientsPage />} />
                   <Route path="/portfolio" element={<PortfolioPage />} />
                   <Route path="/products" element={<ProductsPage />} />
                   <Route path="/funding" element={<FundingPage />} />
@@ -911,7 +2373,7 @@ function App() {
                   <Route path="*" element={<Navigate to="/home" replace />} />
                 </Routes>
               </div>
-              <CommunityRightRail />
+              {!isClientsPage && <CommunityRightRail />}
             </div>
           </div>
         </main>
