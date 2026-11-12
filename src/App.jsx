@@ -1267,6 +1267,12 @@ const initialClientsData = [
       { id: 'm3', sender: 'Sofia Romero', isClient: true, text: 'Sounds like a great plan. Please queue the 5,000 shares order for me.', time: '10:12 AM' },
       { id: 'm4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Order ORD-9841 queued on PSE: Buy 5,000 SMPH @ ₱32.50 Limit. Will notify you as soon as the fill executes.', time: '10:14 AM' },
     ],
+    previousMessages: [
+      { id: 'pm-1', sender: 'Sofia Romero', isClient: true, text: 'Hi Alex, regarding our quarterly review, should we rebalance 15% from cash into SMPH and FMETF after the dividend record date?', time: 'Sep 18 · 2:15 PM' },
+      { id: 'pm-2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Hello Sofia! Yes, that rebalance locks in the dividend payout while maintaining growth targets. I have prepared the blotter for execution.', time: 'Sep 18 · 2:32 PM' },
+      { id: 'pm-3', sender: 'Sofia Romero', isClient: true, text: 'Can you also check my annual statutory limit for personal equity retirement account (PERA) contributions?', time: 'Aug 24 · 11:10 AM' },
+      { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Your 2026 PERA cap is ₱200,000. All documents and Tax Form 1701 have been qualified for your 5% tax credit.', time: 'Aug 24 · 11:25 AM' },
+    ],
   },
   {
     id: 'client-2',
@@ -1296,6 +1302,12 @@ const initialClientsData = [
       { id: 'm1', sender: 'Marcus Tan', isClient: true, text: 'Hello Alex, please send me the latest UITF fund factsheet when convenient.', time: 'Yesterday' },
       { id: 'm2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Sent over via your portal documents! Let me know if you want to increase monthly DCA allocations.', time: 'Yesterday' },
     ],
+    previousMessages: [
+      { id: 'pm-1', sender: 'Marcus Tan', isClient: true, text: 'Hello Alex, please send me the latest UITF fund factsheet when convenient.', time: 'Oct 11 · 4:10 PM' },
+      { id: 'pm-2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Sent over via your portal documents! Let me know if you want to increase monthly DCA allocations.', time: 'Oct 11 · 4:25 PM' },
+      { id: 'pm-3', sender: 'Marcus Tan', isClient: true, text: 'TEL position was trimmed at ₱1,350 as planned. Thanks for executing.', time: 'Oct 04 · 10:45 AM' },
+      { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Confirmed, proceeds of ₱337,500 are settled in your discretionary cash balance.', time: 'Oct 04 · 11:00 AM' },
+    ],
   },
   {
     id: 'client-3',
@@ -1322,6 +1334,12 @@ const initialClientsData = [
     ],
     messages: [
       { id: 'm1', sender: 'Elena Bautista', isClient: true, text: 'Alex, received my BIR 5% tax credit receipt for 2025 contributions. Thank you for processing!', time: 'Oct 09' },
+    ],
+    previousMessages: [
+      { id: 'pm-1', sender: 'Elena Bautista', isClient: true, text: 'Alex, received my BIR 5% tax credit receipt for 2025 contributions. Thank you for processing!', time: 'Oct 09 · 3:30 PM' },
+      { id: 'pm-2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Glad to hear Elena! Your maximum tax credit of ₱10,000 is reflected on your statement.', time: 'Oct 09 · 3:45 PM' },
+      { id: 'pm-3', sender: 'Elena Bautista', isClient: true, text: 'Should we increase our BND allocation before month end?', time: 'Sep 29 · 1:15 PM' },
+      { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Yes, fixed income yields are steady at 4.2%. Queuing for the next batch.', time: 'Sep 29 · 1:30 PM' },
     ],
   },
   {
@@ -1351,6 +1369,12 @@ const initialClientsData = [
     messages: [
       { id: 'm1', sender: 'David Lim', isClient: true, text: 'Margin ratio looks good at 32%. Keeping the limit sell order on MONDE open.', time: 'Oct 10' },
     ],
+    previousMessages: [
+      { id: 'pm-1', sender: 'David Lim', isClient: true, text: 'Margin ratio looks good at 32%. Keeping the limit sell order on MONDE open.', time: 'Oct 10 · 1:20 PM' },
+      { id: 'pm-2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Noted David. Stop-loss trigger is set at ₱9.60 as a safety guard.', time: 'Oct 10 · 1:40 PM' },
+      { id: 'pm-3', sender: 'David Lim', isClient: true, text: 'Let me know if NVDA CDR volatility spikes after the US earnings report.', time: 'Oct 02 · 9:10 AM' },
+      { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Monitoring closely. We have ample margin buffer at 35% equity.', time: 'Oct 02 · 9:30 AM' },
+    ],
   },
   {
     id: 'client-5',
@@ -1378,6 +1402,12 @@ const initialClientsData = [
     messages: [
       { id: 'm1', sender: 'Patricia Cruz', isClient: true, text: 'Confirming our quarterly trust allocation review next Tuesday at 2 PM.', time: 'Oct 08' },
     ],
+    previousMessages: [
+      { id: 'pm-1', sender: 'Patricia Cruz', isClient: true, text: 'Confirming our quarterly trust allocation review next Tuesday at 2 PM.', time: 'Oct 08 · 11:15 AM' },
+      { id: 'pm-2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Calendar invite sent Patricia. Looking forward to reviewing the UITF balanced growth numbers.', time: 'Oct 08 · 11:30 AM' },
+      { id: 'pm-3', sender: 'Patricia Cruz', isClient: true, text: 'Can you provide the dividend payout schedule for Globe Telecom?', time: 'Sep 25 · 2:00 PM' },
+      { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'GLO dividend ex-date is next week with ₱28.00/share declared.', time: 'Sep 25 · 2:20 PM' },
+    ],
   },
 ]
 
@@ -1391,6 +1421,7 @@ function ClientsPage() {
   const [activeTab, setActiveTab] = useState('holdings')
   const [chatMode, setChatMode] = useState('live')
   const [replyText, setReplyText] = useState('')
+  const [messageSearch, setMessageSearch] = useState('')
   const [orderModalOpen, setOrderModalOpen] = useState(false)
   const [orderTicker, setOrderTicker] = useState('SMPH')
   const [orderSide, setOrderSide] = useState('BUY')
@@ -1529,31 +1560,6 @@ function ClientsPage() {
         </div>
       )}
 
-      {/* Page Header */}
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-[#262c3a] sm:text-[28px]">
-            Clients
-          </h1>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              setOrderTicker('SMPH')
-              setOrderPrice(32.50)
-              setOrderShares(1000)
-              setOrderSide('BUY')
-              setOrderModalOpen(true)
-            }}
-            className="flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-3.5 py-2 text-xs font-semibold text-white shadow-xs transition hover:bg-[#1d4ed8]"
-          >
-            <Plus size={15} />
-            <span>Place Client Order</span>
-          </button>
-        </div>
-      </div>
 
       {/* 3-Panel Layout: Left (Clients), Middle (Financials & Orders), Right (Messaging) */}
       <Card className="grid min-h-[720px] overflow-hidden rounded-2xl border border-[#e8eaed] bg-white xl:grid-cols-[280px_minmax(0,1fr)_340px] 2xl:grid-cols-[300px_minmax(0,1fr)_360px] lg:grid-cols-[260px_minmax(0,1fr)]">
@@ -2029,19 +2035,36 @@ function ClientsPage() {
         {/* Panel 3: Messaging Panel (Right - Similar size to Panel 1, with Historical & Live tabs) */}
         <div className="flex flex-col bg-[#fafbfc]">
           {/* Messaging Panel Header & Tabs */}
-          <div className="border-b border-[#edeef0] bg-white p-3.5">
-            <div className="flex items-center justify-between mb-2">
+          <div className="border-b border-[#edeef0] bg-white p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MessageCircle size={16} className="text-[#2563eb]" />
                 <h3 className="text-xs font-bold text-[#1e293b]">Client Messages</h3>
               </div>
-              <span className="flex items-center gap-1 text-[10px] text-[#059669] font-medium">
-                <span className="size-1.5 rounded-full bg-[#059669] animate-pulse" />
-                Live Desk
-              </span>
             </div>
 
-            {/* Chat Mode Tabs: Historical vs Live */}
+            {/* Search Field */}
+            <label className="flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-2.5 py-1.5 text-[#9ca3af] focus-within:border-[#2563eb] focus-within:bg-white transition">
+              <Search size={13} />
+              <input
+                value={messageSearch}
+                onChange={(e) => setMessageSearch(e.target.value)}
+                placeholder="Search messages..."
+                className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
+              />
+              {messageSearch && (
+                <button
+                  type="button"
+                  onClick={() => setMessageSearch('')}
+                  className="text-[#9ca3af] hover:text-[#4b5563]"
+                  aria-label="Clear message search"
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </label>
+
+            {/* Chat Mode Tabs: Today vs Previous */}
             <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
               <button
                 type="button"
@@ -2050,8 +2073,8 @@ function ClientsPage() {
                   chatMode === 'live' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
                 }`}
               >
-                <span className="size-1.5 rounded-full bg-[#10b981]" />
-                <span>Live Chat</span>
+                <MessageCircle size={12} />
+                <span>Today</span>
               </button>
               <button
                 type="button"
@@ -2061,94 +2084,58 @@ function ClientsPage() {
                 }`}
               >
                 <Clock size={12} />
-                <span>Historical</span>
+                <span>Previous</span>
               </button>
             </div>
           </div>
 
           {/* Chat Messages Body */}
           <div className="scroll-pane flex-1 space-y-3 overflow-y-auto p-3.5">
-            {chatMode === 'historical' ? (
-              <div className="space-y-3">
-                <div className="text-center">
-                  <span className="rounded-full bg-[#edf0f4] px-2.5 py-0.5 text-[9px] font-medium text-[#717784]">
-                    Historical Consultations &amp; Logs
-                  </span>
-                </div>
+            {(() => {
+              const activeMessages = chatMode === 'live'
+                ? (selectedClient.messages || [])
+                : (selectedClient.previousMessages || [])
 
-                {/* Historical records */}
-                <div className="rounded-xl border border-[#e4e7ed] bg-white p-3 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between text-[10px] text-[#8e94a0]">
-                    <span className="font-bold text-[#475467]">Quarterly Review</span>
-                    <span>Sep 18, 2026</span>
-                  </div>
-                  <p className="text-[11px] text-[#333b49] leading-relaxed">
-                    Client confirmed rebalancing 15% from cash into SMPH and FMETF after dividend record date.
-                  </p>
-                  <span className="inline-block rounded-md bg-[#ecfdf5] px-1.5 py-0.5 text-[9px] font-semibold text-[#047857]">
-                    Resolution: Executed
-                  </span>
-                </div>
-
-                <div className="rounded-xl border border-[#e4e7ed] bg-white p-3 space-y-1.5 text-xs">
-                  <div className="flex items-center justify-between text-[10px] text-[#8e94a0]">
-                    <span className="font-bold text-[#475467]">BIR PERA Consultation</span>
-                    <span>Aug 24, 2026</span>
-                  </div>
-                  <p className="text-[11px] text-[#333b49] leading-relaxed">
-                    Advised client regarding annual statutory limit for personal equity retirement account. Document signed.
-                  </p>
-                  <span className="inline-block rounded-md bg-[#e0f2fe] px-1.5 py-0.5 text-[9px] font-semibold text-[#0369a1]">
-                    Tax Form 1701 Qualified
-                  </span>
-                </div>
-
-                {/* Past client messages */}
-                <div className="pt-1 border-t border-[#edeef0]">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-[#9ca3af] mb-2">Archive Thread</p>
-                  <div className="space-y-2">
-                    {selectedClient.messages.slice(0, 2).map((msg) => (
-                      <div key={`hist-${msg.id}`} className="rounded-lg bg-[#f4f6f8] p-2 text-[11px]">
-                        <div className="flex items-center justify-between text-[9px] text-[#8e94a0] mb-0.5">
-                          <span className="font-semibold text-[#4b5563]">{msg.sender}</span>
-                          <span>{msg.time}</span>
-                        </div>
-                        <p className="text-[#475467]">{msg.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Live Chat Stream */
-              <div className="space-y-3">
-                <div className="text-center">
-                  <span className="rounded-full bg-[#ecfdf5] px-2.5 py-0.5 text-[9px] font-semibold text-[#065f46]">
-                    Active Session with {selectedClient.name}
-                  </span>
-                </div>
-
-                {selectedClient.messages.map((msg) => {
-                  const isAgent = !msg.isClient
-                  return (
-                    <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
-                      <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
-                        <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
-                        <span>·</span>
-                        <span>{msg.time}</span>
-                      </div>
-                      <div
-                        className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${
-                          isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
-                        }`}
-                      >
-                        <p>{msg.text}</p>
-                      </div>
-                    </div>
+              const displayedMessages = messageSearch.trim()
+                ? activeMessages.filter(
+                    (msg) =>
+                      msg.text.toLowerCase().includes(messageSearch.toLowerCase()) ||
+                      msg.sender.toLowerCase().includes(messageSearch.toLowerCase())
                   )
-                })}
-              </div>
-            )}
+                : activeMessages
+
+              if (displayedMessages.length === 0) {
+                return (
+                  <div className="p-8 text-center text-xs text-[#9ca3af]">
+                    {messageSearch
+                      ? `No messages match "${messageSearch}"`
+                      : chatMode === 'live'
+                      ? 'No messages today yet.'
+                      : 'No previous conversations recorded.'}
+                  </div>
+                )
+              }
+
+              return displayedMessages.map((msg) => {
+                const isAgent = !msg.isClient
+                return (
+                  <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
+                    <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
+                      <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
+                      <span>·</span>
+                      <span>{msg.time}</span>
+                    </div>
+                    <div
+                      className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${
+                        isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
+                      }`}
+                    >
+                      <p>{msg.text}</p>
+                    </div>
+                  </div>
+                )
+              })
+            })()}
           </div>
 
           {/* Quick Reply Suggestions */}
@@ -2176,7 +2163,7 @@ function ClientsPage() {
             <input
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
-              placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Add note to historical log...'}
+              placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Send a message...'}
               className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-3 py-2 text-xs text-[#374151] outline-none placeholder:text-[#a0a5ad]"
             />
             <button
