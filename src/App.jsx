@@ -43,7 +43,16 @@ const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
   { label: 'Invest', items: [
     { id: 'portfolio', label: 'Portfolio', icon: 'portfolio' },
-    { id: 'products', label: 'Products', icon: 'products' },
+    {
+      id: 'products',
+      label: 'Products',
+      icon: 'products',
+      badge: {
+        text: 'New',
+        icon: 'sparkles',
+        title: 'New products available on the Products page',
+      },
+    },
     { id: 'funding', label: 'Funding', icon: 'funding' },
   ] },
   { label: 'Discover', items: [{ id: 'learn', label: 'Learn', icon: 'learn', badge: '2' }] },
@@ -83,10 +92,11 @@ const holdings = [
 const products = [
   { id: 'market', symbol: '◎', name: 'Total Market Index', category: 'Index funds', detail: 'Broad exposure to leading US companies', minimum: '₱1', fee: '0.03%', risk: 'Moderate', tint: 'sage', return: '+8.4%' },
   { id: 'global', symbol: '◉', name: 'Global Equity Fund', category: 'Index funds', detail: 'Invest across established global markets', minimum: '₱1', fee: '0.08%', risk: 'Moderate', tint: 'blue', return: '+7.1%' },
+  { id: 'tech', symbol: '✦', name: 'NextGen AI & Tech Index', category: 'Index funds', detail: 'High-growth technology leaders shaping AI and automation', minimum: '₱50', fee: '0.14%', risk: 'Growth', tint: 'blue', return: '+14.6%', isNew: true },
   { id: 'treasury', symbol: '▤', name: 'Treasury Portfolio', category: 'Fixed income', detail: 'A steadier mix of government bonds', minimum: '₱100', fee: '0.12%', risk: 'Low', tint: 'sand', return: '+4.2%' },
   { id: 'cash', symbol: '◌', name: 'Cash Reserve', category: 'Cash', detail: 'Keep funds available for your next move', minimum: '₱1', fee: 'No fee', risk: 'Low', tint: 'lavender', return: '4.1% APY' },
   { id: 'retirement', symbol: '↗', name: 'Future Builder', category: 'Retirement', detail: 'A diversified long-term portfolio', minimum: '₱25', fee: '0.18%', risk: 'Balanced', tint: 'rose', return: '+6.8%' },
-  { id: 'green', symbol: '✳', name: 'Sustainable Leaders', category: 'Index funds', detail: 'Companies screened for sustainability', minimum: '₱10', fee: '0.15%', risk: 'Moderate', tint: 'sage', return: '+6.2%' },
+  { id: 'green', symbol: '✳', name: 'Sustainable Leaders', category: 'Index funds', detail: 'Companies screened for sustainability', minimum: '₱10', fee: '0.15%', risk: 'Moderate', tint: 'sage', return: '+6.2%', isNew: true },
 ]
 
 const activities = [
@@ -279,19 +289,60 @@ function Brand({ compact = false }) {
 
 function SidebarLink({ item, mobile = false, collapsed = false }) {
   const compact = collapsed && !mobile
+  const isAnnouncement = typeof item.badge === 'object' && item.badge !== null
+  const compactTitle = compact
+    ? isAnnouncement
+      ? `${item.label} · ${item.badge.title || `${item.badge.text} products available`}`
+      : item.label
+    : undefined
+
   return (
     <RouterNavLink
       to={`/${item.id}`}
       end
       aria-label={compact ? item.label : undefined}
-      title={compact ? item.label : undefined}
+      title={compactTitle}
       className={({ isActive }) => `group relative flex items-center rounded-xl py-2.5 text-left text-[14px] font-medium transition ${mobile ? 'shrink-0 gap-3 px-3' : compact ? 'w-full justify-center px-0' : 'w-full gap-3 px-3'} ${item.danger ? 'text-[#b86a62] hover:bg-[#fff2f0] hover:text-[#a94f48]' : isActive ? 'bg-[#eff6ff] text-[#1d4ed8]' : 'text-[#757982] hover:bg-[#f3f4f6] hover:text-[#2563eb]'}`}
     >
       {({ isActive }) => <>
-        <Icon name={item.icon} size={19} className={item.danger ? 'text-[#b86a62]' : isActive ? 'text-[#2563eb]' : 'text-[#9397a0] group-hover:text-[#2563eb]'} />
+        <div className="relative flex shrink-0 items-center justify-center">
+          <Icon name={item.icon} size={19} className={item.danger ? 'text-[#b86a62]' : isActive ? 'text-[#2563eb]' : 'text-[#9397a0] group-hover:text-[#2563eb]'} />
+          {compact && isAnnouncement && (
+            <span
+              title={item.badge.title || `${item.badge.text} products available`}
+              className="sidebar-badge-ring absolute -right-1.5 -top-1.5 flex size-4 items-center justify-center rounded-full bg-gradient-to-tr from-[#2563eb] to-[#4f46e5] text-white shadow-xs ring-2 transition-transform duration-200 group-hover:scale-110"
+            >
+              <Sparkles size={9} className="text-amber-300 fill-amber-300 animate-sparkle" />
+            </span>
+          )}
+          {compact && !isAnnouncement && item.badge && (
+            <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-[#f3e8d9] text-[8px] font-bold text-[#a87543]">
+              {item.badge}
+            </span>
+          )}
+          {compact && item.unread && (
+            <span className="absolute right-1 top-1 size-2 rounded-full bg-[#cc8a52]" />
+          )}
+        </div>
         {!compact && <span>{item.label}</span>}
-        {item.badge && <span className={compact ? 'absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-[#f3e8d9] text-[8px] font-bold text-[#a87543]' : 'ml-auto rounded-full bg-[#f3e8d9] px-1.5 py-0.5 text-[9px] font-bold text-[#a87543]'}>{item.badge}</span>}
-        {item.unread && <span className={compact ? 'absolute right-1 top-1 size-2 rounded-full bg-[#cc8a52]' : 'ml-auto size-2 rounded-full bg-[#cc8a52]'} />}
+        {!compact && item.badge && (
+          isAnnouncement ? (
+            <span
+              title={item.badge.title || `${item.badge.text} products available`}
+              className="ml-auto inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#2563eb] via-[#3b82f6] to-[#4f46e5] px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-wider text-white shadow-xs shadow-blue-500/25 ring-1 ring-white/20 transition-all duration-200 group-hover:scale-105 group-hover:shadow-blue-500/40"
+            >
+              <Sparkles size={10} className="shrink-0 text-amber-300 fill-amber-300/80 animate-sparkle" />
+              <span className="leading-none">{item.badge.text}</span>
+            </span>
+          ) : (
+            <span className="ml-auto rounded-full bg-[#f3e8d9] px-1.5 py-0.5 text-[9px] font-bold text-[#a87543]">
+              {item.badge}
+            </span>
+          )
+        )}
+        {!compact && item.unread && (
+          <span className="ml-auto size-2 rounded-full bg-[#cc8a52]" />
+        )}
       </>}
     </RouterNavLink>
   )
@@ -888,7 +939,18 @@ function ProductCard({ product, onExplore }) {
   const tints = { sage: 'bg-[#eaedf2] text-[#4a5878]', blue: 'bg-[#e9eff4] text-[#64839b]', sand: 'bg-[#f4eee5] text-[#ad8156]', lavender: 'bg-[#f0edf7] text-[#8574a5]', rose: 'bg-[#f5ebeb] text-[#ad7472]' }
   return (
     <Card className="flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
-      <div className="flex items-start justify-between"><span className={`flex size-11 items-center justify-center rounded-[14px] text-xl ${tints[product.tint]}`}>{product.symbol}</span><span className="rounded-full bg-[#f5f6f7] px-2.5 py-1 text-[10px] font-medium text-[#828690]">{product.category}</span></div>
+      <div className="flex items-start justify-between">
+        <span className={`flex size-11 items-center justify-center rounded-[14px] text-xl ${tints[product.tint]}`}>{product.symbol}</span>
+        <div className="flex items-center gap-1.5">
+          {product.isNew && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-xs">
+              <Sparkles size={9} className="text-amber-300 fill-amber-300 animate-sparkle" />
+              New
+            </span>
+          )}
+          <span className="rounded-full bg-[#f5f6f7] px-2.5 py-1 text-[10px] font-medium text-[#828690]">{product.category}</span>
+        </div>
+      </div>
       <h2 className="mt-5 text-[15px] font-semibold text-[#343a48]">{product.name}</h2><p className="mt-1.5 min-h-10 text-xs leading-5 text-[#90949c]">{product.detail}</p>
       <div className="my-5 grid grid-cols-2 gap-y-3 border-y border-[#edeef0] py-4 text-xs"><span className="text-[#9a9da4]">Historical return</span><span className="text-right font-semibold text-[#4e5d80]">{product.return}</span><span className="text-[#9a9da4]">Annual fee</span><span className="text-right font-medium text-[#626772]">{product.fee}</span><span className="text-[#9a9da4]">Starting amount</span><span className="text-right font-medium text-[#626772]">{product.minimum}</span></div>
       <div className="mt-auto flex items-center justify-between"><span className="text-[10px] text-[#a0a3aa]">{product.risk} risk · Demo data</span><button onClick={() => onExplore(product)} type="button" className="inline-flex items-center gap-1 text-xs font-semibold text-[#4d5b79] hover:text-[#2e3b5a]">Explore <Icon name="arrow" size={13} /></button></div>
@@ -910,7 +972,16 @@ function ProductsPage() {
         <div className="flex gap-1 overflow-x-auto rounded-xl bg-[#edeef1] p-1">{categories.map((item) => <button key={item} onClick={() => setCategory(item)} type="button" className={`shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition ${category === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#898d96] hover:text-[#50596c]'}`}>{item}</button>)}</div>
         <label className="flex items-center gap-2 rounded-xl border border-[#e6e8eb] bg-white px-3 py-2.5 text-[#9599a0]"><Icon name="search" size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search products" className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-40" /></label>
       </div>
-      <div className="mb-5 flex items-center justify-between"><p className="text-xs text-[#999ca3]">{filtered.length} options to explore</p><span className="text-[10px] text-[#a7aaaf]">Returns shown are illustrative</span></div>
+      <div className="mb-5 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <p className="text-xs text-[#999ca3]">{filtered.length} options to explore</p>
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#eff6ff] px-2 py-0.5 text-[10px] font-semibold text-[#1d4ed8]">
+            <Sparkles size={10} className="text-amber-500 fill-amber-400" />
+            New funds added
+          </span>
+        </div>
+        <span className="text-[10px] text-[#a7aaaf]">Returns shown are illustrative</span>
+      </div>
       {filtered.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filtered.map((product) => <ProductCard key={product.id} product={product} onExplore={setSelectedProduct} />)}</div> : <Card className="p-12 text-center"><p className="text-sm font-medium text-[#666b76]">No matching products</p><p className="mt-1 text-xs text-[#9a9da4]">Try a different search or category.</p></Card>}
       {selectedProduct && <Modal title={selectedProduct.name} onClose={() => setSelectedProduct(null)}><p className="text-sm leading-6 text-[#7f838d]">{selectedProduct.detail}. This sample product page is for exploring the experience. Product details and performance shown here are illustrative.</p><div className="mt-5 rounded-xl bg-[#f5f6f8] p-4"><p className="text-xs text-[#9397a0]">Minimum investment</p><p className="mt-1 font-semibold text-[#404656]">{selectedProduct.minimum}</p></div><button onClick={() => { setSelectedProduct(null); navigate('/funding') }} type="button" className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Continue to funding</button></Modal>}
     </div>

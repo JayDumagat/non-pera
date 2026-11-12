@@ -19,6 +19,29 @@ body {
   to { opacity: 1; transform: scale(1); }
 }
 
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.18) rotate(10deg);
+    opacity: 1;
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle-twinkle 2.4s ease-in-out infinite;
+}
+
+.sidebar-badge-ring {
+  --tw-ring-color: #ffffff;
+}
+
+[data-theme='night'] .sidebar-badge-ring {
+  --tw-ring-color: #171b23 !important;
+}
+
 .sponsored-ad-image {
   animation: sponsored-ad-enter 360ms ease-out both;
 }
