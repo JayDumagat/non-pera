@@ -1273,6 +1273,12 @@ const initialClientsData = [
       { id: 'pm-3', sender: 'Sofia Romero', isClient: true, text: 'Can you also check my annual statutory limit for personal equity retirement account (PERA) contributions?', time: 'Aug 24 · 11:10 AM' },
       { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Your 2026 PERA cap is ₱200,000. All documents and Tax Form 1701 have been qualified for your 5% tax credit.', time: 'Aug 24 · 11:25 AM' },
     ],
+    trades: [
+      { id: 'TRD-9041-01', orderId: 'ORD-9780', side: 'BUY', ticker: 'BDO', name: 'BDO Unibank', shares: 1200, price: 151.00, gross: 181200, commission: 453.00, fees: 90.60, net: 181743.60, time: 'Yesterday, 2:15 PM', settlement: 'T+2 (Pending)', status: 'SETTLING', channel: 'Broker-Assisted Chat' },
+      { id: 'TRD-9041-02', orderId: 'ORD-9512', side: 'BUY', ticker: 'ALI', name: 'Ayala Land Inc.', shares: 10000, price: 32.20, gross: 322000, commission: 805.00, fees: 161.00, net: 322966.00, time: 'Oct 08, 2026, 11:30 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Advisory Phone Mandate' },
+      { id: 'TRD-9041-03', orderId: 'ORD-9304', side: 'BUY', ticker: 'FMETF', name: 'First Metro ETF', shares: 3000, price: 106.50, gross: 319500, commission: 798.75, fees: 159.75, net: 320458.50, time: 'Sep 24, 2026, 1:45 PM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Client Portal Request' },
+      { id: 'TRD-9041-04', orderId: 'ORD-9118', side: 'SELL', ticker: 'AC', name: 'Ayala Corporation', shares: 400, price: 635.00, gross: 254000, commission: 635.00, fees: 127.00, net: 253238.00, time: 'Sep 12, 2026, 10:20 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Broker-Assisted Chat' },
+    ],
   },
   {
     id: 'client-2',
@@ -1308,6 +1314,10 @@ const initialClientsData = [
       { id: 'pm-3', sender: 'Marcus Tan', isClient: true, text: 'TEL position was trimmed at ₱1,350 as planned. Thanks for executing.', time: 'Oct 04 · 10:45 AM' },
       { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Confirmed, proceeds of ₱337,500 are settled in your discretionary cash balance.', time: 'Oct 04 · 11:00 AM' },
     ],
+    trades: [
+      { id: 'TRD-7712-01', orderId: 'ORD-8920', side: 'BUY', ticker: 'ICT', name: 'Intl Container Terminal', shares: 500, price: 302.00, gross: 151000, commission: 377.50, fees: 75.50, net: 151453.00, time: 'Oct 11, 2026, 10:45 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Broker-Assisted Chat' },
+      { id: 'TRD-7712-02', orderId: 'ORD-8812', side: 'SELL', ticker: 'TEL', name: 'PLDT Inc.', shares: 250, price: 1350.00, gross: 337500, commission: 843.75, fees: 168.75, net: 336487.50, time: 'Oct 04, 2026, 1:30 PM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Advisory Phone Mandate' },
+    ],
   },
   {
     id: 'client-3',
@@ -1340,6 +1350,10 @@ const initialClientsData = [
       { id: 'pm-2', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Glad to hear Elena! Your maximum tax credit of ₱10,000 is reflected on your statement.', time: 'Oct 09 · 3:45 PM' },
       { id: 'pm-3', sender: 'Elena Bautista', isClient: true, text: 'Should we increase our BND allocation before month end?', time: 'Sep 29 · 1:15 PM' },
       { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Yes, fixed income yields are steady at 4.2%. Queuing for the next batch.', time: 'Sep 29 · 1:30 PM' },
+    ],
+    trades: [
+      { id: 'TRD-5520-01', orderId: 'ORD-7510', side: 'BUY', ticker: 'BND', name: 'Total Bond ETF', shares: 2000, price: 52.80, gross: 105600, commission: 264.00, fees: 52.80, net: 105916.80, time: 'Sep 29, 2026, 11:10 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'PERA Tax-Exempt Order' },
+      { id: 'TRD-5520-02', orderId: 'ORD-7390', side: 'BUY', ticker: 'TEL', name: 'PLDT Inc.', shares: 150, price: 1315.00, gross: 197250, commission: 493.13, fees: 98.62, net: 197841.75, time: 'Aug 18, 2026, 2:00 PM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Broker-Assisted Advisory' },
     ],
   },
   {
@@ -1375,6 +1389,10 @@ const initialClientsData = [
       { id: 'pm-3', sender: 'David Lim', isClient: true, text: 'Let me know if NVDA CDR volatility spikes after the US earnings report.', time: 'Oct 02 · 9:10 AM' },
       { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'Monitoring closely. We have ample margin buffer at 35% equity.', time: 'Oct 02 · 9:30 AM' },
     ],
+    trades: [
+      { id: 'TRD-3304-01', orderId: 'ORD-6401', side: 'BUY', ticker: 'NVDA', name: 'Nvidia Corp. CDR', shares: 800, price: 520.00, gross: 416000, commission: 1040.00, fees: 208.00, net: 417248.00, time: 'Oct 02, 2026, 9:45 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Margin Order Desk' },
+      { id: 'TRD-3304-02', orderId: 'ORD-6218', side: 'BUY', ticker: 'MONDE', name: 'Monde Nissin', shares: 50000, price: 9.90, gross: 495000, commission: 1237.50, fees: 247.50, net: 496485.00, time: 'Sep 15, 2026, 10:30 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Margin Order Desk' },
+    ],
   },
   {
     id: 'client-5',
@@ -1408,17 +1426,21 @@ const initialClientsData = [
       { id: 'pm-3', sender: 'Patricia Cruz', isClient: true, text: 'Can you provide the dividend payout schedule for Globe Telecom?', time: 'Sep 25 · 2:00 PM' },
       { id: 'pm-4', sender: 'Alex Johnson (Agent)', isClient: false, text: 'GLO dividend ex-date is next week with ₱28.00/share declared.', time: 'Sep 25 · 2:20 PM' },
     ],
+    trades: [
+      { id: 'TRD-1188-01', orderId: 'ORD-5410', side: 'BUY', ticker: 'GLO', name: 'Globe Telecom', shares: 100, price: 1750.00, gross: 175000, commission: 437.50, fees: 87.50, net: 175525.00, time: 'Sep 28, 2026, 11:00 AM', settlement: 'T+2 Settled', status: 'SETTLED', channel: 'Trust Committee Order' },
+    ],
   },
 ]
 
 function ClientsPage() {
   const [clients, setClients] = useState(initialClientsData)
   const [selectedClientId, setSelectedClientId] = useState('client-1')
+  const [selectedOrderId, setSelectedOrderId] = useState(null)
   const [leftTab, setLeftTab] = useState('clients')
   const [orderFilter, setOrderFilter] = useState('ALL')
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState('ALL')
-  const [activeTab, setActiveTab] = useState('holdings')
+  const [activeTab, setActiveTab] = useState('trades')
   const [chatMode, setChatMode] = useState('live')
   const [replyText, setReplyText] = useState('')
   const [messageSearch, setMessageSearch] = useState('')
@@ -1449,6 +1471,31 @@ function ClientsPage() {
   const pendingOrdersCount = useMemo(() => {
     return allDeskOrders.filter((o) => o.status === 'PENDING').length
   }, [allDeskOrders])
+
+  const buyOrdersCount = useMemo(() => {
+    return allDeskOrders.filter((o) => o.side === 'BUY').length
+  }, [allDeskOrders])
+
+  const sellOrdersCount = useMemo(() => {
+    return allDeskOrders.filter((o) => o.side === 'SELL').length
+  }, [allDeskOrders])
+
+  const filteredOrders = useMemo(() => {
+    return allDeskOrders.filter((order) => {
+      const query = searchQuery.toLowerCase().trim()
+      const matches =
+        !query ||
+        order.id.toLowerCase().includes(query) ||
+        order.ticker.toLowerCase().includes(query) ||
+        order.clientName.toLowerCase().includes(query) ||
+        (order.accountNumber && order.accountNumber.toLowerCase().includes(query))
+      if (!matches) return false
+      if (orderFilter === 'PENDING') return order.status === 'PENDING'
+      if (orderFilter === 'BUY') return order.side === 'BUY'
+      if (orderFilter === 'SELL') return order.side === 'SELL'
+      return true
+    })
+  }, [allDeskOrders, searchQuery, orderFilter])
 
   const filteredClients = clients.filter((client) => {
     const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -1542,6 +1589,56 @@ function ClientsPage() {
     triggerToast(`Order ${orderId} has been cancelled.`)
   }
 
+  const handleExecuteOrder = (order) => {
+    const gross = order.shares * order.price
+    const commission = gross * 0.0025
+    const fees = gross * 0.0005
+    const net = order.side === 'BUY' ? gross + commission + fees : gross - commission - fees
+
+    const newTrade = {
+      id: `TRD-${Math.floor(1000 + Math.random() * 9000)}-01`,
+      orderId: order.id,
+      side: order.side,
+      ticker: order.ticker,
+      name: order.ticker,
+      shares: order.shares,
+      price: order.price,
+      gross,
+      commission,
+      fees,
+      net,
+      time: 'Just now',
+      settlement: 'T+2 (Pending)',
+      status: 'SETTLING',
+      channel: 'Broker-Assisted Execution',
+    }
+
+    const execNote = {
+      id: String(Date.now()),
+      sender: 'Alex Johnson (Agent)',
+      isClient: false,
+      text: `Execution complete: ${order.side} ${order.shares.toLocaleString()} ${order.ticker} @ ₱${order.price.toFixed(2)}. Net Settlement: ${formatPeso(net)}. Trade Ref: ${newTrade.id}`,
+      time: 'Just now',
+    }
+
+    setClients((prev) =>
+      prev.map((c) =>
+        c.id === selectedClient.id
+          ? {
+              ...c,
+              orders: c.orders.map((o) => (o.id === order.id ? { ...o, status: 'EXECUTED' } : o)),
+              trades: [newTrade, ...(c.trades || [])],
+              messages: [...c.messages, execNote],
+              pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
+              cash: order.side === 'BUY' ? Math.max(0, c.cash - net) : c.cash + net,
+            }
+          : c
+      )
+    )
+
+    triggerToast(`Order ${order.id} executed on PSE! Trade confirmation ${newTrade.id} created.`)
+  }
+
   const openOrderModalForHolding = (holding) => {
     setOrderTicker(holding.ticker)
     setOrderPrice(holding.currentPrice)
@@ -1608,14 +1705,24 @@ function ClientsPage() {
 
           {/* Search & Filter Header */}
           <div className="border-b border-[#edeef0] p-3">
-            <label className="flex items-center gap-2 rounded-xl bg-[#f5f6f7] px-3 py-2 text-[#9b9ea5]">
-              <Search size={14} />
+            <label className="relative flex items-center gap-2 rounded-xl bg-[#f5f6f7] px-3 py-2 text-[#9b9ea5]">
+              <Search size={14} className="shrink-0" />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={leftTab === 'clients' ? 'Search clients or ticker...' : 'Filter orders by ticker or ID...'}
-                className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
+                placeholder={leftTab === 'clients' ? 'Search clients or ticker...' : 'Filter ticker, client, or ID...'}
+                className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0] pr-5"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 text-[#9ca3af] hover:text-[#475569] transition"
+                  title="Clear search"
+                >
+                  <X size={13} />
+                </button>
+              )}
             </label>
 
             {leftTab === 'clients' ? (
@@ -1643,8 +1750,8 @@ function ClientsPage() {
                 {[
                   { id: 'ALL', label: `All (${allDeskOrders.length})` },
                   { id: 'PENDING', label: `Pending (${pendingOrdersCount})` },
-                  { id: 'BUY', label: 'Buys' },
-                  { id: 'SELL', label: 'Sells' },
+                  { id: 'BUY', label: `Buys (${buyOrdersCount})` },
+                  { id: 'SELL', label: `Sells (${sellOrdersCount})` },
                 ].map((f) => (
                   <button
                     key={f.id}
@@ -1671,7 +1778,10 @@ function ClientsPage() {
                     <button
                       key={client.id}
                       type="button"
-                      onClick={() => setSelectedClientId(client.id)}
+                      onClick={() => {
+                        setSelectedClientId(client.id)
+                        setSelectedOrderId(null)
+                      }}
                       className={`w-full p-3.5 text-left transition hover:bg-[#f9fafb] ${isSelected ? 'bg-[#f0f5ff]' : 'bg-white'}`}
                     >
                       <div className="flex items-start gap-3">
@@ -1707,74 +1817,118 @@ function ClientsPage() {
                 <div className="p-6 text-center text-xs text-[#9ca3af]">No clients match the current filter.</div>
               )
             ) : (
-              /* Left Tab 2: Orders List across clients */
-              allDeskOrders
-                .filter((order) => {
-                  const query = searchQuery.toLowerCase()
-                  const matches =
-                    order.id.toLowerCase().includes(query) ||
-                    order.ticker.toLowerCase().includes(query) ||
-                    order.clientName.toLowerCase().includes(query)
-                  if (!matches) return false
-                  if (orderFilter === 'PENDING') return order.status === 'PENDING'
-                  if (orderFilter === 'BUY') return order.side === 'BUY'
-                  if (orderFilter === 'SELL') return order.side === 'SELL'
-                  return true
-                })
-                .map((order) => {
-                  const isSelected = order.clientId === selectedClient.id
+              /* Left Tab 2: Orders List across clients with Clear Design Hierarchy */
+              filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => {
+                  const isSelected = order.id === selectedOrderId || (!selectedOrderId && order.clientId === selectedClient.id)
+                  const totalValue = order.shares * order.price
+
                   return (
                     <button
                       key={`${order.clientId}-${order.id}`}
                       type="button"
                       onClick={() => {
                         setSelectedClientId(order.clientId)
+                        setSelectedOrderId(order.id)
                         setActiveTab('orders')
                       }}
-                      className={`w-full p-3 text-left transition hover:bg-[#f9fafb] ${isSelected ? 'bg-[#f0f5ff]' : 'bg-white'}`}
+                      className={`group relative w-full text-left p-3.5 transition border-b border-[#f1f3f6] border-l-[3.5px] ${
+                        isSelected
+                          ? 'border-l-[#2563eb] bg-[#eff6ff]/90'
+                          : 'border-l-transparent bg-white hover:bg-[#f8fafc]'
+                      }`}
                     >
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-1.5">
+                      {/* Top Row: Side Badge + Ticker + Type | Total Estimated Value (Primary Hierarchy) */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-1.5 min-w-0">
                           <span
-                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                            className={`rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${
                               order.side === 'BUY'
-                                ? 'bg-[#dcfce7] text-[#15803d]'
+                                ? 'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]'
                                 : order.side === 'SELL'
-                                ? 'bg-[#fee2e2] text-[#b91c1c]'
-                                : 'bg-[#e0e7ff] text-[#4338ca]'
+                                ? 'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]'
+                                : 'bg-[#e0e7ff] text-[#4338ca] border border-[#c7d2fe]'
                             }`}
                           >
                             {order.side}
                           </span>
-                          <span className="font-bold text-xs text-[#1e293b]">{order.ticker}</span>
-                          <span className="font-mono text-[10px] text-[#8e94a0]">({order.shares.toLocaleString()} @ ₱{order.price.toFixed(2)})</span>
+                          <span className="text-[13px] font-bold text-[#0f172a] tracking-tight group-hover:text-[#2563eb] transition-colors">
+                            {order.ticker}
+                          </span>
+                          <span className="rounded bg-[#f1f5f9] px-1.5 py-0.5 text-[8.5px] font-semibold text-[#64748b]">
+                            {order.type}
+                          </span>
+                        </div>
+                        <span className="text-xs font-bold text-[#0f172a] tabular-nums shrink-0">
+                          {formatPeso(totalValue)}
+                        </span>
+                      </div>
+
+                      {/* Middle Row: Quantity & Limit Price Terms | Live Order Status (Secondary Hierarchy) */}
+                      <div className="mt-1.5 flex items-center justify-between gap-2 text-[11px]">
+                        <div className="flex items-center gap-1 text-[#475467] min-w-0 truncate">
+                          <span className="font-semibold text-[#334155]">{order.shares.toLocaleString()}</span>
+                          <span className="text-[#94a3b8]">shs @</span>
+                          <span className="font-semibold text-[#1e293b] tabular-nums">₱{order.price.toFixed(2)}</span>
                         </div>
                         <span
-                          className={`rounded-md px-1.5 py-0.5 text-[8px] font-bold ${
-                            order.status === 'EXECUTED'
-                              ? 'bg-[#ecfdf5] text-[#059669]'
-                              : order.status === 'PENDING'
-                              ? 'bg-[#fef3c7] text-[#92400e]'
-                              : 'bg-[#f1f5f9] text-[#64748b]'
+                          className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                            order.status === 'PENDING'
+                              ? 'bg-[#fef3c7] text-[#92400e] border border-[#fde68a]'
+                              : order.status === 'EXECUTED'
+                              ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
+                              : 'bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]'
                           }`}
                         >
+                          {order.status === 'PENDING' && (
+                            <span className="size-1.5 rounded-full bg-[#d97706] animate-pulse" />
+                          )}
+                          {order.status === 'EXECUTED' && (
+                            <CheckCircle2 size={10} className="text-[#059669]" />
+                          )}
                           {order.status}
                         </span>
                       </div>
-                      <div className="mt-1.5 flex items-center justify-between text-[10px] text-[#6b7280]">
-                        <span className="font-medium text-[#475467] truncate max-w-[140px]">{order.clientName}</span>
-                        <span className="font-mono text-[9px] text-[#9ca3af]">{order.id}</span>
+
+                      {/* Bottom Row: Client Attribution & Order Timestamp/ID (Tertiary Hierarchy) */}
+                      <div className="mt-2 flex items-center justify-between gap-2 border-t border-[#f1f3f6]/80 pt-1.5 text-[10px]">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className={`flex size-4.5 shrink-0 items-center justify-center rounded-full text-[8.5px] font-bold ${order.clientColor}`}>
+                            {order.clientAvatar}
+                          </span>
+                          <span className="truncate font-medium text-[#475467]">{order.clientName}</span>
+                        </div>
+                        <div className="flex items-center gap-1 shrink-0 text-[#94a3b8] font-mono text-[9px]">
+                          <span>{order.date}</span>
+                          <span>·</span>
+                          <span>#{order.id}</span>
+                        </div>
                       </div>
                     </button>
                   )
                 })
+              ) : (
+                <div className="flex flex-col items-center justify-center p-8 text-center">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-[#f1f5f9] text-[#94a3b8]">
+                    <ArrowUpDown size={18} />
+                  </div>
+                  <p className="mt-2.5 text-xs font-semibold text-[#334155]">No orders found</p>
+                  <p className="mt-1 text-[11px] text-[#94a3b8] max-w-[190px]">
+                    {searchQuery
+                      ? `No orders matching "${searchQuery}"`
+                      : orderFilter === 'PENDING'
+                      ? 'No pending orders waiting for execution.'
+                      : 'No orders match this filter.'}
+                  </p>
+                </div>
+              )
             )}
           </div>
         </div>
 
-        {/* Panel 2: Client Financial Information, Holdings & Order Blotter (Middle - Largest) */}
+        {/* Panel 2: Client Financial Information, Trades & Order Blotter (Middle - Largest) */}
         <div className="flex min-w-0 flex-1 flex-col border-b border-[#edeef0] xl:border-b-0 xl:border-r">
-          {/* Client Summary Top Bar */}
+          {/* Client Summary Top Bar - Broker-Assisted Trading Account Card */}
           <div className="border-b border-[#edeef0] bg-[#fafbfc] p-4 sm:p-5">
             <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
               <div className="flex items-center gap-3">
@@ -1782,17 +1936,20 @@ function ClientsPage() {
                   {selectedClient.avatar}
                 </span>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
-                    <span className="rounded-md bg-[#e0f2fe] px-2 py-0.5 text-[9px] font-bold uppercase text-[#0369a1]">
-                      KYC Verified
+                    <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
+                      Broker-Assisted Account
                     </span>
-                    <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9px] font-medium text-[#4b5563]">
+                    <span className="rounded-md bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 text-[9.5px] font-semibold text-[#065f46]">
+                      Trading Mandate Active
+                    </span>
+                    <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
                       {selectedClient.category}
                     </span>
                   </div>
                   <p className="mt-0.5 text-xs text-[#8a909d]">
-                    Account #{selectedClient.accountNumber} · Risk Rating: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
+                    Account #{selectedClient.accountNumber} · Licensed Broker: <span className="font-semibold text-[#334155]">Alex Johnson (CRN #84920)</span> · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
                   </p>
                 </div>
               </div>
@@ -1800,10 +1957,10 @@ function ClientsPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => triggerToast(`Exported formal CGSI statement for ${selectedClient.name}`)}
+                  onClick={() => triggerToast(`Exported formal CGSI broker-assisted blotter for ${selectedClient.name}`)}
                   className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9]"
                 >
-                  Export Statement
+                  Export Blotter
                 </button>
                 <button
                   type="button"
@@ -1814,118 +1971,194 @@ function ClientsPage() {
                     setOrderSide('BUY')
                     setOrderModalOpen(true)
                   }}
-                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1d4ed8]"
+                  className="flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#1d4ed8]"
                 >
                   <Plus size={14} />
-                  <span>Trade</span>
+                  <span>Place Order</span>
                 </button>
               </div>
             </div>
 
-            {/* Financial Stats Grid */}
+            {/* Broker-Assisted Trading Stats Grid */}
             <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Total Portfolio</p>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.portfolioValue)}</p>
-                <p className="mt-0.5 text-[10px] font-semibold text-[#059669]">+{selectedClient.monthlyReturn}% monthly</p>
-              </div>
-              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Available Cash</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Buying Power</p>
+                  <span className="size-1.5 rounded-full bg-[#10b981]" title="Funds Settled" />
+                </div>
                 <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash)}</p>
-                <p className="mt-0.5 text-[10px] text-[#6b7280]">Buying power</p>
+                <p className="mt-0.5 text-[10px] text-[#059669] font-medium">Ready for immediate fill</p>
               </div>
+
               <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">PERA Allocation</p>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.pera)}</p>
-                <p className="mt-0.5 text-[10px] text-[#059669]">Tax-exempt</p>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Trading Facility</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash * 1.5 + 500000)}</p>
+                <p className="mt-0.5 text-[10px] text-[#6b7280]">Approved intraday credit buffer</p>
               </div>
+
               <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Active Orders</p>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{selectedClient.orders.length} orders</p>
-                <p className="mt-0.5 text-[10px] text-[#d97706]">{selectedClient.pendingOrderCount} pending fills</p>
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">T+2 Clearing Balance</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">
+                  {formatPeso((selectedClient.trades && selectedClient.trades[0]?.net) || 181743.60)}
+                </p>
+                <p className="mt-0.5 text-[10px] text-[#2563eb] font-medium">Next settlement cycle (PSE T+2)</p>
+              </div>
+
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Assisted Commission</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">0.25% PSE Standard</p>
+                <p className="mt-0.5 text-[10px] text-[#d97706] font-medium">
+                  {selectedClient.orders.filter((o) => o.status === 'PENDING').length} active orders pending fill
+                </p>
+              </div>
+            </div>
+
+            {/* Broker-Assisted Compliance & Exchange Gateway Strip */}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2 text-[11px] text-[#4b5563]">
+              <div className="flex items-center gap-1.5">
+                <ShieldCheck size={14} className="text-[#059669] shrink-0" />
+                <span>
+                  <strong className="text-[#1f2937]">Execution Mandate:</strong> Verbal & chat order instructions authorized under PSE guidelines.
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] text-[#64748b]">
+                <span className="inline-flex items-center gap-1">
+                  <span className="size-1.5 rounded-full bg-[#10b981]" />
+                  PSE Direct FIX Gateway
+                </span>
+                <span>·</span>
+                <span className="font-medium text-[#1e293b]">Best Execution Active</span>
               </div>
             </div>
           </div>
 
-          {/* Middle Tabs: Holdings & Financials vs Orders Blotter */}
+          {/* Middle Tabs: Trades vs Orders */}
           <div className="flex border-b border-[#edeef0] bg-[#fafbfc] px-5 text-xs font-semibold">
             {[
-              { id: 'holdings', label: 'Holdings & Financials', badge: selectedClient.holdings.length },
-              { id: 'orders', label: 'Orders Blotter', badge: selectedClient.orders.length },
+              { id: 'trades', label: 'Trades', badge: (selectedClient.trades || []).length },
+              { id: 'orders', label: 'Orders', badge: (selectedClient.orders || []).length },
             ].map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative flex items-center gap-1.5 py-3 px-3 transition ${activeTab === tab.id ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]' : 'text-[#6b7280] hover:text-[#2563eb]'}`}
+                className={`relative flex items-center gap-1.5 py-3 px-3 transition ${
+                  activeTab === tab.id
+                    ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]'
+                    : 'text-[#6b7280] hover:text-[#2563eb]'
+                }`}
               >
                 <span>{tab.label}</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[9px] ${activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'}`}>
+                <span
+                  className={`rounded-full px-1.5 py-0.2 text-[9px] ${
+                    activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'
+                  }`}
+                >
                   {tab.badge}
                 </span>
               </button>
             ))}
           </div>
 
-          {/* Middle Tab 1: Holdings & Financials */}
-          {activeTab === 'holdings' && (
+          {/* Middle Tab 1: Trades (Executed Trades & Confirmations) */}
+          {activeTab === 'trades' && (
             <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                <div>
+                  <h3 className="text-sm font-semibold text-[#1f2937]">Executed Trades &amp; Confirmations</h3>
+                  <p className="text-[11px] text-[#8e94a0]">
+                    Broker-assisted transaction logs, fill confirmations, and T+2 settlement records for {selectedClient.name}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => triggerToast(`Exported ${selectedClient.trades?.length || 0} trade confirmation slips for ${selectedClient.name}`)}
+                  className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9] self-start sm:self-auto"
+                >
+                  Export Confirmations
+                </button>
+              </div>
+
               <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                 <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Equities</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">₱3,527,000.00</p>
-                  <p className="mt-0.5 text-[10px] text-[#2563eb]">73.2% allocation</p>
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Traded Value</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">
+                    {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.gross || 0), 0))}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#2563eb]">Gross turnover across {(selectedClient.trades || []).length} trades</p>
                 </div>
                 <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">UITFs &amp; Funds</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">₱651,000.00</p>
-                  <p className="mt-0.5 text-[10px] text-[#059669]">13.5% allocation</p>
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Commission</p>
+                  <p className="mt-1 text-sm font-bold text-[#059669]">
+                    {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.commission || 0), 0))}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#059669]">Broker assisted rate (0.25%)</p>
                 </div>
                 <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Liquid Cash</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">{formatPeso(selectedClient.cash)}</p>
-                  <p className="mt-0.5 text-[10px] text-[#d97706]">13.3% buying power</p>
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Settlement Status</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE T+2 Standard</p>
+                  <p className="mt-0.5 text-[10px] text-[#d97706]">Clearing &amp; custody assured</p>
                 </div>
               </div>
 
               <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
-                <table className="w-full min-w-[540px] text-left">
+                <table className="w-full min-w-[700px] text-left">
                   <thead>
                     <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
-                      <th className="px-3.5 py-2.5">Security</th>
-                      <th className="px-2.5 py-2.5">Type</th>
+                      <th className="px-3.5 py-2.5">Trade Ref</th>
+                      <th className="px-2.5 py-2.5">Side</th>
+                      <th className="px-2.5 py-2.5">Security</th>
                       <th className="px-2.5 py-2.5 text-right">Shares</th>
-                      <th className="px-2.5 py-2.5 text-right">Avg Cost</th>
-                      <th className="px-2.5 py-2.5 text-right">Price</th>
-                      <th className="px-2.5 py-2.5 text-right">Market Value</th>
-                      <th className="px-2.5 py-2.5 text-right">Return</th>
-                      <th className="px-3 py-2.5 text-right">Action</th>
+                      <th className="px-2.5 py-2.5 text-right">Fill Price</th>
+                      <th className="px-2.5 py-2.5 text-right">Gross Value</th>
+                      <th className="px-2.5 py-2.5 text-right">Comm &amp; Fees</th>
+                      <th className="px-2.5 py-2.5 text-right">Net Settlement</th>
+                      <th className="px-2.5 py-2.5">Settlement</th>
+                      <th className="px-2.5 py-2.5">Execution Time</th>
+                      <th className="px-2.5 py-2.5">Channel</th>
+                      <th className="px-3 py-2.5 text-right">Slip</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#f2f4f6] text-xs">
-                    {selectedClient.holdings.map((h) => (
-                      <tr key={h.ticker} className="hover:bg-[#f9fafb] transition">
-                        <td className="px-3.5 py-3">
-                          <span className="font-bold text-[#1e293b]">{h.ticker}</span>
-                          <span className="block text-[10px] text-[#8e94a0]">{h.name}</span>
-                        </td>
-                        <td className="px-2.5 py-3 text-[#64748b]">{h.type}</td>
-                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{h.shares.toLocaleString()}</td>
-                        <td className="px-2.5 py-3 text-right text-[#64748b]">₱{h.avgCost.toFixed(2)}</td>
-                        <td className="px-2.5 py-3 text-right font-semibold text-[#1e293b]">₱{h.currentPrice.toFixed(2)}</td>
-                        <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(h.value)}</td>
-                        <td className="px-2.5 py-3 text-right">
-                          <span className={`font-semibold ${h.gain >= 0 ? 'text-[#059669]' : 'text-[#dc2626]'}`}>
-                            {h.gain >= 0 ? '+' : ''}{h.gain.toFixed(2)}%
+                    {(selectedClient.trades || []).map((t) => (
+                      <tr key={t.id} className="hover:bg-[#f9fafb] transition">
+                        <td className="px-3.5 py-3 font-mono text-[11px] font-bold text-[#334155]">{t.id}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              t.side === 'BUY' ? 'bg-[#dcfce7] text-[#15803d]' : 'bg-[#fee2e2] text-[#b91c1c]'
+                            }`}
+                          >
+                            {t.side}
                           </span>
                         </td>
+                        <td className="px-2.5 py-3">
+                          <span className="font-bold text-[#1e293b]">{t.ticker}</span>
+                          <span className="block text-[10px] text-[#8e94a0]">{t.name}</span>
+                        </td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{t.shares.toLocaleString()}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{t.price.toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-right text-[#475467]">{formatPeso(t.gross)}</td>
+                        <td className="px-2.5 py-3 text-right text-[11px] text-[#64748b]">₱{(t.commission + (t.fees || 0)).toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(t.net)}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold ${
+                              t.status === 'SETTLED' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#fef3c7] text-[#92400e]'
+                            }`}
+                          >
+                            {t.settlement}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{t.time}</td>
+                        <td className="px-2.5 py-3 text-[10px] text-[#64748b]">{t.channel}</td>
                         <td className="px-3 py-3 text-right">
                           <button
                             type="button"
-                            onClick={() => openOrderModalForHolding(h)}
+                            onClick={() => triggerToast(`CGSI Confirmation Slip #${t.id}: ${t.side} ${t.shares.toLocaleString()} ${t.ticker} @ ₱${t.price.toFixed(2)} net ${formatPeso(t.net)}`)}
                             className="rounded-lg bg-[#eff6ff] px-2.5 py-1 text-[11px] font-semibold text-[#2563eb] hover:bg-[#dbeafe] transition"
                           >
-                            Trade
+                            Slip
                           </button>
                         </td>
                       </tr>
@@ -1936,13 +2169,15 @@ function ClientsPage() {
             </div>
           )}
 
-          {/* Middle Tab 2: Orders Blotter */}
+          {/* Middle Tab 2: Orders (Client Order Book) */}
           {activeTab === 'orders' && (
             <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                 <div>
                   <h3 className="text-sm font-semibold text-[#1f2937]">Client Order Book</h3>
-                  <p className="text-[11px] text-[#8e94a0]">Execution records for {selectedClient.name}</p>
+                  <p className="text-[11px] text-[#8e94a0]">
+                    Real-time working orders queued for execution on the PSE for {selectedClient.name}
+                  </p>
                 </div>
                 <button
                   type="button"
@@ -1953,15 +2188,41 @@ function ClientsPage() {
                     setOrderSide('BUY')
                     setOrderModalOpen(true)
                   }}
-                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition"
+                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition shadow-xs self-start sm:self-auto"
                 >
                   <Plus size={14} />
-                  <span>New Order</span>
+                  <span>+ Place Client Order</span>
                 </button>
               </div>
 
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Pending Fills</p>
+                  <p className="mt-1 text-sm font-bold text-[#d97706]">
+                    {selectedClient.orders.filter((o) => o.status === 'PENDING').length} orders
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#6b7280]">Awaiting price match on PSE</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Queued Capital</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">
+                    {formatPeso(
+                      selectedClient.orders
+                        .filter((o) => o.status === 'PENDING')
+                        .reduce((acc, o) => acc + o.shares * o.price, 0)
+                    )}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#2563eb]">Committed order value</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Exchange Gateway</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE Direct FIX</p>
+                  <p className="mt-0.5 text-[10px] text-[#059669]">Continuous trading session</p>
+                </div>
+              </div>
+
               <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
-                <table className="w-full min-w-[540px] text-left">
+                <table className="w-full min-w-[640px] text-left">
                   <thead>
                     <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
                       <th className="px-3.5 py-2.5">Order ID</th>
@@ -1977,7 +2238,14 @@ function ClientsPage() {
                   </thead>
                   <tbody className="divide-y divide-[#f2f4f6] text-xs">
                     {selectedClient.orders.map((o) => (
-                      <tr key={o.id} className="hover:bg-[#f9fafb] transition">
+                      <tr
+                        key={o.id}
+                        className={`transition ${
+                          o.id === selectedOrderId
+                            ? 'bg-[#eff6ff] ring-1 ring-[#93c5fd]'
+                            : 'hover:bg-[#f9fafb]'
+                        }`}
+                      >
                         <td className="px-3.5 py-3 font-mono text-[11px] font-semibold text-[#475467]">{o.id}</td>
                         <td className="px-2.5 py-3">
                           <span
@@ -2012,15 +2280,26 @@ function ClientsPage() {
                         <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{o.date}</td>
                         <td className="px-3.5 py-3 text-right">
                           {o.status === 'PENDING' ? (
-                            <button
-                              type="button"
-                              onClick={() => handleCancelOrder(o.id)}
-                              className="text-[11px] font-semibold text-[#dc2626] hover:underline"
-                            >
-                              Cancel
-                            </button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleExecuteOrder(o)}
+                                className="rounded-md bg-[#eff6ff] px-2 py-1 text-[11px] font-bold text-[#2563eb] hover:bg-[#dbeafe] transition"
+                              >
+                                Fill Order
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleCancelOrder(o.id)}
+                                className="rounded-md bg-[#fef2f2] px-2 py-1 text-[11px] font-semibold text-[#dc2626] hover:bg-[#fee2e2] transition"
+                              >
+                                Cancel
+                              </button>
+                            </div>
                           ) : (
-                            <span className="text-[10px] text-[#9ca3af]">—</span>
+                            <span className="text-[10px] font-medium text-[#9ca3af]">
+                              {o.status === 'EXECUTED' ? '✓ Filled' : 'Cancelled'}
+                            </span>
                           )}
                         </td>
                       </tr>
