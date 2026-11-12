@@ -1930,52 +1930,23 @@ function ClientsPage() {
         <div className="flex min-w-0 flex-1 flex-col border-b border-[#edeef0] xl:border-b-0 xl:border-r">
           {/* Client Summary Top Bar - Broker-Assisted Trading Account Card */}
           <div className="border-b border-[#edeef0] bg-[#fafbfc] p-4 sm:p-5">
-            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-3">
-                <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
-                  {selectedClient.avatar}
-                </span>
-                <div>
-                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                    <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
-                    <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
-                      Broker-Assisted Account
-                    </span>
-                    <span className="rounded-md bg-[#ecfdf5] border border-[#a7f3d0] px-2 py-0.5 text-[9.5px] font-semibold text-[#065f46]">
-                      Trading Mandate Active
-                    </span>
-                    <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
-                      {selectedClient.category}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 text-xs text-[#8a909d]">
-                    Account #{selectedClient.accountNumber} · Licensed Broker: <span className="font-semibold text-[#334155]">Alex Johnson (CRN #84920)</span> · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
-                  </p>
+            <div className="flex items-center gap-3">
+              <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
+                {selectedClient.avatar}
+              </span>
+              <div>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
+                  <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
+                    Broker-Assisted Account
+                  </span>
+                  <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
+                    {selectedClient.category}
+                  </span>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => triggerToast(`Exported formal CGSI broker-assisted blotter for ${selectedClient.name}`)}
-                  className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9]"
-                >
-                  Export Blotter
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrderTicker('SMPH')
-                    setOrderPrice(32.50)
-                    setOrderShares(1000)
-                    setOrderSide('BUY')
-                    setOrderModalOpen(true)
-                  }}
-                  className="flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#1d4ed8]"
-                >
-                  <Plus size={14} />
-                  <span>Place Order</span>
-                </button>
+                <p className="mt-0.5 text-xs text-[#8a909d]">
+                  Account #{selectedClient.accountNumber} · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
+                </p>
               </div>
             </div>
 
@@ -2010,24 +1981,6 @@ function ClientsPage() {
                 <p className="mt-0.5 text-[10px] text-[#d97706] font-medium">
                   {selectedClient.orders.filter((o) => o.status === 'PENDING').length} active orders pending fill
                 </p>
-              </div>
-            </div>
-
-            {/* Broker-Assisted Compliance & Exchange Gateway Strip */}
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#e2e8f0] bg-white px-3.5 py-2 text-[11px] text-[#4b5563]">
-              <div className="flex items-center gap-1.5">
-                <ShieldCheck size={14} className="text-[#059669] shrink-0" />
-                <span>
-                  <strong className="text-[#1f2937]">Execution Mandate:</strong> Verbal & chat order instructions authorized under PSE guidelines.
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-[10px] text-[#64748b]">
-                <span className="inline-flex items-center gap-1">
-                  <span className="size-1.5 rounded-full bg-[#10b981]" />
-                  PSE Direct FIX Gateway
-                </span>
-                <span>·</span>
-                <span className="font-medium text-[#1e293b]">Best Execution Active</span>
               </div>
             </div>
           </div>
