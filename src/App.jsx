@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Navigate, NavLink as RouterNavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
-  ArrowDownLeft,
   ArrowRight,
   ArrowUpDown,
   ArrowUpRight,
@@ -40,6 +39,8 @@ import {
   WalletCards,
   X,
 } from 'lucide-react'
+import { getAccountQuickActions, isFundCategory } from './utils/accountQuickActions'
+import { getScopedAccountContent } from './utils/accountContent'
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
@@ -105,6 +106,45 @@ const activities = [
   { title: 'Recurring investment', detail: 'Total Market ETF · Today, 9:42 AM', amount: '-₱150.00', kind: 'invest' },
   { title: 'Dividend received', detail: 'International ETF · Oct 12, 2026', amount: '+₱18.24', kind: 'income' },
   { title: 'Deposit completed', detail: 'Bank transfer · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
+]
+
+const accountHoldings = [
+  { accountId: 'account-1', category: 'equities', ticker: 'SM', name: 'SM Investments Corp.', type: 'PSE equity', units: '8.0 shares', value: 7240, change: 5.42, color: '#2563eb' },
+  { accountId: 'account-1', category: 'equities', ticker: 'BDO', name: 'BDO Unibank, Inc.', type: 'PSE equity', units: '14.1 shares', value: 2182.16, change: 4.48, color: '#3b82f6' },
+  { accountId: 'account-2', category: 'equities', ticker: 'VTI', name: 'Total Market ETF', type: 'US equities', units: '18.2 shares', value: 3980.4, change: 4.28, color: '#3b82f6' },
+  { accountId: 'account-2', category: 'equities', ticker: 'VXUS', name: 'International ETF', type: 'Global equities', units: '24.6 shares', value: 2238, change: 2.14, color: '#707c9a' },
+  { accountId: 'account-3', category: 'equities', ticker: 'AC', name: 'Ayala Corporation', type: 'PSE equity', units: '1.5 shares', value: 963, change: 7.85, color: '#60a5fa' },
+  { accountId: 'account-3', category: 'equities', ticker: 'ALI', name: 'Ayala Land, Inc.', type: 'PSE equity', units: '18.6 shares', value: 636.44, change: 6.12, color: '#3b82f6' },
+  { accountId: 'account-4', category: 'uitfs', ticker: 'BDOEI', name: 'BDO Equity Index UITF', type: 'PSEi tracker', units: '21.4 units', value: 2180.5, change: 3.8, color: '#0d9488' },
+  { accountId: 'account-5', category: 'uitfs', ticker: 'BPIST', name: 'BPI Short Term UITF', type: 'Money market', units: '8.1 units', value: 1300, change: 2.4, color: '#14b8a6' },
+  { accountId: 'account-6', category: 'mutual-fund', ticker: 'ALFMG', name: 'ALFM Growth Mutual Fund', type: 'PH equity fund', units: '6.4 shares', value: 1680, change: 4.1, color: '#d97706' },
+  { accountId: 'account-7', category: 'mutual-fund', ticker: 'PEFI', name: 'Philequity Mutual Fund', type: 'PH growth fund', units: '28.5 shares', value: 1080, change: 5.6, color: '#f59e0b' },
+  { accountId: 'account-8', category: 'others', ticker: 'RTB30', name: 'Retail Treasury Bond 5Y', type: 'Gov. fixed income', units: '9.0 units', value: 900, change: 1.1, color: '#7c3aed' },
+  { accountId: 'account-9', category: 'others', ticker: 'TRUST', name: 'CGSI Balanced Trust', type: 'Trust mandate', units: '3.0 units', value: 300, change: 2.2, color: '#8b5cf6' },
+]
+
+const accountActivities = [
+  { accountId: 'account-1', category: 'equities', title: 'Buy order filled', detail: 'SM Investments · Today, 10:15 AM', amount: '-₱1,500.00', kind: 'invest' },
+  { accountId: 'account-1', category: 'equities', title: 'Cash dividend', detail: 'BDO Unibank · Oct 11, 2026', amount: '+₱42.50', kind: 'income' },
+  { accountId: 'account-1', category: 'equities', title: 'Margin interest settled', detail: 'Monthly billing · Oct 05, 2026', amount: '-₱18.20', kind: 'invest' },
+  { accountId: 'account-2', category: 'equities', title: 'Rebalance executed', detail: 'Total Market ETF · Today, 9:42 AM', amount: '-₱150.00', kind: 'invest' },
+  { accountId: 'account-2', category: 'equities', title: 'Dividend received', detail: 'International ETF · Oct 12, 2026', amount: '+₱18.24', kind: 'income' },
+  { accountId: 'account-2', category: 'equities', title: 'Deposit completed', detail: 'Bank transfer · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
+  { accountId: 'account-3', category: 'equities', title: 'Broker limit buy', detail: 'Ayala Corporation · Yesterday, 2:30 PM', amount: '-₱642.00', kind: 'invest' },
+  { accountId: 'account-3', category: 'equities', title: 'Cash dividend', detail: 'Ayala Land · Oct 09, 2026', amount: '+₱24.10', kind: 'income' },
+  { accountId: 'account-3', category: 'equities', title: 'Deposit completed', detail: 'InstaPay transfer · Oct 06, 2026', amount: '+₱350.00', kind: 'deposit' },
+  { accountId: 'account-4', category: 'uitfs', title: 'UITF subscription', detail: 'BDO Equity Index Fund · Oct 14, 2026', amount: '-₱500.00', kind: 'invest' },
+  { accountId: 'account-4', category: 'uitfs', title: 'Deposit completed', detail: 'BDO Online · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
+  { accountId: 'account-5', category: 'uitfs', title: 'UITF subscription', detail: 'BPI Short Term Fund · Oct 12, 2026', amount: '-₱300.00', kind: 'invest' },
+  { accountId: 'account-5', category: 'uitfs', title: 'NavPU gain posted', detail: 'BPI Short Term Fund · Oct 08, 2026', amount: '+₱12.80', kind: 'income' },
+  { accountId: 'account-6', category: 'mutual-fund', title: 'Monthly subscription', detail: 'ALFM Growth Fund · Oct 15, 2026', amount: '-₱400.00', kind: 'invest' },
+  { accountId: 'account-6', category: 'mutual-fund', title: 'Deposit completed', detail: 'Auto-debit · Oct 15, 2026', amount: '+₱400.00', kind: 'deposit' },
+  { accountId: 'account-7', category: 'mutual-fund', title: 'Fund subscription', detail: 'Philequity Fund · Oct 11, 2026', amount: '-₱280.00', kind: 'invest' },
+  { accountId: 'account-7', category: 'mutual-fund', title: 'Quarterly gain', detail: 'Philequity Fund · Oct 04, 2026', amount: '+₱31.50', kind: 'income' },
+  { accountId: 'account-8', category: 'others', title: 'Coupon credited', detail: 'Retail Treasury Bond · Oct 13, 2026', amount: '+₱14.60', kind: 'income' },
+  { accountId: 'account-8', category: 'others', title: 'Bond allocation', detail: 'Margin Fixed Income · Oct 02, 2026', amount: '-₱450.00', kind: 'invest' },
+  { accountId: 'account-9', category: 'others', title: 'Trust distribution', detail: 'CGSI Balanced Trust · Oct 09, 2026', amount: '+₱8.40', kind: 'income' },
+  { accountId: 'account-9', category: 'others', title: 'Initial funding', detail: 'Discretionary Trust · Oct 01, 2026', amount: '+₱300.00', kind: 'deposit' },
 ]
 
 const rangeReturns = { '1W': '+1.24%', '1M': '+5.49%', '3M': '+8.16%', '1Y': '+12.38%', ALL: '+18.62%' }
@@ -680,32 +720,46 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                   </span>
                 </button>
 
-                {isSelected && (
-                  <div
-                    role="region"
-                    aria-label={`Quick actions for ${account.name}`}
-                    className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#d5dbe5] bg-white px-2 pb-2 pt-4 shadow-xs"
-                  >
-                    <div className="grid grid-cols-2 gap-1.5">
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/funding?mode=deposit&account=${encodeURIComponent(account.id)}`)}
-                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#2563eb] px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]"
-                      >
-                        <ArrowDownLeft size={12} />
-                        <span>Deposit</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/funding?mode=withdraw&account=${encodeURIComponent(account.id)}`)}
-                        className="inline-flex items-center justify-center gap-1 rounded-lg border border-[#dce1ea] bg-white px-2 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#f8f9fb]"
-                      >
-                        <ArrowUpRight size={12} />
-                        <span>Withdraw</span>
-                      </button>
+                {isSelected && (() => {
+                  const quickActions = getAccountQuickActions(account)
+                  return (
+                    <div
+                      role="region"
+                      aria-label={`Quick actions for ${account.name}`}
+                      className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#d5dbe5] bg-white px-2 pb-2 pt-4 shadow-xs"
+                    >
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {quickActions.primary.map((action) => (
+                          <button
+                            key={action.id}
+                            type="button"
+                            onClick={() => navigate(action.to)}
+                            className={
+                              action.primary
+                                ? 'inline-flex items-center justify-center gap-1 rounded-lg bg-[#2563eb] px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]'
+                                : 'inline-flex items-center justify-center gap-1 rounded-lg border border-[#dce1ea] bg-white px-2 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#f8f9fb]'
+                            }
+                          >
+                            {action.primary ? <Plus size={12} /> : <ArrowUpRight size={12} />}
+                            <span>{action.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-[#eef0f4] pt-1.5">
+                        {quickActions.fixed.map((action) => (
+                          <button
+                            key={action.id}
+                            type="button"
+                            onClick={() => navigate(action.to)}
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-[#e5e8ef] bg-[#f7f8fb] px-1 py-1.5 text-[9.5px] font-semibold text-[#475063] transition hover:border-[#c9d2e3] hover:bg-[#eff3fa] hover:text-[#2563eb] sm:text-[10px]"
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )
+                })()}
               </div>
             )
           })}
@@ -735,22 +789,22 @@ function HoldingMark({ ticker, color }) {
   return <span className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold tracking-tight text-white" style={{ backgroundColor: color }}>{ticker.slice(0, 3)}</span>
 }
 
-function HoldingsTable({ limit }) {
-  const visible = limit ? holdings.slice(0, limit) : holdings
+function HoldingsTable({ limit, items = holdings }) {
+  const visible = limit ? items.slice(0, limit) : items
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[610px] text-left">
         <thead><tr className="border-b border-[#edeef0] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#a0a3aa]"><th className="px-5 py-3 font-semibold sm:px-6">Investment</th><th className="px-4 py-3 font-semibold">Units</th><th className="px-4 py-3 text-right font-semibold">Value</th><th className="px-5 py-3 text-right font-semibold sm:px-6">Return</th></tr></thead>
-        <tbody>{visible.map((holding) => <tr key={holding.ticker} className="border-b border-[#f0f1f2] last:border-0"><td className="px-5 py-4 sm:px-6"><div className="flex items-center gap-3"><HoldingMark ticker={holding.ticker} color={holding.color} /><div><p className="text-sm font-semibold text-[#393e4b]">{holding.name}</p><p className="mt-0.5 text-xs text-[#9b9ea4]">{holding.ticker} · {holding.type}</p></div></div></td><td className="px-4 py-4 text-xs text-[#7f838c]">{holding.units}</td><td className="px-4 py-4 text-right text-sm font-semibold text-[#3d424e]">{formatPeso(holding.value)}</td><td className="px-5 py-4 text-right sm:px-6"><Change value={`${holding.change > 0 ? '+' : ''}${holding.change.toFixed(2)}%`} /></td></tr>)}</tbody>
+        <tbody>{visible.map((holding) => <tr key={`${holding.accountId || 'global'}-${holding.ticker}`} className="border-b border-[#f0f1f2] last:border-0"><td className="px-5 py-4 sm:px-6"><div className="flex items-center gap-3"><HoldingMark ticker={holding.ticker} color={holding.color} /><div><p className="text-sm font-semibold text-[#393e4b]">{holding.name}</p><p className="mt-0.5 text-xs text-[#9b9ea4]">{holding.ticker} · {holding.type}</p></div></div></td><td className="px-4 py-4 text-xs text-[#7f838c]">{holding.units}</td><td className="px-4 py-4 text-right text-sm font-semibold text-[#3d424e]">{formatPeso(holding.value)}</td><td className="px-5 py-4 text-right sm:px-6"><Change value={`${holding.change > 0 ? '+' : ''}${holding.change.toFixed(2)}%`} /></td></tr>)}</tbody>
       </table>
     </div>
   )
 }
 
-function ActivityList({ limit }) {
+function ActivityList({ limit, items = activities }) {
   return (
     <div className="divide-y divide-[#eff0f2]">
-      {activities.slice(0, limit || activities.length).map((activity) => <div key={activity.title} className="flex items-center gap-3 py-4 first:pt-1 last:pb-0"><span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${activity.kind === 'income' ? 'bg-[#edf0f5] text-[#5e6e92]' : activity.kind === 'deposit' ? 'bg-[#f4efe8] text-[#b9824d]' : 'bg-[#eff2f5] text-[#75869b]'}`}><Icon name={activity.kind === 'invest' ? 'portfolio' : activity.kind === 'deposit' ? 'plus' : 'up'} size={16} /></span><div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-[#464b56]">{activity.title}</p><p className="mt-1 truncate text-[10px] text-[#a0a3aa]">{activity.detail}</p></div><span className={`shrink-0 text-xs font-semibold ${activity.amount.startsWith('+') ? 'text-[#485980]' : 'text-[#585c65]'}`}>{activity.amount}</span></div>)}
+      {items.slice(0, limit || items.length).map((activity) => <div key={`${activity.accountId || 'global'}-${activity.title}-${activity.detail}`} className="flex items-center gap-3 py-4 first:pt-1 last:pb-0"><span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${activity.kind === 'income' ? 'bg-[#edf0f5] text-[#5e6e92]' : activity.kind === 'deposit' ? 'bg-[#f4efe8] text-[#b9824d]' : 'bg-[#eff2f5] text-[#75869b]'}`}><Icon name={activity.kind === 'invest' ? 'portfolio' : activity.kind === 'deposit' ? 'plus' : 'up'} size={16} /></span><div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-[#464b56]">{activity.title}</p><p className="mt-1 truncate text-[10px] text-[#a0a3aa]">{activity.detail}</p></div><span className={`shrink-0 text-xs font-semibold ${activity.amount.startsWith('+') ? 'text-[#485980]' : 'text-[#585c65]'}`}>{activity.amount}</span></div>)}
     </div>
   )
 }
@@ -960,14 +1014,26 @@ function HomePage() {
   const [range, setRange] = useState('1M')
   const [selectedCategory, setSelectedCategory] = useState('overall')
   const [selectedAccountId, setSelectedAccountId] = useState(null)
+  const scopedContent = useMemo(
+    () =>
+      getScopedAccountContent({
+        category: selectedCategory,
+        accountId: selectedAccountId,
+        holdings: accountHoldings,
+        activities: accountActivities,
+        defaultHoldings: holdings,
+        defaultActivities: activities,
+      }),
+    [selectedCategory, selectedAccountId],
+  )
 
   return (
     <div className="space-y-6">
       <PortfolioValueCard range={range} setRange={setRange} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedAccountId={selectedAccountId} setSelectedAccountId={setSelectedAccountId} />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,0.8fr)]">
-        <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-2 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Your investments</h2><p className="mt-1 text-xs text-[#9a9da4]">A quick look at your holdings</p></div><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-semibold text-[#646e84] hover:text-[#313e5d]">See all</button></div><HoldingsTable limit={3} /></Card>
-        <Card className="p-5 sm:p-6"><div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-[#343a48]">Recent activity</h2><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-medium text-[#6f7789]">History</button></div><ActivityList limit={3} /></Card>
+        <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-3 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Your investments</h2></div><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-semibold text-[#646e84] hover:text-[#313e5d]">See all</button></div><HoldingsTable limit={3} items={scopedContent.holdings} /></Card>
+        <Card className="p-5 sm:p-6"><div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-[#343a48]">Recent activity</h2><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-medium text-[#6f7789]">History</button></div><ActivityList limit={3} items={scopedContent.activities} /></Card>
       </div>
 
       <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-[#e7e9ec] bg-[#f6f7f9] p-5 sm:flex-row sm:items-center sm:px-7"><div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#636f88] shadow-sm"><Icon name="learn" size={18} /></span><div><p className="text-sm font-semibold text-[#3d4351]">A little learning goes a long way</p><p className="mt-1 text-xs text-[#8c9099]">Explore bite-sized guides to investing with confidence.</p></div></div><button onClick={() => navigate('/learn')} type="button" className="inline-flex items-center gap-2 text-xs font-semibold text-[#525e79]">Explore the library <Icon name="arrow" size={14} /></button></div>
@@ -976,11 +1042,141 @@ function HomePage() {
 }
 
 function PortfolioPage() {
+  const location = useLocation()
+  return <PortfolioPageContent key={location.search} search={location.search} />
+}
+
+function PortfolioPageContent({ search }) {
   const navigate = useNavigate()
   const [range, setRange] = useState('1M')
+  const searchParams = new URLSearchParams(search)
+  const rawAction = (searchParams.get('action') || '').toLowerCase()
+  const selectedAccount = investmentAccounts.find((item) => item.id === searchParams.get('account')) || null
+  const isFundAction = selectedAccount
+    ? isFundCategory(selectedAccount.category)
+    : rawAction === 'subscribe' || rawAction === 'redeem'
+  const actionOptions = isFundAction ? ['Subscribe', 'Redeem'] : ['Buy', 'Sell']
+  const defaultAction =
+    rawAction === 'redeem'
+      ? 'Redeem'
+      : rawAction === 'subscribe'
+        ? 'Subscribe'
+        : rawAction === 'sell'
+          ? 'Sell'
+          : rawAction === 'buy'
+            ? 'Buy'
+            : actionOptions[0]
+  const showQuickOrder = Boolean(rawAction || selectedAccount)
+  const [orderAction, setOrderAction] = useState(defaultAction)
+  const instrumentOptions = isFundAction
+    ? investmentAccounts.filter((item) => isFundCategory(item.category)).map((item) => item.name)
+    : holdings.map((item) => `${item.ticker} · ${item.name}`)
+  const [instrument, setInstrument] = useState(
+    selectedAccount && isFundAction ? selectedAccount.name : instrumentOptions[0] || '',
+  )
+  const [orderAmount, setOrderAmount] = useState('')
+  const [orderNotice, setOrderNotice] = useState('')
+  const selectedCategory = selectedAccount
+    ? portfolioCategories.find((item) => item.id === selectedAccount.category)
+    : null
+
+  function handleQuickOrderSubmit(event) {
+    event.preventDefault()
+    if (!orderAmount || Number(orderAmount) <= 0) {
+      setOrderNotice('Enter an amount greater than ₱0 to continue.')
+      return
+    }
+    setOrderNotice(
+      `${orderAction} order for ${formatPeso(Number(orderAmount))} of ${instrument}${selectedAccount ? ` in ${selectedAccount.name}` : ''} is ready in this demo.`,
+    )
+  }
+
   return (
     <div className="space-y-6">
       <PageIntro title="Your portfolio" subtitle="Track your investments and see how they're growing." action={<button onClick={() => navigate('/products')} type="button" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8]"><Icon name="plus" size={16} />Explore investments</button>} />
+      {showQuickOrder && (
+        <Card className="p-5 sm:p-6">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              {selectedAccount && (
+                <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: selectedCategory?.color || selectedAccount.color }} />
+              )}
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold text-[#343a48]">
+                  {isFundAction ? 'Fund subscription & redemption' : 'Trade order'}
+                </h2>
+                {selectedAccount && (
+                  <p className="mt-0.5 flex flex-wrap items-center gap-1 text-[11px] text-[#8d93a0]">
+                    <span className="font-semibold text-[#454b58]">{selectedAccount.name}</span>
+                    {selectedCategory && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-semibold" style={{ color: selectedCategory.color }}>{selectedCategory.label}</span>
+                      </>
+                    )}
+                    <span aria-hidden="true">·</span>
+                    <span className="font-mono">{selectedAccount.accountNumber}</span>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-semibold text-[#343a48]">{formatPeso(selectedAccount.value)}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label="Close quick action panel"
+              onClick={() => navigate('/portfolio')}
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#8f939b] hover:bg-[#f3f4f6]"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="mb-4 flex max-w-sm rounded-xl bg-[#f2f3f5] p-1">
+            {actionOptions.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => { setOrderAction(item); setOrderNotice('') }}
+                className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${orderAction === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <form onSubmit={handleQuickOrderSubmit} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,180px)_auto] sm:items-end">
+            <label className="block text-xs font-medium text-[#6f7480]">
+              {isFundAction ? 'Fund' : 'Investment'}
+              <select
+                value={instrument}
+                onChange={(event) => setInstrument(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-[#e4e6ea] bg-white px-3 py-2.5 text-xs font-medium text-[#393f4e] outline-none focus:border-[#828da4]"
+              >
+                {instrumentOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-xs font-medium text-[#6f7480]">
+              Amount (PHP)
+              <input
+                inputMode="decimal"
+                value={orderAmount}
+                onChange={(event) => setOrderAmount(event.target.value)}
+                placeholder="₱0.00"
+                className="mt-1.5 w-full rounded-xl border border-[#e4e6ea] bg-white px-3 py-2.5 text-xs font-semibold text-[#393f4e] outline-none focus:border-[#828da4]"
+              />
+            </label>
+            <button type="submit" className="rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#1d4ed8]">
+              Review {orderAction.toLowerCase()}
+            </button>
+          </form>
+          {orderNotice && (
+            <p role="status" className={`mt-3 rounded-xl px-4 py-2.5 text-xs ${orderNotice.startsWith('Enter') ? 'bg-[#fcf3ec] text-[#a06b43]' : 'bg-[#edf0f6] text-[#485674]'}`}>
+              {orderNotice}
+            </p>
+          )}
+        </Card>
+      )}
       <div className="grid gap-4 sm:grid-cols-3">
         {[["Total value", formatPeso(24680.5), 'Including cash balance'], ['Total invested', formatPeso(21420), 'Across 4 positions'], ['Total return', `+${formatPeso(1284.2)}`, '+5.49% all time']].map(([label, value, detail], i) => <Card key={label} className="p-5"><p className="text-xs text-[#9498a0]">{label}</p><p className={`mt-3 text-2xl font-semibold tracking-tight ${i === 2 ? 'text-[#445680]' : 'text-[#353b48]'}`}>{value}</p><p className="mt-1 text-xs text-[#a0a3a9]">{detail}</p></Card>)}
       </div>
@@ -1051,19 +1247,27 @@ function FundingPage() {
 
 function FundingPageContent({ search }) {
   const searchParams = new URLSearchParams(search)
-  const initialMode = searchParams.get('mode') === 'withdraw' ? 'Withdraw' : 'Add money'
+  const rawMode = searchParams.get('mode')
+  const initialMode = rawMode === 'withdraw' ? 'Withdraw' : rawMode === 'transfer' ? 'Transfer' : 'Add money'
   const selectedAccount = investmentAccounts.find((item) => item.id === searchParams.get('account')) || null
   const selectedCategory = selectedAccount ? portfolioCategories.find((item) => item.id === selectedAccount.category) : null
+  const transferTargets = investmentAccounts.filter((item) => item.id !== selectedAccount?.id)
   const [mode, setMode] = useState(initialMode)
   const [amount, setAmount] = useState('')
   const [method, setMethod] = useState('bank')
+  const [transferTargetId, setTransferTargetId] = useState(transferTargets[0]?.id || '')
   const [notice, setNotice] = useState('')
   const methods = [{ id: 'bank', name: 'Bank transfer', detail: '1–3 business days', mark: 'BK' }, { id: 'debit', name: 'Debit card', detail: 'Usually instant', mark: '••' }]
   const availableBalance = selectedAccount ? selectedAccount.value : 3260.5
+  const destinationAccount = transferTargets.find((item) => item.id === transferTargetId) || transferTargets[0]
   function handleSubmit(event) {
     event.preventDefault()
     if (!amount || Number(amount) <= 0) {
       setNotice('Enter an amount greater than ₱0 to continue.')
+      return
+    }
+    if (mode === 'Transfer') {
+      setNotice(`Transfer request for ${formatPeso(Number(amount))}${selectedAccount ? ` from ${selectedAccount.name}` : ''}${destinationAccount ? ` to ${destinationAccount.name}` : ''} is ready in this demo.`)
       return
     }
     setNotice(`${mode} request for ${formatPeso(Number(amount))}${selectedAccount ? ` (${selectedAccount.name})` : ''} is ready in this demo.`)
@@ -1089,12 +1293,30 @@ function FundingPageContent({ search }) {
               <span className="shrink-0 text-xs font-semibold text-[#343a48]">{formatPeso(selectedAccount.value)}</span>
             </div>
           )}
-          <div className="mb-7 flex rounded-xl bg-[#f2f3f5] p-1">{['Add money', 'Withdraw'].map((item) => <button key={item} onClick={() => { setMode(item); setNotice('') }} type="button" className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${mode === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}>{item}</button>)}</div>
+          <div className="mb-7 flex rounded-xl bg-[#f2f3f5] p-1">{['Add money', 'Withdraw', 'Transfer'].map((item) => <button key={item} onClick={() => { setMode(item); setNotice('') }} type="button" className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${mode === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}>{item}</button>)}</div>
           <form onSubmit={handleSubmit}>
-            <label className="block text-xs font-semibold text-[#595e6a]" htmlFor="amount">{mode === 'Add money' ? 'How much would you like to add?' : 'How much would you like to withdraw?'}</label>
+            <label className="block text-xs font-semibold text-[#595e6a]" htmlFor="amount">{mode === 'Add money' ? 'How much would you like to add?' : mode === 'Withdraw' ? 'How much would you like to withdraw?' : 'How much would you like to transfer?'}</label>
             <div className="mt-3 flex items-center rounded-xl border border-[#e4e6ea] px-4 py-4 focus-within:border-[#828da4]"><span className="mr-2 text-xl text-[#9a9ea5]">₱</span><input id="amount" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00" className="w-full bg-transparent text-2xl font-semibold tracking-tight text-[#393f4e] outline-none placeholder:text-[#c1c4c9]" /><span className="text-xs text-[#9b9fa6]">PHP</span></div>
-            <p className="mt-2 text-[10px] text-[#9da0a7]">{mode === 'Add money' ? `Available balance: ${formatPeso(availableBalance)}` : `Withdrawable balance: ${formatPeso(availableBalance)}`}</p>
-            <div className="mt-7"><p className="mb-3 text-xs font-semibold text-[#595e6a]">Choose a method</p><div className="space-y-2">{methods.map((item) => <button key={item.id} onClick={() => setMethod(item.id)} type="button" className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${method === item.id ? 'border-[#7f8aa1] bg-[#f6f7fa]' : 'border-[#e9eaed] hover:bg-[#fafafb]'}`}><span className="flex size-10 items-center justify-center rounded-lg bg-white text-[10px] font-bold text-[#666f81] shadow-sm">{item.mark}</span><span className="flex-1"><span className="block text-xs font-semibold text-[#525763]">{item.name}</span><span className="mt-1 block text-[10px] text-[#9a9da4]">{item.detail}</span></span><span className={`flex size-4 items-center justify-center rounded-full border ${method === item.id ? 'border-[#546282] bg-[#546282]' : 'border-[#d5d8dd]'}`}>{method === item.id && <span className="size-1.5 rounded-full bg-white" />}</span></button>)}</div></div>
+            <p className="mt-2 text-[10px] text-[#9da0a7]">{mode === 'Add money' ? `Available balance: ${formatPeso(availableBalance)}` : mode === 'Withdraw' ? `Withdrawable balance: ${formatPeso(availableBalance)}` : `Transferable balance: ${formatPeso(availableBalance)}`}</p>
+            {mode === 'Transfer' ? (
+              <div className="mt-7">
+                <label className="mb-3 block text-xs font-semibold text-[#595e6a]" htmlFor="transfer-destination">Transfer to account</label>
+                <select
+                  id="transfer-destination"
+                  value={transferTargetId}
+                  onChange={(event) => setTransferTargetId(event.target.value)}
+                  className="w-full rounded-xl border border-[#e4e6ea] bg-white px-4 py-3 text-xs font-semibold text-[#393f4e] outline-none focus:border-[#828da4]"
+                >
+                  {transferTargets.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} · {item.accountNumber} ({formatPeso(item.value)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="mt-7"><p className="mb-3 text-xs font-semibold text-[#595e6a]">Choose a method</p><div className="space-y-2">{methods.map((item) => <button key={item.id} onClick={() => setMethod(item.id)} type="button" className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${method === item.id ? 'border-[#7f8aa1] bg-[#f6f7fa]' : 'border-[#e9eaed] hover:bg-[#fafafb]'}`}><span className="flex size-10 items-center justify-center rounded-lg bg-white text-[10px] font-bold text-[#666f81] shadow-sm">{item.mark}</span><span className="flex-1"><span className="block text-xs font-semibold text-[#525763]">{item.name}</span><span className="mt-1 block text-[10px] text-[#9a9da4]">{item.detail}</span></span><span className={`flex size-4 items-center justify-center rounded-full border ${method === item.id ? 'border-[#546282] bg-[#546282]' : 'border-[#d5d8dd]'}`}>{method === item.id && <span className="size-1.5 rounded-full bg-white" />}</span></button>)}</div></div>
+            )}
             {notice && <p role="status" className={`mt-5 rounded-xl px-4 py-3 text-xs ${notice.startsWith('Enter') ? 'bg-[#fcf3ec] text-[#a06b43]' : 'bg-[#edf0f6] text-[#485674]'}`}>{notice}</p>}
             <button type="submit" className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]">Review {mode.toLowerCase()}</button>
             <p className="mt-3 text-center text-[10px] leading-5 text-[#a0a3aa]">Demo only. No funds will be moved.</p>
