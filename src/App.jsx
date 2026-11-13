@@ -771,57 +771,58 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-start">
         <div className="min-w-0 space-y-4">
-          <Card className="min-w-0 p-5 sm:p-6">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <button
-                  type="button"
-                  aria-expanded={showChart}
-                  aria-label="Toggle to view chart"
-                  title="Toggle to view chart"
-                  onClick={() => setShowChart(!showChart)}
-                  className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
-                    showChart
-                      ? 'text-[#2563eb] dark:text-[#60a5fa]'
-                      : 'text-[#555c6b] dark:text-[#9da3b1]'
-                  }`}
-                >
-                  <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
-                  <span>Toggle to view chart</span>
-                  <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
-                </button>
-              </div>
-
-              <div className="flex items-center rounded-xl bg-[#f2f4f7] p-1" role="tablist" aria-label="Balance view toggle">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={balanceView === 'assets'}
-                  onClick={() => setBalanceView('assets')}
-                  className={`flex flex-col items-center justify-center rounded-lg px-3 py-1 text-center text-xs font-semibold leading-tight transition ${
-                    balanceView === 'assets'
-                      ? 'bg-white text-[#2563eb] shadow-sm'
-                      : 'text-[#7e8490] hover:text-[#343a48]'
-                  }`}
-                >
-                  <span>Total Assets</span>
-                  <span className={`text-[10px] font-normal ${balanceView === 'assets' ? 'text-[#2563eb]' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={balanceView === 'cash'}
-                  onClick={() => setBalanceView('cash')}
-                  className={`flex h-full items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                    balanceView === 'cash'
-                      ? 'bg-white text-[#2563eb] shadow-sm'
-                      : 'text-[#7e8490] hover:text-[#343a48]'
-                  }`}
-                >
-                  Available Cash
-                </button>
-              </div>
+          <div>
+            <div className="grid w-full grid-cols-2 items-end gap-0" role="tablist" aria-label="Balance view toggle">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={balanceView === 'assets'}
+                onClick={() => setBalanceView('assets')}
+                className={`relative flex items-center justify-center gap-1.5 whitespace-nowrap rounded-tl-2xl border-l border-t border-r border-[#e9eaed] px-3.5 py-2.5 text-xs font-semibold transition sm:px-4 ${
+                  balanceView === 'assets'
+                    ? 'attached-tab-active z-10 -mb-px bg-white pb-[11px] text-[#2563eb]'
+                    : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
+                }`}
+              >
+                <span>Total Assets</span>
+                <span className={`hidden text-[10px] font-normal sm:inline ${balanceView === 'assets' ? 'text-[#2563eb]/85' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={balanceView === 'cash'}
+                onClick={() => setBalanceView('cash')}
+                className={`relative flex items-center justify-center whitespace-nowrap rounded-tr-2xl border-t border-r border-[#e9eaed] px-3.5 py-2.5 text-xs font-semibold transition sm:px-4 ${
+                  balanceView === 'cash'
+                    ? 'attached-tab-active z-10 -mb-px bg-white pb-[11px] text-[#2563eb]'
+                    : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
+                }`}
+              >
+                Available Cash
+              </button>
             </div>
+
+            <Card className="min-w-0 rounded-t-none p-5 sm:p-6">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <button
+                    type="button"
+                    aria-expanded={showChart}
+                    aria-label="Toggle to view chart"
+                    title="Toggle to view chart"
+                    onClick={() => setShowChart(!showChart)}
+                    className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
+                      showChart
+                        ? 'text-[#2563eb] dark:text-[#60a5fa]'
+                        : 'text-[#555c6b] dark:text-[#9da3b1]'
+                    }`}
+                  >
+                    <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
+                    <span>Toggle to view chart</span>
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
+                  </button>
+                </div>
+              </div>
 
             {balanceView === 'assets' ? (
               <div className="grid grid-cols-2 items-start gap-3 sm:gap-6">
@@ -881,7 +882,8 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                 <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} />
               </div>
             )}
-          </Card>
+            </Card>
+          </div>
 
           <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
         </div>
