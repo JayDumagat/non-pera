@@ -41,6 +41,7 @@ import {
 } from 'lucide-react'
 import { getAccountQuickActions, isFundCategory } from './utils/accountQuickActions'
 import { getScopedAccountContent } from './utils/accountContent'
+import { filterProducts } from './utils/productFilters'
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
@@ -93,13 +94,19 @@ const holdings = [
 ]
 
 const products = [
-  { id: 'market', symbol: '◎', name: 'Total Market Index', category: 'Index funds', detail: 'Broad exposure to leading US companies', minimum: '₱1', fee: '0.03%', risk: 'Moderate', tint: 'sage', return: '+8.4%' },
-  { id: 'global', symbol: '◉', name: 'Global Equity Fund', category: 'Index funds', detail: 'Invest across established global markets', minimum: '₱1', fee: '0.08%', risk: 'Moderate', tint: 'blue', return: '+7.1%' },
-  { id: 'tech', symbol: '✦', name: 'NextGen AI & Tech Index', category: 'Index funds', detail: 'High-growth technology leaders shaping AI and automation', minimum: '₱50', fee: '0.14%', risk: 'Growth', tint: 'blue', return: '+14.6%', isNew: true },
-  { id: 'treasury', symbol: '▤', name: 'Treasury Portfolio', category: 'Fixed income', detail: 'A steadier mix of government bonds', minimum: '₱100', fee: '0.12%', risk: 'Low', tint: 'sand', return: '+4.2%' },
-  { id: 'cash', symbol: '◌', name: 'Cash Reserve', category: 'Cash', detail: 'Keep funds available for your next move', minimum: '₱1', fee: 'No fee', risk: 'Low', tint: 'lavender', return: '4.1% APY' },
-  { id: 'retirement', symbol: '↗', name: 'Future Builder', category: 'Retirement', detail: 'A diversified long-term portfolio', minimum: '₱25', fee: '0.18%', risk: 'Balanced', tint: 'rose', return: '+6.8%' },
-  { id: 'green', symbol: '✳', name: 'Sustainable Leaders', category: 'Index funds', detail: 'Companies screened for sustainability', minimum: '₱10', fee: '0.15%', risk: 'Moderate', tint: 'sage', return: '+6.2%', isNew: true },
+  { id: 'sm', symbol: 'SM', name: 'SM Investments Corp.', category: 'Stocks & ETFs', detail: 'Blue-chip Philippine conglomerate', minimum: '₱905', fee: '0.25%', risk: 'Moderate', tint: 'blue', return: '+11.4%' },
+  { id: 'bdo', symbol: 'BDO', name: 'BDO Unibank, Inc.', category: 'Stocks & ETFs', detail: 'Leading Philippine universal bank', minimum: '₱155', fee: '0.25%', risk: 'Moderate', tint: 'sage', return: '+9.8%' },
+  { id: 'market', symbol: 'VTI', name: 'Total Market Index ETF', category: 'Stocks & ETFs', detail: 'Broad exposure to leading US companies', minimum: '₱1', fee: '0.03%', risk: 'Moderate', tint: 'sage', return: '+8.4%' },
+  { id: 'tech', symbol: 'AIQ', name: 'NextGen AI & Tech ETF', category: 'Stocks & ETFs', detail: 'High-growth technology leaders shaping AI and automation', minimum: '₱50', fee: '0.14%', risk: 'Growth', tint: 'blue', return: '+14.6%', isNew: true },
+  { id: 'alfmg', symbol: 'ALF', name: 'ALFM Growth Fund', category: 'Mutual Funds', detail: 'Diversified Philippine equity growth mutual fund', minimum: '₱1,000', fee: '1.50%', risk: 'Growth', tint: 'sand', return: '+8.9%' },
+  { id: 'pefi', symbol: 'PEF', name: 'Philequity Fund', category: 'Mutual Funds', detail: 'Long-term Philippine large-cap equity mutual fund', minimum: '₱1,000', fee: '1.50%', risk: 'Growth', tint: 'sand', return: '+10.2%' },
+  { id: 'balanced', symbol: 'SLB', name: 'Sun Life Prosperity Balanced', category: 'Mutual Funds', detail: 'Balanced mix of Philippine equities and fixed income', minimum: '₱1,000', fee: '1.25%', risk: 'Balanced', tint: 'rose', return: '+6.8%' },
+  { id: 'bdoei', symbol: 'BEI', name: 'BDO Equity Index Fund', category: 'UITFs', detail: 'Tracks the Philippine Stock Exchange Index (PSEi)', minimum: '₱1,000', fee: '1.00%', risk: 'Growth', tint: 'sage', return: '+7.6%' },
+  { id: 'bpist', symbol: 'BST', name: 'BPI Short Term Fund', category: 'UITFs', detail: 'Money market UITF focused on capital preservation', minimum: '₱1,000', fee: '0.50%', risk: 'Low', tint: 'lavender', return: '+4.3%' },
+  { id: 'sbglo', symbol: 'SBG', name: 'Security Bank Global Feeder', category: 'UITFs', detail: 'Feeder UITF investing in developed global equities', minimum: '₱5,000', fee: '0.75%', risk: 'Moderate', tint: 'blue', return: '+9.1%', isNew: true },
+  { id: 'treasury', symbol: 'RTB', name: 'Retail Treasury Bonds (RTB)', category: 'Fixed Income', detail: 'Philippine sovereign fixed-rate treasury notes', minimum: '₱5,000', fee: 'No fee', risk: 'Low', tint: 'sand', return: '+6.25%' },
+  { id: 'corpbond', symbol: 'BND', name: 'Treasury & Corporate Bond Mix', category: 'Fixed Income', detail: 'A steadier mix of government and investment-grade bonds', minimum: '₱1,000', fee: '0.12%', risk: 'Low', tint: 'lavender', return: '+4.8%' },
+  { id: 'cash', symbol: 'CSH', name: 'CGSI Peso Cash Reserve', category: 'Cash', detail: 'Keep idle peso liquidity earning yield between trades', minimum: '₱1', fee: 'No fee', risk: 'Low', tint: 'lavender', return: '4.1% APY' },
 ]
 
 const activities = [
@@ -1187,55 +1194,143 @@ function PortfolioPageContent({ search }) {
   )
 }
 
-function ProductCard({ product, onExplore }) {
-  const tints = { sage: 'bg-[#eaedf2] text-[#4a5878]', blue: 'bg-[#e9eff4] text-[#64839b]', sand: 'bg-[#f4eee5] text-[#ad8156]', lavender: 'bg-[#f0edf7] text-[#8574a5]', rose: 'bg-[#f5ebeb] text-[#ad7472]' }
-  return (
-    <Card className="flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
-      <div className="flex items-start justify-between">
-        <span className={`flex size-11 items-center justify-center rounded-[14px] text-xl ${tints[product.tint]}`}>{product.symbol}</span>
-        <div className="flex items-center gap-1.5">
-          {product.isNew && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-xs">
-              <Sparkles size={9} className="text-amber-300 fill-amber-300 animate-sparkle" />
-              New
-            </span>
-          )}
-          <span className="rounded-full bg-[#f5f6f7] px-2.5 py-1 text-[10px] font-medium text-[#828690]">{product.category}</span>
-        </div>
-      </div>
-      <h2 className="mt-5 text-[15px] font-semibold text-[#343a48]">{product.name}</h2><p className="mt-1.5 min-h-10 text-xs leading-5 text-[#90949c]">{product.detail}</p>
-      <div className="my-5 grid grid-cols-2 gap-y-3 border-y border-[#edeef0] py-4 text-xs"><span className="text-[#9a9da4]">Historical return</span><span className="text-right font-semibold text-[#4e5d80]">{product.return}</span><span className="text-[#9a9da4]">Annual fee</span><span className="text-right font-medium text-[#626772]">{product.fee}</span><span className="text-[#9a9da4]">Starting amount</span><span className="text-right font-medium text-[#626772]">{product.minimum}</span></div>
-      <div className="mt-auto flex items-center justify-between"><span className="text-[10px] text-[#a0a3aa]">{product.risk} risk · Demo data</span><button onClick={() => onExplore(product)} type="button" className="inline-flex items-center gap-1 text-xs font-semibold text-[#4d5b79] hover:text-[#2e3b5a]">Explore <Icon name="arrow" size={13} /></button></div>
-    </Card>
-  )
-}
-
 function ProductsPage() {
   const navigate = useNavigate()
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const categories = ['All', 'Index funds', 'Fixed income', 'Cash', 'Retirement']
-  const filtered = useMemo(() => products.filter((product) => (category === 'All' || product.category === category) && `${product.name} ${product.detail} ${product.category}`.toLowerCase().includes(search.toLowerCase())), [category, search])
+  const categories = ['All', 'Stocks & ETFs', 'Mutual Funds', 'UITFs', 'Fixed Income', 'Cash']
+  const filtered = useMemo(() => filterProducts(products, { category, search }), [category, search])
+  const tints = {
+    sage: 'bg-[#eaedf2] text-[#4a5878]',
+    blue: 'bg-[#e9eff4] text-[#436895]',
+    sand: 'bg-[#f4eee5] text-[#9b6e41]',
+    lavender: 'bg-[#f0edf7] text-[#726096]',
+    rose: 'bg-[#f5ebeb] text-[#9d605e]',
+  }
+
   return (
     <div>
-      <PageIntro title="Explore products" subtitle="Find options that fit your goals and investing style." />
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1 overflow-x-auto rounded-xl bg-[#edeef1] p-1">{categories.map((item) => <button key={item} onClick={() => setCategory(item)} type="button" className={`shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition ${category === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#898d96] hover:text-[#50596c]'}`}>{item}</button>)}</div>
-        <label className="flex items-center gap-2 rounded-xl border border-[#e6e8eb] bg-white px-3 py-2.5 text-[#9599a0]"><Icon name="search" size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search products" className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-40" /></label>
-      </div>
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <p className="text-xs text-[#999ca3]">{filtered.length} options to explore</p>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#eff6ff] px-2 py-0.5 text-[10px] font-semibold text-[#1d4ed8]">
-            <Sparkles size={10} className="text-amber-500 fill-amber-400" />
-            New funds added
-          </span>
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-3 border-b border-[#edeef0] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div role="tablist" aria-label="Product categories" className="flex gap-1 overflow-x-auto">
+            {categories.map((item) => {
+              const active = category === item
+              return (
+                <button
+                  key={item}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setCategory(item)}
+                  type="button"
+                  className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition ${
+                    active
+                      ? 'bg-[#eff4ff] font-semibold text-[#2563eb]'
+                      : 'text-[#7f8490] hover:bg-[#f6f7f9] hover:text-[#424957]'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </div>
+          <label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e6e8eb] bg-[#fafbfc] px-2.5 py-1.5 text-[#9599a0] focus-within:border-[#9aa5b8] focus-within:bg-white">
+            <Icon name="search" size={13} />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search products"
+              aria-label="Search products"
+              className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-32"
+            />
+          </label>
         </div>
-        <span className="text-[10px] text-[#a7aaaf]">Returns shown are illustrative</span>
-      </div>
-      {filtered.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filtered.map((product) => <ProductCard key={product.id} product={product} onExplore={setSelectedProduct} />)}</div> : <Card className="p-12 text-center"><p className="text-sm font-medium text-[#666b76]">No matching products</p><p className="mt-1 text-xs text-[#9a9da4]">Try a different search or category.</p></Card>}
-      {selectedProduct && <Modal title={selectedProduct.name} onClose={() => setSelectedProduct(null)}><p className="text-sm leading-6 text-[#7f838d]">{selectedProduct.detail}. This sample product page is for exploring the experience. Product details and performance shown here are illustrative.</p><div className="mt-5 rounded-xl bg-[#f5f6f8] p-4"><p className="text-xs text-[#9397a0]">Minimum investment</p><p className="mt-1 font-semibold text-[#404656]">{selectedProduct.minimum}</p></div><button onClick={() => { setSelectedProduct(null); navigate('/funding') }} type="button" className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Continue to funding</button></Modal>}
+
+        {filtered.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px] text-left">
+              <thead>
+                <tr className="border-b border-[#edeef0] text-[10px] font-semibold uppercase tracking-[0.07em] text-[#9ca0a8]">
+                  <th className="px-4 py-3 font-semibold sm:px-5">Product</th>
+                  {category === 'All' && <th className="px-3 py-3 font-semibold whitespace-nowrap">Category</th>}
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Risk</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Min.</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Fee</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Return</th>
+                  <th className="px-4 py-3 text-right font-semibold sm:px-5"><span className="sr-only">Action</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((product) => (
+                  <tr key={product.id} className="border-b border-[#f0f1f2] transition last:border-0 hover:bg-[#fafbfc]">
+                    <td className="max-w-[230px] px-4 py-3 sm:px-5">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold tracking-tight ${tints[product.tint]}`}>
+                          {product.symbol}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="truncate text-xs font-semibold text-[#343a48]">{product.name}</span>
+                            {product.isNew && (
+                              <span className="inline-flex shrink-0 items-center rounded-full bg-[#eff6ff] px-1.5 py-0.5 text-[9px] font-semibold text-[#2563eb]">
+                                New
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 truncate text-[11px] text-[#9398a3]">{product.detail}</p>
+                        </div>
+                      </div>
+                    </td>
+                    {category === 'All' && <td className="px-3 py-3 text-[11px] text-[#69707d] whitespace-nowrap">{product.category}</td>}
+                    <td className="px-3 py-3 text-[11px] text-[#69707d] whitespace-nowrap">{product.risk}</td>
+                    <td className="px-3 py-3 text-right text-xs font-medium text-[#464c5a] whitespace-nowrap">{product.minimum}</td>
+                    <td className="px-3 py-3 text-right text-[11px] text-[#797f8c] whitespace-nowrap">{product.fee}</td>
+                    <td className="px-3 py-3 text-right text-xs font-semibold text-[#2563eb] whitespace-nowrap">{product.return}</td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap sm:px-5">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedProduct(product)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#e4e7ed] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#454d5e] transition hover:border-[#b9c6db] hover:text-[#2563eb]"
+                      >
+                        <span>Explore</span>
+                        <Icon name="arrow" size={11} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <p className="text-sm font-medium text-[#666b76]">No matching products</p>
+            <p className="mt-1 text-xs text-[#9a9da4]">Try a different search or category tab.</p>
+          </div>
+        )}
+      </Card>
+
+      {selectedProduct && (
+        <Modal title={selectedProduct.name} onClose={() => setSelectedProduct(null)}>
+          <p className="text-xs font-medium text-[#8a909c]">{selectedProduct.category} · {selectedProduct.risk} risk</p>
+          <p className="mt-3 text-sm leading-6 text-[#6f7480]">{selectedProduct.detail}. Product details and historical returns shown here are illustrative.</p>
+          <div className="mt-5 grid grid-cols-3 gap-3 rounded-xl bg-[#f5f6f8] p-4">
+            <div><p className="text-[10px] text-[#9397a0]">Min. invest</p><p className="mt-1 text-xs font-semibold text-[#404656]">{selectedProduct.minimum}</p></div>
+            <div><p className="text-[10px] text-[#9397a0]">Annual fee</p><p className="mt-1 text-xs font-semibold text-[#404656]">{selectedProduct.fee}</p></div>
+            <div><p className="text-[10px] text-[#9397a0]">Return</p><p className="mt-1 text-xs font-semibold text-[#2563eb]">{selectedProduct.return}</p></div>
+          </div>
+          <button
+            onClick={() => {
+              const isFund = selectedProduct.category === 'UITFs' || selectedProduct.category === 'Mutual Funds'
+              setSelectedProduct(null)
+              navigate(isFund ? '/portfolio?action=subscribe' : '/funding')
+            }}
+            type="button"
+            className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]"
+          >
+            {selectedProduct.category === 'UITFs' || selectedProduct.category === 'Mutual Funds' ? 'Continue to subscribe' : 'Continue to funding'}
+          </button>
+        </Modal>
+      )}
     </div>
   )
 }
