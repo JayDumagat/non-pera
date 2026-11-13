@@ -129,6 +129,31 @@ body {
   border-color: #303540 !important;
 }
 
+[data-theme='night'] .sidebar-badge {
+  background-color: #3a2d1f !important;
+  color: #f3c188 !important;
+}
+
+[data-theme='night'] .sidebar-badge-compact,
+[data-theme='night'] .sidebar-unread-dot {
+  --tw-ring-color: #171b23 !important;
+}
+
+[data-theme='night'] .attached-tab-active {
+  background-color: #1c202a !important;
+  border-color: #2b303c !important;
+  color: #60a5fa !important;
+}
+
+[data-theme='night'] .attached-tab-active span {
+  color: #60a5fa !important;
+}
+
+[data-theme='night'] .attached-tab-inactive {
+  background-color: #161922 !important;
+  border-color: #262b36 !important;
+}
+
 [data-theme='night'] input,
 [data-theme='night'] textarea {
   color: #e4e7ec !important;
