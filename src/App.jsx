@@ -62,7 +62,7 @@ const navigationSections = [
   { label: 'Discover', items: [{ id: 'learn', label: 'Learn', icon: 'learn', badge: '2' }] },
   { label: 'Account', items: [
     { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
-    { id: 'profile', label: 'Profile', icon: 'profile' },
+    { id: 'notifications', label: 'Notifications', icon: 'bell', badge: '2' },
   ] },
 ]
 
@@ -562,15 +562,6 @@ function MobileNavigation({ isTraderView }) {
     ? traderNavigationSections.flatMap((section) => section.items)
     : navigation
   return <nav className="flex gap-1 overflow-x-auto border-b border-[#e8e9ec] bg-white px-3 py-2 lg:hidden" aria-label="Main navigation">{items.map((item) => <SidebarLink key={item.id} item={item} mobile />)}</nav>
-}
-
-function PageIntro({ title, subtitle, action }) {
-  return (
-    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div><h1 className="text-[26px] font-semibold tracking-tight text-[#262c3a] sm:text-[30px]">{title}</h1>{subtitle && <p className="mt-1.5 text-sm text-[#898d95]">{subtitle}</p>}</div>
-      {action}
-    </div>
-  )
 }
 
 function Card({ children, className = '', tone = 'white', ...props }) {
@@ -1100,7 +1091,6 @@ function PortfolioPageContent({ search }) {
 
   return (
     <div className="space-y-6">
-      <PageIntro title="Your portfolio" subtitle="Track your investments and see how they're growing." action={<button onClick={() => navigate('/products')} type="button" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8]"><Icon name="plus" size={16} />Explore investments</button>} />
       {showQuickOrder && (
         <Card className="p-5 sm:p-6">
           <div className="mb-4 flex items-start justify-between gap-3">
@@ -1188,7 +1178,7 @@ function PortfolioPageContent({ search }) {
         {[["Total value", formatPeso(24680.5), 'Including cash balance'], ['Total invested', formatPeso(21420), 'Across 4 positions'], ['Total return', `+${formatPeso(1284.2)}`, '+5.49% all time']].map(([label, value, detail], i) => <Card key={label} className="p-5"><p className="text-xs text-[#9498a0]">{label}</p><p className={`mt-3 text-2xl font-semibold tracking-tight ${i === 2 ? 'text-[#445680]' : 'text-[#353b48]'}`}>{value}</p><p className="mt-1 text-xs text-[#a0a3a9]">{detail}</p></Card>)}
       </div>
       <Card className="p-5 sm:p-6"><TrendChart range={range} setRange={setRange} /></Card>
-      <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-3 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Holdings</h2><p className="mt-1 text-xs text-[#9a9da4]">Your current investments</p></div><button type="button" className="rounded-lg border border-[#e6e8eb] px-3 py-2 text-xs font-medium text-[#717580] hover:bg-[#f7f8f9]">Download statement</button></div><HoldingsTable /></Card>
+      <Card className="overflow-hidden"><div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-3 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Holdings</h2><p className="mt-1 text-xs text-[#9a9da4]">Your current investments</p></div><div className="flex items-center gap-2"><button onClick={() => navigate('/products')} type="button" className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563eb] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"><Icon name="plus" size={14} />Explore investments</button><button type="button" className="rounded-lg border border-[#e6e8eb] px-3 py-2 text-xs font-medium text-[#717580] hover:bg-[#f7f8f9]">Download statement</button></div></div><HoldingsTable /></Card>
       <Card className="p-5 sm:p-6"><h2 className="text-sm font-semibold text-[#343a48]">Activity</h2><div className="mt-4 grid gap-x-8 md:grid-cols-2"><ActivityList /></div></Card>
     </div>
   )
@@ -1369,7 +1359,6 @@ function FundingPageContent({ search }) {
   }
   return (
     <div>
-      <PageIntro title="Move money" subtitle="Add funds or transfer money out of your account." />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.7fr)]">
         <Card className="p-5 sm:p-7">
           {selectedAccount && (
@@ -1431,7 +1420,6 @@ function ProfilePage() {
   const [notifications, setNotifications] = useState(true)
   return (
     <div>
-      <PageIntro title="Your profile" subtitle="Manage your personal details and preferences." />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_310px]">
         <div className="space-y-6">
           <Card className="p-5 sm:p-7"><div className="mb-6 flex items-center gap-4 border-b border-[#edeef0] pb-6"><Avatar className="size-16 rounded-2xl" iconSize={26} /><div><h2 className="text-sm font-semibold text-[#3f4553]">Alex Johnson</h2><p className="mt-1 text-xs text-[#9498a0]">Balanced risk profile · Member since 2023</p></div><button type="button" className="ml-auto rounded-lg border border-[#e6e8eb] px-3 py-2 text-xs font-medium text-[#727680] hover:bg-[#f7f8f9]">Change photo</button></div>
@@ -1449,7 +1437,6 @@ function ProfilePage() {
 function SettingsPage({ darkMode, setDarkMode }) {
   return (
     <div>
-      <PageIntro title="Settings" subtitle="Manage your app preferences." />
       <Card className="max-w-2xl p-5 sm:p-7">
         <div className="flex items-center justify-between gap-4">
           <div><h2 className="text-sm font-semibold text-[#424856]">Appearance</h2><p className="mt-1 text-xs text-[#9296a0]">Choose day or night mode.</p></div>
@@ -1468,7 +1455,6 @@ function FaqPage() {
   ]
   return (
     <div>
-      <PageIntro title="Frequently asked questions" subtitle="Quick answers about this investment dashboard." />
       <div className="max-w-3xl space-y-3">{questions.map(([question, answer]) => <Card key={question} className="p-5"><h2 className="text-sm font-semibold text-[#424856]">{question}</h2><p className="mt-2 text-xs leading-5 text-[#858a95]">{answer}</p></Card>)}</div>
     </div>
   )
@@ -1477,8 +1463,7 @@ function FaqPage() {
 function PolicyPage({ title, documentName }) {
   return (
     <div>
-      <PageIntro title={title} subtitle={`Information about Caballes-Go Securities ${documentName.toLowerCase()}.`} />
-      <Card className="max-w-3xl p-5 sm:p-7"><p className="text-sm leading-6 text-[#747a87]">The approved CGSI {documentName.toLowerCase()} is not included in this demo. Please refer to Caballes-Go Securities’ official materials for the current document.</p></Card>
+      <Card className="max-w-3xl p-5 sm:p-7"><h2 className="mb-2 text-sm font-semibold text-[#343a48]">{title}</h2><p className="text-sm leading-6 text-[#747a87]">The approved CGSI {documentName.toLowerCase()} is not included in this demo. Please refer to Caballes-Go Securities’ official materials for the current document.</p></Card>
     </div>
   )
 }
@@ -1487,8 +1472,7 @@ function SignOutPage() {
   const navigate = useNavigate()
   return (
     <div>
-      <PageIntro title="Sign out" subtitle="End your current session." />
-      <Card className="max-w-xl p-5 sm:p-7"><p className="text-sm leading-6 text-[#747a87]">This prototype is using a demo account, so there is no live session to end.</p><button type="button" onClick={() => navigate('/home')} className="mt-5 rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1d4ed8]">Return to dashboard</button></Card>
+      <Card className="max-w-xl p-5 sm:p-7"><h2 className="mb-2 text-sm font-semibold text-[#343a48]">Sign out</h2><p className="text-sm leading-6 text-[#747a87]">This prototype is using a demo account, so there is no live session to end.</p><button type="button" onClick={() => navigate('/home')} className="mt-5 rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1d4ed8]">Return to dashboard</button></Card>
     </div>
   )
 }
@@ -1505,7 +1489,6 @@ function LearnPage() {
   const featured = articles[0]
   return (
     <div>
-      <PageIntro title="Learn at your pace" subtitle="Clear, practical guides for your investing journey." />
       <div className="mb-6 flex items-center gap-3 rounded-xl border border-[#e5e8ed] bg-[#f1f4f7] px-4 py-3"><span className="flex size-8 items-center justify-center rounded-lg bg-white text-[#626e86]"><Icon name="learn" size={16} /></span><p className="text-xs text-[#717887]"><span className="font-semibold">2 new learning alerts:</span> fresh guides on diversification and investing habits.</p></div>
       <button onClick={() => setSelectedArticle(featured)} type="button" className="mb-7 grid w-full overflow-hidden rounded-2xl border border-[#e8eaed] bg-[#e9ecf1] text-left transition hover:shadow-md md:grid-cols-[1.1fr_0.9fr]">
         <div className="p-6 sm:p-9"><span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#677081]">Featured guide · {featured.length}</span><h2 className="mt-5 max-w-md text-2xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-3xl">{featured.title}</h2><p className="mt-3 max-w-md text-sm leading-6 text-[#7d838d]">A friendly introduction to the ideas behind long-term investing and how to get started thoughtfully.</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-semibold text-[#4e5b75]">Read the guide <Icon name="arrow" size={14} /></span></div>
@@ -1530,10 +1513,116 @@ function MessagesPage() {
   const [sent, setSent] = useState(false)
   return (
     <div>
-      <PageIntro title="Messages" subtitle="Updates and notes about your account." />
       <Card className="grid min-h-[580px] overflow-hidden md:grid-cols-[300px_minmax(0,1fr)]">
         <div className="border-b border-[#edeef0] md:border-b-0 md:border-r"><div className="border-b border-[#edeef0] p-4"><label className="flex items-center gap-2 rounded-lg bg-[#f5f6f7] px-3 py-2 text-[#9b9ea5]"><Icon name="search" size={15} /><input placeholder="Search messages" className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]" /></label></div><div className="flex overflow-x-auto md:block">{threads.map((thread) => <button key={thread.id} onClick={() => { setActiveThread(thread); setSent(false) }} type="button" className={`min-w-[250px] flex-1 border-b border-[#f0f1f2] p-4 text-left transition hover:bg-[#fafafb] md:w-full ${activeThread.id === thread.id ? 'bg-[#f5f6f8]' : 'bg-white'}`}><span className="flex items-start gap-3"><span className={`flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-[#677083] ${thread.color}`}>{thread.avatar}</span><span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><span className="truncate text-xs font-semibold text-[#494e5a]">{thread.title}</span><span className="shrink-0 text-[9px] text-[#a0a3aa]">{thread.time}</span></span><span className="mt-1 block truncate text-[10px] text-[#989ca3]">{thread.preview}</span></span></span></button>)}</div></div>
         <div className="flex min-h-[440px] flex-col"><div className="flex items-center gap-3 border-b border-[#edeef0] px-5 py-4"><span className={`flex size-9 items-center justify-center rounded-full text-xs font-semibold text-[#677083] ${activeThread.color}`}>{activeThread.avatar}</span><span><span className="block text-xs font-semibold text-[#484d59]">{activeThread.sender}</span><span className="mt-0.5 block text-[10px] text-[#9a9da4]">Account updates</span></span><span className="ml-auto rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[9px] font-medium text-[#8a8e98]">{activeThread.time}</span></div><div className="flex-1 p-5 sm:p-7"><div className="max-w-xl rounded-2xl rounded-tl-sm bg-[#f4f5f7] p-4 sm:p-5"><p className="text-sm font-semibold text-[#434957]">{activeThread.title}</p><p className="mt-3 text-xs leading-6 text-[#7d818b]">{activeThread.preview}</p><p className="mt-3 text-xs leading-6 text-[#7d818b]">You can view more details anytime in your account. If you have questions, just reply to this message and our team will be happy to help.</p><p className="mt-4 text-[9px] text-[#a1a4aa]">{activeThread.time} · {activeThread.sender}</p></div>{sent && <div className="ml-auto mt-4 max-w-sm rounded-2xl rounded-tr-sm bg-[#eaedf2] p-4 text-xs text-[#555e71]">{reply || 'Thanks for the update.'}<p className="mt-2 text-right text-[9px] text-[#959aa3]">Just now · You</p></div>}</div><form onSubmit={(event) => { event.preventDefault(); if (reply.trim()) setSent(true) }} className="flex items-center gap-2 border-t border-[#edeef0] p-4"><input value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Write a reply..." className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-4 py-3 text-xs text-[#525763] outline-none placeholder:text-[#a5a8ae]" /><button aria-label="Send reply" type="submit" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"><Icon name="send" size={17} /></button></form></div>
+      </Card>
+    </div>
+  )
+}
+
+const initialNotifications = [
+  { id: 'n1', title: 'New in Learn', description: 'Two new guides on diversification and consistent investing habits are ready for you.', time: 'Today · 9:30 AM', category: 'Learning', icon: 'learn', tint: 'bg-[#edf0f4] text-[#5f6d8a]', route: '/learn', actionLabel: 'Open Learn', unread: true },
+  { id: 'n2', title: 'Your weekly summary', description: 'Your total portfolio is up 1.2% this week across Equities and UITFs.', time: 'Yesterday · 6:00 PM', category: 'Portfolio', icon: 'portfolio', tint: 'bg-[#f5f1e9] text-[#aa8354]', route: '/portfolio', actionLabel: 'View Portfolio', unread: true },
+  { id: 'n3', title: 'Scheduled deposit completed', description: '₱500.00 bank transfer settled into your Margin cash balance.', time: 'Oct 10, 2026', category: 'Funding', icon: 'funding', tint: 'bg-[#eaf0fb] text-[#3a66c4]', route: '/funding', actionLabel: 'View Funding', unread: false },
+  { id: 'n4', title: 'Monthly statement ready', description: 'Your September account statement is available in your Profile and Messages.', time: 'Oct 01, 2026', category: 'Account', icon: 'messages', tint: 'bg-[#edf2e9] text-[#5c7847]', route: '/profile', actionLabel: 'Open Profile', unread: false },
+]
+
+function NotificationsPage() {
+  const navigate = useNavigate()
+  const [filter, setFilter] = useState('all')
+  const [items, setItems] = useState(initialNotifications)
+  const unreadCount = items.filter((item) => item.unread).length
+  const visibleItems = filter === 'unread' ? items.filter((item) => item.unread) : items
+
+  const markRead = (id) => {
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, unread: false } : item)))
+  }
+
+  const markAllRead = () => {
+    setItems((prev) => prev.map((item) => ({ ...item, unread: false })))
+  }
+
+  return (
+    <div>
+      <Card className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edeef0] pb-4">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-sm font-semibold text-[#343a48]">Notifications</h2>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-[#f5ebdf] px-2 py-0.5 text-[10px] font-bold text-[#a87543]">
+                {unreadCount} new
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <div role="tablist" aria-label="Filter notifications" className="inline-flex rounded-xl border border-[#e6e8eb] bg-[#f6f7f9] p-0.5">
+              {[{ id: 'all', label: 'All' }, { id: 'unread', label: 'Unread' }].map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={filter === tab.id}
+                  type="button"
+                  onClick={() => setFilter(tab.id)}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition ${filter === tab.id ? 'bg-white text-[#2563eb] shadow-2xs' : 'text-[#777c87] hover:text-[#343a48]'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={markAllRead}
+              disabled={unreadCount === 0}
+              className="rounded-xl border border-[#e6e8eb] px-3 py-1.5 text-xs font-medium text-[#5f6675] transition hover:bg-[#f6f7f9] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              Mark all read
+            </button>
+          </div>
+        </div>
+
+        {visibleItems.length === 0 ? (
+          <div className="py-12 text-center">
+            <p className="text-sm font-medium text-[#4a505e]">You’re all caught up</p>
+            <p className="mt-1 text-xs text-[#8e939e]">No unread notifications right now.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-[#edeef0]">
+            {visibleItems.map((item) => (
+              <div key={item.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => markRead(item.id)}
+                  className="flex min-w-0 flex-1 items-start gap-3.5 text-left"
+                >
+                  <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${item.tint}`}>
+                    <Icon name={item.icon} size={17} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-xs font-semibold text-[#3f4553]">{item.title}</span>
+                      {item.unread && <span aria-label="Unread" className="size-2 shrink-0 rounded-full bg-[#2563eb]" />}
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-[#7d828e]">{item.description}</span>
+                    <span className="mt-1 block text-[10px] text-[#9ca0a9]">{item.category} · {item.time}</span>
+                  </span>
+                </button>
+                <div className="flex shrink-0 items-center gap-2 sm:pl-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markRead(item.id)
+                      navigate(item.route)
+                    }}
+                    className="rounded-xl border border-[#e6e8eb] px-3 py-1.5 text-xs font-medium text-[#2563eb] transition hover:bg-[#eff5ff]"
+                  >
+                    {item.actionLabel}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   )
@@ -3053,6 +3142,7 @@ function App() {
                   <Route path="/funding" element={<FundingPage />} />
                   <Route path="/learn" element={<LearnPage />} />
                   <Route path="/messages" element={<MessagesPage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
                   <Route path="/faq" element={<FaqPage />} />
