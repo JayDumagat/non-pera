@@ -40,7 +40,6 @@ import {
   WalletCards,
   X,
 } from 'lucide-react'
-import { applyAccountTransaction } from './utils/accountTransactions.js'
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
@@ -626,52 +625,18 @@ function CategoryTrendChart({ range, setRange, category, selectedAccountId, acco
   )
 }
 
-function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount, accounts: allAccounts = investmentAccounts, categories = portfolioCategories, onAccountTransaction }) {
+function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount, accounts: allAccounts = investmentAccounts, categories = portfolioCategories }) {
+  const navigate = useNavigate()
   const categoryData = categories.find((item) => item.id === category) || categories[0]
   const accounts = getCategoryAccounts(categoryData.id, allAccounts)
-  const selectedAccount = accounts.find((account) => account.id === selectedAccountId) || null
   const multiplier = rangeReturnMultipliers[range]
-  const [activeAction, setActiveAction] = useState(null)
-  const [amount, setAmount] = useState('')
-  const [actionError, setActionError] = useState('')
-  const [actionNotice, setActionNotice] = useState('')
 
   const handleToggleAccount = (accountId, cardElement = null) => {
     const nextId = selectedAccountId === accountId ? null : accountId
-    setActiveAction(null)
-    setAmount('')
-    setActionError('')
-    setActionNotice('')
     onSelectAccount(nextId)
     if (nextId && cardElement) {
       cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
     }
-  }
-
-  const handleOpenAction = (type) => {
-    setActiveAction((prev) => (prev === type ? null : type))
-    setAmount('')
-    setActionError('')
-    setActionNotice('')
-  }
-
-  const handleQuickSubmit = (event) => {
-    event.preventDefault()
-    if (!selectedAccount || !activeAction || !onAccountTransaction) return
-    const result = onAccountTransaction({
-      accountId: selectedAccount.id,
-      type: activeAction,
-      amount,
-    })
-    if (result.error) {
-      setActionError(result.error)
-      return
-    }
-    const label = activeAction === 'deposit' ? 'Deposited' : 'Withdrew'
-    setActionError('')
-    setActionNotice(`${label} ${formatPeso(Math.abs(result.delta))}. Bal: ${formatPeso(result.updatedAccount.value)}`)
-    setActiveAction(null)
-    setAmount('')
   }
 
   return (
@@ -724,112 +689,21 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                     <div className="grid grid-cols-2 gap-1.5">
                       <button
                         type="button"
-                        aria-pressed={activeAction === 'deposit'}
-                        onClick={() => handleOpenAction('deposit')}
-                        className={`inline-flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-semibold transition ${
-                          activeAction === 'deposit'
-                            ? 'bg-[#1d4ed8] text-white shadow-xs'
-                            : 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]'
-                        }`}
+                        onClick={() => navigate(`/funding?mode=deposit&account=${encodeURIComponent(account.id)}`)}
+                        className="inline-flex items-center justify-center gap-1 rounded-lg bg-[#2563eb] px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]"
                       >
                         <ArrowDownLeft size={12} />
                         <span>Deposit</span>
                       </button>
                       <button
                         type="button"
-                        aria-pressed={activeAction === 'withdraw'}
-                        onClick={() => handleOpenAction('withdraw')}
-                        className={`inline-flex items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition ${
-                          activeAction === 'withdraw'
-                            ? 'quick-action-withdraw-active border-[#2563eb] bg-[#eff5ff] text-blue-600'
-                            : 'border-[#dce1ea] bg-white text-[#434a58] hover:border-[#b9c6db] hover:bg-[#f8f9fb]'
-                        }`}
+                        onClick={() => navigate(`/funding?mode=withdraw&account=${encodeURIComponent(account.id)}`)}
+                        className="inline-flex items-center justify-center gap-1 rounded-lg border border-[#dce1ea] bg-white px-2 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#f8f9fb]"
                       >
                         <ArrowUpRight size={12} />
                         <span>Withdraw</span>
                       </button>
                     </div>
-
-                    {activeAction && (
-                      <form onSubmit={handleQuickSubmit} className="mt-2 border-t border-[#eceef2] pt-2">
-                        <div className="flex flex-wrap items-center gap-1">
-                          {[500, 1000, 5000].map((preset) => (
-                            <button
-                              key={preset}
-                              type="button"
-                              onClick={() => {
-                                setAmount(String(preset))
-                                setActionError('')
-                              }}
-                              className="flex-1 rounded border border-[#e2e6ed] bg-[#f8f9fb] px-1 py-0.5 text-[9.5px] font-medium text-[#525b6e] transition hover:border-[#9cb9f5] hover:text-blue-600"
-                            >
-                              +{preset >= 1000 ? `${preset / 1000}k` : preset}
-                            </button>
-                          ))}
-                          {activeAction === 'withdraw' && (
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setAmount(String(account.value))
-                                setActionError('')
-                              }}
-                              className="flex-1 rounded border border-[#e2e6ed] bg-[#f8f9fb] px-1 py-0.5 text-[9.5px] font-medium text-[#525b6e] transition hover:border-[#9cb9f5] hover:text-blue-600"
-                            >
-                              Max
-                            </button>
-                          )}
-                        </div>
-
-                        <div className="mt-1.5 flex items-center rounded-lg border border-[#dce1ea] bg-white px-2 py-1 focus-within:border-[#2563eb]">
-                          <span className="mr-1 text-[11px] font-semibold text-[#8c929f]">₱</span>
-                          <input
-                            id="quick-account-amount"
-                            aria-label="Quick transfer amount"
-                            inputMode="decimal"
-                            value={amount}
-                            onChange={(event) => {
-                              setAmount(event.target.value)
-                              if (actionError) setActionError('')
-                            }}
-                            placeholder="0.00"
-                            className="w-full min-w-0 bg-transparent text-[11px] font-semibold text-[#343a48] outline-none placeholder:text-[#b4b9c4]"
-                          />
-                        </div>
-
-                        <div className="mt-1.5 flex items-center gap-1">
-                          <button
-                            type="submit"
-                            className="flex-1 rounded-lg bg-[#2563eb] px-2 py-1 text-[10.5px] font-semibold text-white transition hover:bg-[#1d4ed8]"
-                          >
-                            Confirm {activeAction}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setActiveAction(null)
-                              setActionError('')
-                            }}
-                            aria-label={`Cancel ${activeAction}`}
-                            className="flex size-6 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#667082] transition hover:bg-[#f6f8fb]"
-                          >
-                            <X size={12} />
-                          </button>
-                        </div>
-
-                        {actionError && (
-                          <p role="alert" className="mt-1.5 text-[10px] font-medium leading-tight text-red-600">
-                            {actionError}
-                          </p>
-                        )}
-                      </form>
-                    )}
-
-                    {actionNotice && (
-                      <div role="status" className="mt-2 flex items-start gap-1 border-t border-[#eceef2] pt-1.5 text-[10px] font-medium leading-tight text-emerald-700">
-                        <CheckCircle2 size={12} className="mt-0.5 shrink-0 text-emerald-600" />
-                        <span>{actionNotice}</span>
-                      </div>
-                    )}
                   </div>
                 )}
               </div>
@@ -881,7 +755,7 @@ function ActivityList({ limit }) {
   )
 }
 
-function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId, accounts = investmentAccounts, categories = portfolioCategories, onAccountTransaction }) {
+function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId, accounts = investmentAccounts, categories = portfolioCategories }) {
   const selectedData = categories.find((item) => item.id === selectedCategory) || categories[0]
   const selectedPera = categoryPeraBalances[selectedCategory] || categoryPeraBalances.overall
   const selectedCash = categoryCashBalances[selectedCategory] || categoryCashBalances.overall
@@ -1036,7 +910,7 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
             </Card>
           </div>
 
-          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} accounts={accounts} categories={categories} onAccountTransaction={onAccountTransaction} />
+          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} accounts={accounts} categories={categories} />
         </div>
 
         <Card className="flex flex-col p-4 sm:p-5">
@@ -1086,21 +960,10 @@ function HomePage() {
   const [range, setRange] = useState('1M')
   const [selectedCategory, setSelectedCategory] = useState('overall')
   const [selectedAccountId, setSelectedAccountId] = useState(null)
-  const [accounts, setAccounts] = useState(investmentAccounts)
-  const [categories, setCategories] = useState(portfolioCategories)
-
-  const handleAccountTransaction = ({ accountId, type, amount }) => {
-    const result = applyAccountTransaction({ accounts, categories, accountId, type, amount })
-    if (!result.error) {
-      setAccounts(result.accounts)
-      setCategories(result.categories)
-    }
-    return result
-  }
 
   return (
     <div className="space-y-6">
-      <PortfolioValueCard range={range} setRange={setRange} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedAccountId={selectedAccountId} setSelectedAccountId={setSelectedAccountId} accounts={accounts} categories={categories} onAccountTransaction={handleAccountTransaction} />
+      <PortfolioValueCard range={range} setRange={setRange} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedAccountId={selectedAccountId} setSelectedAccountId={setSelectedAccountId} />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,0.8fr)]">
         <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-2 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Your investments</h2><p className="mt-1 text-xs text-[#9a9da4]">A quick look at your holdings</p></div><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-semibold text-[#646e84] hover:text-[#313e5d]">See all</button></div><HoldingsTable limit={3} /></Card>
@@ -1182,29 +1045,55 @@ function ProductsPage() {
 }
 
 function FundingPage() {
-  const [mode, setMode] = useState('Add money')
+  const location = useLocation()
+  return <FundingPageContent key={location.search} search={location.search} />
+}
+
+function FundingPageContent({ search }) {
+  const searchParams = new URLSearchParams(search)
+  const initialMode = searchParams.get('mode') === 'withdraw' ? 'Withdraw' : 'Add money'
+  const selectedAccount = investmentAccounts.find((item) => item.id === searchParams.get('account')) || null
+  const selectedCategory = selectedAccount ? portfolioCategories.find((item) => item.id === selectedAccount.category) : null
+  const [mode, setMode] = useState(initialMode)
   const [amount, setAmount] = useState('')
   const [method, setMethod] = useState('bank')
   const [notice, setNotice] = useState('')
   const methods = [{ id: 'bank', name: 'Bank transfer', detail: '1–3 business days', mark: 'BK' }, { id: 'debit', name: 'Debit card', detail: 'Usually instant', mark: '••' }]
+  const availableBalance = selectedAccount ? selectedAccount.value : 3260.5
   function handleSubmit(event) {
     event.preventDefault()
     if (!amount || Number(amount) <= 0) {
       setNotice('Enter an amount greater than ₱0 to continue.')
       return
     }
-    setNotice(`${mode} request for ${formatPeso(Number(amount))} is ready in this demo.`)
+    setNotice(`${mode} request for ${formatPeso(Number(amount))}${selectedAccount ? ` (${selectedAccount.name})` : ''} is ready in this demo.`)
   }
   return (
     <div>
       <PageIntro title="Move money" subtitle="Add funds or transfer money out of your account." />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.7fr)]">
         <Card className="p-5 sm:p-7">
+          {selectedAccount && (
+            <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[#e6e9ef] bg-[#f8f9fb] px-4 py-3">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: selectedCategory?.color || selectedAccount.color }} />
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-[#343a48]">{selectedAccount.name}</p>
+                  <p className="mt-0.5 flex items-center gap-1 truncate text-[10px] text-[#8d93a0]">
+                    {selectedCategory && <span className="font-semibold" style={{ color: selectedCategory.color }}>{selectedCategory.label}</span>}
+                    {selectedCategory && <span aria-hidden="true">·</span>}
+                    <span className="font-mono">{selectedAccount.accountNumber}</span>
+                  </p>
+                </div>
+              </div>
+              <span className="shrink-0 text-xs font-semibold text-[#343a48]">{formatPeso(selectedAccount.value)}</span>
+            </div>
+          )}
           <div className="mb-7 flex rounded-xl bg-[#f2f3f5] p-1">{['Add money', 'Withdraw'].map((item) => <button key={item} onClick={() => { setMode(item); setNotice('') }} type="button" className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${mode === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}>{item}</button>)}</div>
           <form onSubmit={handleSubmit}>
             <label className="block text-xs font-semibold text-[#595e6a]" htmlFor="amount">{mode === 'Add money' ? 'How much would you like to add?' : 'How much would you like to withdraw?'}</label>
             <div className="mt-3 flex items-center rounded-xl border border-[#e4e6ea] px-4 py-4 focus-within:border-[#828da4]"><span className="mr-2 text-xl text-[#9a9ea5]">₱</span><input id="amount" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00" className="w-full bg-transparent text-2xl font-semibold tracking-tight text-[#393f4e] outline-none placeholder:text-[#c1c4c9]" /><span className="text-xs text-[#9b9fa6]">PHP</span></div>
-            <p className="mt-2 text-[10px] text-[#9da0a7]">{mode === 'Add money' ? `Available balance: ${formatPeso(3260.5)}` : `Withdrawable balance: ${formatPeso(3260.5)}`}</p>
+            <p className="mt-2 text-[10px] text-[#9da0a7]">{mode === 'Add money' ? `Available balance: ${formatPeso(availableBalance)}` : `Withdrawable balance: ${formatPeso(availableBalance)}`}</p>
             <div className="mt-7"><p className="mb-3 text-xs font-semibold text-[#595e6a]">Choose a method</p><div className="space-y-2">{methods.map((item) => <button key={item.id} onClick={() => setMethod(item.id)} type="button" className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${method === item.id ? 'border-[#7f8aa1] bg-[#f6f7fa]' : 'border-[#e9eaed] hover:bg-[#fafafb]'}`}><span className="flex size-10 items-center justify-center rounded-lg bg-white text-[10px] font-bold text-[#666f81] shadow-sm">{item.mark}</span><span className="flex-1"><span className="block text-xs font-semibold text-[#525763]">{item.name}</span><span className="mt-1 block text-[10px] text-[#9a9da4]">{item.detail}</span></span><span className={`flex size-4 items-center justify-center rounded-full border ${method === item.id ? 'border-[#546282] bg-[#546282]' : 'border-[#d5d8dd]'}`}>{method === item.id && <span className="size-1.5 rounded-full bg-white" />}</span></button>)}</div></div>
             {notice && <p role="status" className={`mt-5 rounded-xl px-4 py-3 text-xs ${notice.startsWith('Enter') ? 'bg-[#fcf3ec] text-[#a06b43]' : 'bg-[#edf0f6] text-[#485674]'}`}>{notice}</p>}
             <button type="submit" className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]">Review {mode.toLowerCase()}</button>
