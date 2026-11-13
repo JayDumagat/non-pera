@@ -696,8 +696,8 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                   onClick={(event) => handleToggleAccount(account.id, event.currentTarget.parentElement)}
                   className={`relative z-10 w-full rounded-xl border p-2.5 text-left transition ${
                     isSelected
-                      ? 'account-card-selected border-[#9aa5b8] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.08)]'
-                      : 'border-[#e9ebef] bg-white hover:border-[#cfd5e0] hover:bg-[#fafbfc]'
+                      ? 'account-card-selected border-[#d1d5db] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.06)]'
+                      : 'border-[#eceff3] bg-white hover:border-[#d5dae2] hover:bg-[#fafbfc]'
                   }`}
                 >
                   <span className="flex items-center gap-1.5">
@@ -724,7 +724,7 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                     <div
                       role="region"
                       aria-label={`Quick actions for ${account.name}`}
-                      className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#d5dbe5] bg-white px-2 pb-2 pt-4 shadow-xs"
+                      className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#e0e3e9] bg-white px-2 pb-2 pt-4 shadow-xs"
                     >
                       <div className="grid grid-cols-2 gap-1.5">
                         {quickActions.primary.map((action) => (

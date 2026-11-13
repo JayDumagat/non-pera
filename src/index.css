@@ -99,12 +99,12 @@ body {
 
 [data-theme='night'] .account-card-selected {
   background-color: #151923 !important;
-  border-color: #5b6985 !important;
+  border-color: #6b7280 !important;
 }
 
 [data-theme='night'] .account-attached-drawer {
   background-color: #151923 !important;
-  border-color: #2c3344 !important;
+  border-color: #4b5563 !important;
 }
 
 [data-theme='night'] .quick-action-withdraw-active {
