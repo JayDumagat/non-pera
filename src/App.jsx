@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Navigate, NavLink as RouterNavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
+  ArrowDownLeft,
   ArrowRight,
   ArrowUpDown,
+  ArrowUpRight,
   Bell,
   BookOpen,
   BriefcaseBusiness,
@@ -38,6 +40,7 @@ import {
   WalletCards,
   X,
 } from 'lucide-react'
+import { applyAccountTransaction } from './utils/accountTransactions.js'
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
@@ -108,11 +111,11 @@ const activities = [
 const rangeReturns = { '1W': '+1.24%', '1M': '+5.49%', '3M': '+8.16%', '1Y': '+12.38%', ALL: '+18.62%' }
 
 const portfolioCategories = [
-  { id: 'overall', label: 'Overall', value: 24680.5, change: '+5.49%', changeAmount: 1284.2 },
-  { id: 'equities', label: 'Equities', value: 17240, change: '+6.21%', changeAmount: 1008.4 },
-  { id: 'uitfs', label: 'UITFs', value: 3480.5, change: '+3.71%', changeAmount: 124.5 },
-  { id: 'mutual-fund', label: 'Mutual fund', value: 2760, change: '+4.52%', changeAmount: 119.3 },
-  { id: 'others', label: 'Others', value: 1200, change: '+2.74%', changeAmount: 32 },
+  { id: 'overall', label: 'Overall', value: 24680.5, change: '+5.49%', changeAmount: 1284.2, color: '#6366f1' },
+  { id: 'equities', label: 'Equities', value: 17240, change: '+6.21%', changeAmount: 1008.4, color: '#2563eb' },
+  { id: 'uitfs', label: 'UITFs', value: 3480.5, change: '+3.71%', changeAmount: 124.5, color: '#0d9488' },
+  { id: 'mutual-fund', label: 'Mutual fund', value: 2760, change: '+4.52%', changeAmount: 119.3, color: '#d97706' },
+  { id: 'others', label: 'Others', value: 1200, change: '+2.74%', changeAmount: 32, color: '#7c3aed' },
 ]
 
 const categoryChartPoints = {
@@ -128,14 +131,14 @@ const rangeReturnMultipliers = { '1W': 0.22, '1M': 1, '3M': 2.6, '1Y': 6, ALL: 1
 
 const investmentAccounts = [
   { id: 'account-1', category: 'equities', name: 'Margin', accountNumber: 'JOHALEM-101-1-01-001', value: 9422.16, monthlyReturn: 5.2, color: '#2563eb' },
-  { id: 'account-2', category: 'equities', name: 'Discretionary', accountNumber: 'JOHALEM-102-2-01-002', value: 6218.4, monthlyReturn: 4.4, color: '#0f9f83' },
-  { id: 'account-3', category: 'equities', name: 'Broker-Assisted', accountNumber: 'JOHALEM-103-1-02-003', value: 1599.44, monthlyReturn: 7.6, color: '#8b5cf6' },
-  { id: 'account-4', category: 'uitfs', name: 'Discretionary UITF', accountNumber: 'JOHALEM-201-1-01-004', value: 2180.5, monthlyReturn: 3.8, color: '#0891b2' },
-  { id: 'account-5', category: 'uitfs', name: 'Broker-Assisted UITF', accountNumber: 'JOHALEM-202-2-01-005', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
-  { id: 'account-6', category: 'mutual-fund', name: 'Discretionary Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
-  { id: 'account-7', category: 'mutual-fund', name: 'Broker-Assisted Fund', accountNumber: 'JOHALEM-302-2-02-007', value: 1080, monthlyReturn: 5.6, color: '#db2777' },
-  { id: 'account-8', category: 'others', name: 'Margin Fixed Income', accountNumber: 'JOHALEM-401-1-01-008', value: 900, monthlyReturn: 1.1, color: '#64748b' },
-  { id: 'account-9', category: 'others', name: 'Discretionary Trust', accountNumber: 'JOHALEM-402-2-01-009', value: 300, monthlyReturn: 2.2, color: '#7c3aed' },
+  { id: 'account-2', category: 'equities', name: 'Discretionary', accountNumber: 'JOHALEM-102-2-01-002', value: 6218.4, monthlyReturn: 4.4, color: '#3b82f6' },
+  { id: 'account-3', category: 'equities', name: 'Broker-Assisted', accountNumber: 'JOHALEM-103-1-02-003', value: 1599.44, monthlyReturn: 7.6, color: '#60a5fa' },
+  { id: 'account-4', category: 'uitfs', name: 'BDO Equity Index Fund', accountNumber: 'JOHALEM-201-1-01-004', value: 2180.5, monthlyReturn: 3.8, color: '#0d9488' },
+  { id: 'account-5', category: 'uitfs', name: 'BPI Short Term Fund', accountNumber: 'JOHALEM-202-2-01-005', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
+  { id: 'account-6', category: 'mutual-fund', name: 'ALFM Growth Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
+  { id: 'account-7', category: 'mutual-fund', name: 'Philequity Fund', accountNumber: 'JOHALEM-302-2-02-007', value: 1080, monthlyReturn: 5.6, color: '#f59e0b' },
+  { id: 'account-8', category: 'others', name: 'Margin Fixed Income', accountNumber: 'JOHALEM-401-1-01-008', value: 900, monthlyReturn: 1.1, color: '#7c3aed' },
+  { id: 'account-9', category: 'others', name: 'Discretionary Trust', accountNumber: 'JOHALEM-402-2-01-009', value: 300, monthlyReturn: 2.2, color: '#8b5cf6' },
 ]
 
 const categoryBenchmarks = {
@@ -166,30 +169,31 @@ function formatReturn(value) {
   return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`
 }
 
-function getCategoryAccounts(category) {
-  return category === 'overall' ? investmentAccounts : investmentAccounts.filter((account) => account.category === category)
+function getCategoryAccounts(category, accountsList = investmentAccounts) {
+  return category === 'overall' ? accountsList : accountsList.filter((account) => account.category === category)
 }
 
-function getCategoryChartSeries(category, selectedAccountId = null) {
-  const selectedAccount = investmentAccounts.find((account) => account.id === selectedAccountId)
+function getCategoryChartSeries(category, selectedAccountId = null, accountsList = investmentAccounts, categoriesList = portfolioCategories) {
+  const selectedAccount = accountsList.find((account) => account.id === selectedAccountId)
   const chartCategory = selectedAccount?.category || category
   const benchmark = categoryBenchmarks[chartCategory] || categoryBenchmarks.overall
-  const accounts = chartCategory === 'overall' ? [] : getCategoryAccounts(chartCategory)
+  const accounts = chartCategory === 'overall' ? [] : getCategoryAccounts(chartCategory, accountsList)
+  const overallCategory = categoriesList[0] || portfolioCategories[0]
   const portfolioSeries = selectedAccount
     ? [{ id: selectedAccount.id, name: selectedAccount.name, monthlyReturn: selectedAccount.monthlyReturn, color: selectedAccount.color }]
     : chartCategory === 'overall'
-      ? [{ id: 'portfolio', name: 'Total portfolio', monthlyReturn: Number(portfolioCategories[0].change.replace('%', '').replace('+', '')), color: '#2563eb' }]
+      ? [{ id: 'portfolio', name: 'Total portfolio', monthlyReturn: Number(overallCategory.change.replace('%', '').replace('+', '')), color: '#2563eb' }]
       : accounts.map((account) => ({ id: account.id, name: account.name, monthlyReturn: account.monthlyReturn, color: account.color }))
 
   return [...portfolioSeries, { id: 'benchmark', name: benchmark.name, monthlyReturn: benchmark.monthlyReturn, color: benchmark.color, benchmark: true }]
 }
 
-function getCategoryPerformanceData(category, range, selectedAccountId = null) {
-  const selectedAccount = investmentAccounts.find((account) => account.id === selectedAccountId)
+function getCategoryPerformanceData(category, range, selectedAccountId = null, accountsList = investmentAccounts, categoriesList = portfolioCategories) {
+  const selectedAccount = accountsList.find((account) => account.id === selectedAccountId)
   const chartCategory = selectedAccount?.category || category
-  const activeCategory = portfolioCategories.find((item) => item.id === chartCategory) || portfolioCategories[0]
-  const series = getCategoryChartSeries(activeCategory.id, selectedAccountId)
-  const trendData = getTrendData(activeCategory.id, range)
+  const activeCategory = categoriesList.find((item) => item.id === chartCategory) || categoriesList[0]
+  const series = getCategoryChartSeries(activeCategory.id, selectedAccountId, accountsList, categoriesList)
+  const trendData = getTrendData(activeCategory.id, range, categoriesList)
   const points = categoryChartPoints[activeCategory.id].slice(-rangePointCounts[range])
   const firstPoint = points[0]
   const lastPoint = points[points.length - 1]
@@ -207,8 +211,8 @@ function getCategoryPerformanceData(category, range, selectedAccountId = null) {
   })
 }
 
-function getTrendData(category, range) {
-  const activeCategory = portfolioCategories.find((item) => item.id === category) || portfolioCategories[0]
+function getTrendData(category, range, categoriesList = portfolioCategories) {
+  const activeCategory = categoriesList.find((item) => item.id === category) || categoriesList[0]
   const currentValue = activeCategory.value
   const points = categoryChartPoints[activeCategory.id].slice(-rangePointCounts[range])
   const firstPoint = points[0]
@@ -572,13 +576,13 @@ function TrendChart({ range, setRange, compact = false, category = null }) {
   )
 }
 
-function CategoryTrendChart({ range, setRange, category, selectedAccountId }) {
-  const categoryData = portfolioCategories.find((item) => item.id === category) || portfolioCategories[0]
-  const selectedAccount = investmentAccounts.find((account) => account.id === selectedAccountId)
+function CategoryTrendChart({ range, setRange, category, selectedAccountId, accounts = investmentAccounts, categories = portfolioCategories }) {
+  const categoryData = categories.find((item) => item.id === category) || categories[0]
+  const selectedAccount = accounts.find((account) => account.id === selectedAccountId)
   const chartCategory = selectedAccount?.category || categoryData.id
   const benchmark = categoryBenchmarks[chartCategory] || categoryBenchmarks.overall
-  const series = getCategoryChartSeries(categoryData.id, selectedAccountId)
-  const data = useMemo(() => getCategoryPerformanceData(categoryData.id, range, selectedAccountId), [categoryData.id, range, selectedAccountId])
+  const series = getCategoryChartSeries(categoryData.id, selectedAccountId, accounts, categories)
+  const data = useMemo(() => getCategoryPerformanceData(categoryData.id, range, selectedAccountId, accounts, categories), [categoryData.id, range, selectedAccountId, accounts, categories])
   const showLegend = categoryData.id === 'overall' || Boolean(selectedAccount)
 
   return (
@@ -622,69 +626,216 @@ function CategoryTrendChart({ range, setRange, category, selectedAccountId }) {
   )
 }
 
-function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount }) {
-  const categoryData = portfolioCategories.find((item) => item.id === category) || portfolioCategories[0]
-  const accounts = getCategoryAccounts(categoryData.id)
+function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount, accounts: allAccounts = investmentAccounts, categories = portfolioCategories, onAccountTransaction }) {
+  const categoryData = categories.find((item) => item.id === category) || categories[0]
+  const accounts = getCategoryAccounts(categoryData.id, allAccounts)
+  const selectedAccount = accounts.find((account) => account.id === selectedAccountId) || null
   const multiplier = rangeReturnMultipliers[range]
-  const scrollRef = useRef(null)
+  const [activeAction, setActiveAction] = useState(null)
+  const [amount, setAmount] = useState('')
+  const [actionError, setActionError] = useState('')
+  const [actionNotice, setActionNotice] = useState('')
 
-  const scrollAccounts = (direction) => {
-    scrollRef.current?.scrollBy({ left: direction * 280, behavior: 'smooth' })
+  const handleToggleAccount = (accountId, cardElement = null) => {
+    const nextId = selectedAccountId === accountId ? null : accountId
+    setActiveAction(null)
+    setAmount('')
+    setActionError('')
+    setActionNotice('')
+    onSelectAccount(nextId)
+    if (nextId && cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    }
+  }
+
+  const handleOpenAction = (type) => {
+    setActiveAction((prev) => (prev === type ? null : type))
+    setAmount('')
+    setActionError('')
+    setActionNotice('')
+  }
+
+  const handleQuickSubmit = (event) => {
+    event.preventDefault()
+    if (!selectedAccount || !activeAction || !onAccountTransaction) return
+    const result = onAccountTransaction({
+      accountId: selectedAccount.id,
+      type: activeAction,
+      amount,
+    })
+    if (result.error) {
+      setActionError(result.error)
+      return
+    }
+    const label = activeAction === 'deposit' ? 'Deposited' : 'Withdrew'
+    setActionError('')
+    setActionNotice(`${label} ${formatPeso(Math.abs(result.delta))}. Bal: ${formatPeso(result.updatedAccount.value)}`)
+    setActiveAction(null)
+    setAmount('')
   }
 
   return (
     <section aria-label={`${categoryData.label} accounts`}>
-      <div className="group relative">
-        <button
-          type="button"
-          onClick={() => scrollAccounts(-1)}
-          aria-label="Scroll accounts left"
-          className="absolute left-1 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8eaee] bg-white/85 text-[#7b8190] shadow-xs backdrop-blur-xs transition hover:bg-white hover:text-[#2563eb] hover:shadow-sm dark:border-[#2f3542] dark:bg-[#1f232d]/85 dark:text-[#9ea3b0] dark:hover:bg-[#1f232d] dark:hover:text-[#60a5fa]"
-        >
-          <ChevronLeft size={14} />
-        </button>
-
+      <div className="relative">
         <div
-          ref={scrollRef}
-          className="scroll-pane flex w-full snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth pb-1"
+          className="visible-x-scrollbar flex w-full items-start snap-x snap-mandatory gap-2.5 overflow-x-scroll scroll-smooth pb-3 pt-0.5"
           aria-label="Scrollable investment accounts"
         >
-          {accounts.map((account) => (
-            <button
-              key={account.id}
-              type="button"
-              aria-pressed={selectedAccountId === account.id}
-              onClick={() => onSelectAccount(selectedAccountId === account.id ? null : account.id)}
-              className={`w-[164px] shrink-0 snap-start rounded-xl border p-2 text-left transition ${
-                selectedAccountId === account.id
-                  ? 'border-[#7aa8ff] bg-[#f2f7ff] shadow-[0_0_0_1px_rgba(59,130,246,0.12)]'
-                  : 'border-[#e9ebef] bg-white hover:border-[#c8d9f7] hover:bg-[#fbfdff]'
-              }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: account.color }} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[11px] font-semibold text-[#454b58]">{account.name}</span>
-                  <span className="mt-0.5 block truncate text-[8.5px] font-mono tracking-tight text-[#989da7]">{account.accountNumber}</span>
-                </span>
-              </span>
-              <span className="mt-1.5 block text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
-              <span className="mt-1 flex items-center justify-between gap-1.5">
-                <span className="text-[9px] text-[#9399a5]">{range} return</span>
-                <span className="text-[9.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
-              </span>
-            </button>
-          ))}
-        </div>
+          {accounts.map((account) => {
+            const isSelected = selectedAccountId === account.id
+            const accountCategory = categories.find((item) => item.id === account.category)
+            const categoryColor = accountCategory?.color || account.color
+            return (
+              <div key={account.id} className="flex w-[calc((100%-10px)/2)] shrink-0 snap-start flex-col sm:w-[calc((100%-20px)/3)]">
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={(event) => handleToggleAccount(account.id, event.currentTarget.parentElement)}
+                  className={`relative z-10 w-full rounded-xl border p-2.5 text-left transition ${
+                    isSelected
+                      ? 'account-card-selected border-[#9aa5b8] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.08)]'
+                      : 'border-[#e9ebef] bg-white hover:border-[#cfd5e0] hover:bg-[#fafbfc]'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: categoryColor }} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[11px] font-semibold text-[#454b58]" title={account.name}>{account.name}</span>
+                      <span className="mt-0.5 flex items-center gap-1 text-[8.5px] tracking-tight">
+                        <span className="font-semibold" style={{ color: categoryColor }}>{accountCategory?.label}</span>
+                        <span className="text-[#c1c6d0]">·</span>
+                        <span className="truncate font-mono text-[#989da7]">{account.accountNumber}</span>
+                      </span>
+                    </span>
+                  </span>
+                  <span className="mt-1.5 block text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
+                  <span className="mt-1 flex items-center justify-between gap-1.5">
+                    <span className="text-[9px] text-[#9399a5]">{range} return</span>
+                    <span className="text-[9.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
+                  </span>
+                </button>
 
-        <button
-          type="button"
-          onClick={() => scrollAccounts(1)}
-          aria-label="Scroll accounts right"
-          className="absolute right-1 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8eaee] bg-white/85 text-[#7b8190] shadow-xs backdrop-blur-xs transition hover:bg-white hover:text-[#2563eb] hover:shadow-sm dark:border-[#2f3542] dark:bg-[#1f232d]/85 dark:text-[#9ea3b0] dark:hover:bg-[#1f232d] dark:hover:text-[#60a5fa]"
-        >
-          <ChevronRight size={14} />
-        </button>
+                {isSelected && (
+                  <div
+                    role="region"
+                    aria-label={`Quick actions for ${account.name}`}
+                    className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#d5dbe5] bg-white px-2 pb-2 pt-4 shadow-xs"
+                  >
+                    <div className="grid grid-cols-2 gap-1.5">
+                      <button
+                        type="button"
+                        aria-pressed={activeAction === 'deposit'}
+                        onClick={() => handleOpenAction('deposit')}
+                        className={`inline-flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-[11px] font-semibold transition ${
+                          activeAction === 'deposit'
+                            ? 'bg-[#1d4ed8] text-white shadow-xs'
+                            : 'bg-[#2563eb] text-white hover:bg-[#1d4ed8]'
+                        }`}
+                      >
+                        <ArrowDownLeft size={12} />
+                        <span>Deposit</span>
+                      </button>
+                      <button
+                        type="button"
+                        aria-pressed={activeAction === 'withdraw'}
+                        onClick={() => handleOpenAction('withdraw')}
+                        className={`inline-flex items-center justify-center gap-1 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition ${
+                          activeAction === 'withdraw'
+                            ? 'quick-action-withdraw-active border-[#2563eb] bg-[#eff5ff] text-blue-600'
+                            : 'border-[#dce1ea] bg-white text-[#434a58] hover:border-[#b9c6db] hover:bg-[#f8f9fb]'
+                        }`}
+                      >
+                        <ArrowUpRight size={12} />
+                        <span>Withdraw</span>
+                      </button>
+                    </div>
+
+                    {activeAction && (
+                      <form onSubmit={handleQuickSubmit} className="mt-2 border-t border-[#eceef2] pt-2">
+                        <div className="flex flex-wrap items-center gap-1">
+                          {[500, 1000, 5000].map((preset) => (
+                            <button
+                              key={preset}
+                              type="button"
+                              onClick={() => {
+                                setAmount(String(preset))
+                                setActionError('')
+                              }}
+                              className="flex-1 rounded border border-[#e2e6ed] bg-[#f8f9fb] px-1 py-0.5 text-[9.5px] font-medium text-[#525b6e] transition hover:border-[#9cb9f5] hover:text-blue-600"
+                            >
+                              +{preset >= 1000 ? `${preset / 1000}k` : preset}
+                            </button>
+                          ))}
+                          {activeAction === 'withdraw' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAmount(String(account.value))
+                                setActionError('')
+                              }}
+                              className="flex-1 rounded border border-[#e2e6ed] bg-[#f8f9fb] px-1 py-0.5 text-[9.5px] font-medium text-[#525b6e] transition hover:border-[#9cb9f5] hover:text-blue-600"
+                            >
+                              Max
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="mt-1.5 flex items-center rounded-lg border border-[#dce1ea] bg-white px-2 py-1 focus-within:border-[#2563eb]">
+                          <span className="mr-1 text-[11px] font-semibold text-[#8c929f]">₱</span>
+                          <input
+                            id="quick-account-amount"
+                            aria-label="Quick transfer amount"
+                            inputMode="decimal"
+                            value={amount}
+                            onChange={(event) => {
+                              setAmount(event.target.value)
+                              if (actionError) setActionError('')
+                            }}
+                            placeholder="0.00"
+                            className="w-full min-w-0 bg-transparent text-[11px] font-semibold text-[#343a48] outline-none placeholder:text-[#b4b9c4]"
+                          />
+                        </div>
+
+                        <div className="mt-1.5 flex items-center gap-1">
+                          <button
+                            type="submit"
+                            className="flex-1 rounded-lg bg-[#2563eb] px-2 py-1 text-[10.5px] font-semibold text-white transition hover:bg-[#1d4ed8]"
+                          >
+                            Confirm {activeAction}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveAction(null)
+                              setActionError('')
+                            }}
+                            aria-label={`Cancel ${activeAction}`}
+                            className="flex size-6 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#667082] transition hover:bg-[#f6f8fb]"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+
+                        {actionError && (
+                          <p role="alert" className="mt-1.5 text-[10px] font-medium leading-tight text-red-600">
+                            {actionError}
+                          </p>
+                        )}
+                      </form>
+                    )}
+
+                    {actionNotice && (
+                      <div role="status" className="mt-2 flex items-start gap-1 border-t border-[#eceef2] pt-1.5 text-[10px] font-medium leading-tight text-emerald-700">
+                        <CheckCircle2 size={12} className="mt-0.5 shrink-0 text-emerald-600" />
+                        <span>{actionNotice}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
@@ -730,8 +881,8 @@ function ActivityList({ limit }) {
   )
 }
 
-function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId }) {
-  const selectedData = portfolioCategories.find((item) => item.id === selectedCategory) || portfolioCategories[0]
+function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId, accounts = investmentAccounts, categories = portfolioCategories, onAccountTransaction }) {
+  const selectedData = categories.find((item) => item.id === selectedCategory) || categories[0]
   const selectedPera = categoryPeraBalances[selectedCategory] || categoryPeraBalances.overall
   const selectedCash = categoryCashBalances[selectedCategory] || categoryCashBalances.overall
   const [balanceView, setBalanceView] = useState(() => {
@@ -879,22 +1030,50 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
 
             {showChart && (
               <div className="mt-4 min-w-0 border-t border-[#edeef0] pt-4">
-                <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} />
+                <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} accounts={accounts} categories={categories} />
               </div>
             )}
             </Card>
           </div>
 
-          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
+          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} accounts={accounts} categories={categories} onAccountTransaction={onAccountTransaction} />
         </div>
 
-        <Card className="flex max-h-[360px] flex-col p-4 sm:p-5">
+        <Card className="flex flex-col p-4 sm:p-5">
           <h3 className="mb-3 text-xs font-semibold text-[#555c6a]">Categories</h3>
-          <div role="tablist" aria-label="Portfolio categories" className="scroll-pane min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain">
-            {portfolioCategories.map((category) => <button key={category.id} type="button" role="tab" aria-selected={selectedCategory === category.id} onClick={() => { setSelectedCategory(category.id); setSelectedAccountId(null) }} className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-3 text-left transition ${selectedCategory === category.id ? 'bg-[#eff5ff] text-[#2563eb]' : 'text-[#777f8d] hover:bg-[#f8f9fb] hover:text-[#46536d]'}`}>
-              <span className="min-w-0"><span className="block truncate text-[11px] font-semibold">{category.label}</span><span className="mt-1 block text-[9px] text-[#969ca7]">{formatPeso(category.value)}</span></span>
-              {selectedCategory === category.id && <span className="size-1.5 shrink-0 rounded-full bg-[#3b82f6]" />}
-            </button>)}
+          <div role="tablist" aria-label="Portfolio categories" className="space-y-1.5">
+            {categories.map((category) => {
+              const isCategorySelected = selectedCategory === category.id
+              return (
+                <button
+                  key={category.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isCategorySelected}
+                  onClick={() => { setSelectedCategory(category.id); setSelectedAccountId(null) }}
+                  style={isCategorySelected ? { backgroundColor: `${category.color}14`, borderColor: `${category.color}40` } : undefined}
+                  className={`flex w-full items-center justify-between gap-2 rounded-lg border border-transparent px-3 py-2.5 text-left transition ${
+                    isCategorySelected
+                      ? ''
+                      : 'text-[#777f8d] hover:bg-[#f8f9fb] hover:text-[#46536d]'
+                  }`}
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
+                    <span className="min-w-0">
+                      <span
+                        className="block truncate text-[11px] font-semibold"
+                        style={isCategorySelected ? { color: category.color } : undefined}
+                      >
+                        {category.label}
+                      </span>
+                      <span className="mt-0.5 block text-[9px] text-[#969ca7]">{formatPeso(category.value)}</span>
+                    </span>
+                  </span>
+                  {isCategorySelected && <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />}
+                </button>
+              )
+            })}
           </div>
         </Card>
       </div>
@@ -907,9 +1086,21 @@ function HomePage() {
   const [range, setRange] = useState('1M')
   const [selectedCategory, setSelectedCategory] = useState('overall')
   const [selectedAccountId, setSelectedAccountId] = useState(null)
+  const [accounts, setAccounts] = useState(investmentAccounts)
+  const [categories, setCategories] = useState(portfolioCategories)
+
+  const handleAccountTransaction = ({ accountId, type, amount }) => {
+    const result = applyAccountTransaction({ accounts, categories, accountId, type, amount })
+    if (!result.error) {
+      setAccounts(result.accounts)
+      setCategories(result.categories)
+    }
+    return result
+  }
+
   return (
     <div className="space-y-6">
-      <PortfolioValueCard range={range} setRange={setRange} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedAccountId={selectedAccountId} setSelectedAccountId={setSelectedAccountId} />
+      <PortfolioValueCard range={range} setRange={setRange} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedAccountId={selectedAccountId} setSelectedAccountId={setSelectedAccountId} accounts={accounts} categories={categories} onAccountTransaction={handleAccountTransaction} />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,0.8fr)]">
         <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-2 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Your investments</h2><p className="mt-1 text-xs text-[#9a9da4]">A quick look at your holdings</p></div><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-semibold text-[#646e84] hover:text-[#313e5d]">See all</button></div><HoldingsTable limit={3} /></Card>

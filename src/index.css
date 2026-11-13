@@ -57,6 +57,61 @@ body {
   height: 0;
 }
 
+.visible-x-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c3cbd9 #eef1f5;
+}
+
+.visible-x-scrollbar::-webkit-scrollbar {
+  display: block;
+  height: 7px;
+}
+
+.visible-x-scrollbar::-webkit-scrollbar-track {
+  background: #eef1f5;
+  border-radius: 9999px;
+}
+
+.visible-x-scrollbar::-webkit-scrollbar-thumb {
+  background: #c3cbd9;
+  border-radius: 9999px;
+}
+
+.visible-x-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9aa5b8;
+}
+
+[data-theme='night'] .visible-x-scrollbar {
+  scrollbar-color: #3d4558 #181c24;
+}
+
+[data-theme='night'] .visible-x-scrollbar::-webkit-scrollbar-track {
+  background: #181c24;
+}
+
+[data-theme='night'] .visible-x-scrollbar::-webkit-scrollbar-thumb {
+  background: #3d4558;
+}
+
+[data-theme='night'] .visible-x-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #556078;
+}
+
+[data-theme='night'] .account-card-selected {
+  background-color: #1c202a !important;
+  border-color: #6b768f !important;
+}
+
+[data-theme='night'] .account-attached-drawer {
+  background-color: #1c202a !important;
+  border-color: #3a4152 !important;
+}
+
+[data-theme='night'] .quick-action-withdraw-active {
+  color: #60a5fa !important;
+  border-color: #60a5fa !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sponsored-ad-image { animation: none; }
 }
