@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Navigate, NavLink as RouterNavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
   ArrowRight,
   ArrowUpDown,
+  ArrowUpRight,
   Bell,
   BookOpen,
   BriefcaseBusiness,
@@ -38,6 +39,9 @@ import {
   WalletCards,
   X,
 } from 'lucide-react'
+import { getAccountQuickActions, isFundCategory } from './utils/accountQuickActions'
+import { getScopedAccountContent } from './utils/accountContent'
+import { filterProducts } from './utils/productFilters'
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
@@ -58,12 +62,19 @@ const navigationSections = [
     ]
   },
   { label: 'Discover', items: [{ id: 'learn', label: 'Learn', icon: 'learn', badge: '2' }] },
+<<<<<<< HEAD
   {
     label: 'Account', items: [
       { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
       { id: 'profile', label: 'Profile', icon: 'profile' },
     ]
   },
+=======
+  { label: 'Account', items: [
+    { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
+    { id: 'notifications', label: 'Notifications', icon: 'bell', badge: '2' },
+  ] },
+>>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
 ]
 
 const traderNavigationSections = [
@@ -94,13 +105,19 @@ const holdings = [
 ]
 
 const products = [
-  { id: 'market', symbol: '◎', name: 'Total Market Index', category: 'Index funds', detail: 'Broad exposure to leading US companies', minimum: '₱1', fee: '0.03%', risk: 'Moderate', tint: 'sage', return: '+8.4%' },
-  { id: 'global', symbol: '◉', name: 'Global Equity Fund', category: 'Index funds', detail: 'Invest across established global markets', minimum: '₱1', fee: '0.08%', risk: 'Moderate', tint: 'blue', return: '+7.1%' },
-  { id: 'tech', symbol: '✦', name: 'NextGen AI & Tech Index', category: 'Index funds', detail: 'High-growth technology leaders shaping AI and automation', minimum: '₱50', fee: '0.14%', risk: 'Growth', tint: 'blue', return: '+14.6%', isNew: true },
-  { id: 'treasury', symbol: '▤', name: 'Treasury Portfolio', category: 'Fixed income', detail: 'A steadier mix of government bonds', minimum: '₱100', fee: '0.12%', risk: 'Low', tint: 'sand', return: '+4.2%' },
-  { id: 'cash', symbol: '◌', name: 'Cash Reserve', category: 'Cash', detail: 'Keep funds available for your next move', minimum: '₱1', fee: 'No fee', risk: 'Low', tint: 'lavender', return: '4.1% APY' },
-  { id: 'retirement', symbol: '↗', name: 'Future Builder', category: 'Retirement', detail: 'A diversified long-term portfolio', minimum: '₱25', fee: '0.18%', risk: 'Balanced', tint: 'rose', return: '+6.8%' },
-  { id: 'green', symbol: '✳', name: 'Sustainable Leaders', category: 'Index funds', detail: 'Companies screened for sustainability', minimum: '₱10', fee: '0.15%', risk: 'Moderate', tint: 'sage', return: '+6.2%', isNew: true },
+  { id: 'sm', symbol: 'SM', name: 'SM Investments Corp.', category: 'Stocks & ETFs', detail: 'Blue-chip Philippine conglomerate', minimum: '₱905', fee: '0.25%', risk: 'Moderate', tint: 'blue', return: '+11.4%' },
+  { id: 'bdo', symbol: 'BDO', name: 'BDO Unibank, Inc.', category: 'Stocks & ETFs', detail: 'Leading Philippine universal bank', minimum: '₱155', fee: '0.25%', risk: 'Moderate', tint: 'sage', return: '+9.8%' },
+  { id: 'market', symbol: 'VTI', name: 'Total Market Index ETF', category: 'Stocks & ETFs', detail: 'Broad exposure to leading US companies', minimum: '₱1', fee: '0.03%', risk: 'Moderate', tint: 'sage', return: '+8.4%' },
+  { id: 'tech', symbol: 'AIQ', name: 'NextGen AI & Tech ETF', category: 'Stocks & ETFs', detail: 'High-growth technology leaders shaping AI and automation', minimum: '₱50', fee: '0.14%', risk: 'Growth', tint: 'blue', return: '+14.6%', isNew: true },
+  { id: 'alfmg', symbol: 'ALF', name: 'ALFM Growth Fund', category: 'Mutual Funds', detail: 'Diversified Philippine equity growth mutual fund', minimum: '₱1,000', fee: '1.50%', risk: 'Growth', tint: 'sand', return: '+8.9%' },
+  { id: 'pefi', symbol: 'PEF', name: 'Philequity Fund', category: 'Mutual Funds', detail: 'Long-term Philippine large-cap equity mutual fund', minimum: '₱1,000', fee: '1.50%', risk: 'Growth', tint: 'sand', return: '+10.2%' },
+  { id: 'balanced', symbol: 'SLB', name: 'Sun Life Prosperity Balanced', category: 'Mutual Funds', detail: 'Balanced mix of Philippine equities and fixed income', minimum: '₱1,000', fee: '1.25%', risk: 'Balanced', tint: 'rose', return: '+6.8%' },
+  { id: 'bdoei', symbol: 'BEI', name: 'BDO Equity Index Fund', category: 'UITFs', detail: 'Tracks the Philippine Stock Exchange Index (PSEi)', minimum: '₱1,000', fee: '1.00%', risk: 'Growth', tint: 'sage', return: '+7.6%' },
+  { id: 'bpist', symbol: 'BST', name: 'BPI Short Term Fund', category: 'UITFs', detail: 'Money market UITF focused on capital preservation', minimum: '₱1,000', fee: '0.50%', risk: 'Low', tint: 'lavender', return: '+4.3%' },
+  { id: 'sbglo', symbol: 'SBG', name: 'Security Bank Global Feeder', category: 'UITFs', detail: 'Feeder UITF investing in developed global equities', minimum: '₱5,000', fee: '0.75%', risk: 'Moderate', tint: 'blue', return: '+9.1%', isNew: true },
+  { id: 'treasury', symbol: 'RTB', name: 'Retail Treasury Bonds (RTB)', category: 'Fixed Income', detail: 'Philippine sovereign fixed-rate treasury notes', minimum: '₱5,000', fee: 'No fee', risk: 'Low', tint: 'sand', return: '+6.25%' },
+  { id: 'corpbond', symbol: 'BND', name: 'Treasury & Corporate Bond Mix', category: 'Fixed Income', detail: 'A steadier mix of government and investment-grade bonds', minimum: '₱1,000', fee: '0.12%', risk: 'Low', tint: 'lavender', return: '+4.8%' },
+  { id: 'cash', symbol: 'CSH', name: 'CGSI Peso Cash Reserve', category: 'Cash', detail: 'Keep idle peso liquidity earning yield between trades', minimum: '₱1', fee: 'No fee', risk: 'Low', tint: 'lavender', return: '4.1% APY' },
 ]
 
 const activities = [
@@ -109,14 +126,53 @@ const activities = [
   { title: 'Deposit completed', detail: 'Bank transfer · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
 ]
 
+const accountHoldings = [
+  { accountId: 'account-1', category: 'equities', ticker: 'SM', name: 'SM Investments Corp.', type: 'PSE equity', units: '8.0 shares', value: 7240, change: 5.42, color: '#2563eb' },
+  { accountId: 'account-1', category: 'equities', ticker: 'BDO', name: 'BDO Unibank, Inc.', type: 'PSE equity', units: '14.1 shares', value: 2182.16, change: 4.48, color: '#3b82f6' },
+  { accountId: 'account-2', category: 'equities', ticker: 'VTI', name: 'Total Market ETF', type: 'US equities', units: '18.2 shares', value: 3980.4, change: 4.28, color: '#3b82f6' },
+  { accountId: 'account-2', category: 'equities', ticker: 'VXUS', name: 'International ETF', type: 'Global equities', units: '24.6 shares', value: 2238, change: 2.14, color: '#707c9a' },
+  { accountId: 'account-3', category: 'equities', ticker: 'AC', name: 'Ayala Corporation', type: 'PSE equity', units: '1.5 shares', value: 963, change: 7.85, color: '#60a5fa' },
+  { accountId: 'account-3', category: 'equities', ticker: 'ALI', name: 'Ayala Land, Inc.', type: 'PSE equity', units: '18.6 shares', value: 636.44, change: 6.12, color: '#3b82f6' },
+  { accountId: 'account-4', category: 'uitfs', ticker: 'BDOEI', name: 'BDO Equity Index UITF', type: 'PSEi tracker', units: '21.4 units', value: 2180.5, change: 3.8, color: '#0d9488' },
+  { accountId: 'account-5', category: 'uitfs', ticker: 'BPIST', name: 'BPI Short Term UITF', type: 'Money market', units: '8.1 units', value: 1300, change: 2.4, color: '#14b8a6' },
+  { accountId: 'account-6', category: 'mutual-fund', ticker: 'ALFMG', name: 'ALFM Growth Mutual Fund', type: 'PH equity fund', units: '6.4 shares', value: 1680, change: 4.1, color: '#d97706' },
+  { accountId: 'account-7', category: 'mutual-fund', ticker: 'PEFI', name: 'Philequity Mutual Fund', type: 'PH growth fund', units: '28.5 shares', value: 1080, change: 5.6, color: '#f59e0b' },
+  { accountId: 'account-8', category: 'others', ticker: 'RTB30', name: 'Retail Treasury Bond 5Y', type: 'Gov. fixed income', units: '9.0 units', value: 900, change: 1.1, color: '#7c3aed' },
+  { accountId: 'account-9', category: 'others', ticker: 'TRUST', name: 'CGSI Balanced Trust', type: 'Trust mandate', units: '3.0 units', value: 300, change: 2.2, color: '#8b5cf6' },
+]
+
+const accountActivities = [
+  { accountId: 'account-1', category: 'equities', title: 'Buy order filled', detail: 'SM Investments · Today, 10:15 AM', amount: '-₱1,500.00', kind: 'invest' },
+  { accountId: 'account-1', category: 'equities', title: 'Cash dividend', detail: 'BDO Unibank · Oct 11, 2026', amount: '+₱42.50', kind: 'income' },
+  { accountId: 'account-1', category: 'equities', title: 'Margin interest settled', detail: 'Monthly billing · Oct 05, 2026', amount: '-₱18.20', kind: 'invest' },
+  { accountId: 'account-2', category: 'equities', title: 'Rebalance executed', detail: 'Total Market ETF · Today, 9:42 AM', amount: '-₱150.00', kind: 'invest' },
+  { accountId: 'account-2', category: 'equities', title: 'Dividend received', detail: 'International ETF · Oct 12, 2026', amount: '+₱18.24', kind: 'income' },
+  { accountId: 'account-2', category: 'equities', title: 'Deposit completed', detail: 'Bank transfer · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
+  { accountId: 'account-3', category: 'equities', title: 'Broker limit buy', detail: 'Ayala Corporation · Yesterday, 2:30 PM', amount: '-₱642.00', kind: 'invest' },
+  { accountId: 'account-3', category: 'equities', title: 'Cash dividend', detail: 'Ayala Land · Oct 09, 2026', amount: '+₱24.10', kind: 'income' },
+  { accountId: 'account-3', category: 'equities', title: 'Deposit completed', detail: 'InstaPay transfer · Oct 06, 2026', amount: '+₱350.00', kind: 'deposit' },
+  { accountId: 'account-4', category: 'uitfs', title: 'UITF subscription', detail: 'BDO Equity Index Fund · Oct 14, 2026', amount: '-₱500.00', kind: 'invest' },
+  { accountId: 'account-4', category: 'uitfs', title: 'Deposit completed', detail: 'BDO Online · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
+  { accountId: 'account-5', category: 'uitfs', title: 'UITF subscription', detail: 'BPI Short Term Fund · Oct 12, 2026', amount: '-₱300.00', kind: 'invest' },
+  { accountId: 'account-5', category: 'uitfs', title: 'NavPU gain posted', detail: 'BPI Short Term Fund · Oct 08, 2026', amount: '+₱12.80', kind: 'income' },
+  { accountId: 'account-6', category: 'mutual-fund', title: 'Monthly subscription', detail: 'ALFM Growth Fund · Oct 15, 2026', amount: '-₱400.00', kind: 'invest' },
+  { accountId: 'account-6', category: 'mutual-fund', title: 'Deposit completed', detail: 'Auto-debit · Oct 15, 2026', amount: '+₱400.00', kind: 'deposit' },
+  { accountId: 'account-7', category: 'mutual-fund', title: 'Fund subscription', detail: 'Philequity Fund · Oct 11, 2026', amount: '-₱280.00', kind: 'invest' },
+  { accountId: 'account-7', category: 'mutual-fund', title: 'Quarterly gain', detail: 'Philequity Fund · Oct 04, 2026', amount: '+₱31.50', kind: 'income' },
+  { accountId: 'account-8', category: 'others', title: 'Coupon credited', detail: 'Retail Treasury Bond · Oct 13, 2026', amount: '+₱14.60', kind: 'income' },
+  { accountId: 'account-8', category: 'others', title: 'Bond allocation', detail: 'Margin Fixed Income · Oct 02, 2026', amount: '-₱450.00', kind: 'invest' },
+  { accountId: 'account-9', category: 'others', title: 'Trust distribution', detail: 'CGSI Balanced Trust · Oct 09, 2026', amount: '+₱8.40', kind: 'income' },
+  { accountId: 'account-9', category: 'others', title: 'Initial funding', detail: 'Discretionary Trust · Oct 01, 2026', amount: '+₱300.00', kind: 'deposit' },
+]
+
 const rangeReturns = { '1W': '+1.24%', '1M': '+5.49%', '3M': '+8.16%', '1Y': '+12.38%', ALL: '+18.62%' }
 
 const portfolioCategories = [
-  { id: 'overall', label: 'Overall', value: 24680.5, change: '+5.49%', changeAmount: 1284.2 },
-  { id: 'equities', label: 'Equities', value: 17240, change: '+6.21%', changeAmount: 1008.4 },
-  { id: 'uitfs', label: 'UITFs', value: 3480.5, change: '+3.71%', changeAmount: 124.5 },
-  { id: 'mutual-fund', label: 'Mutual fund', value: 2760, change: '+4.52%', changeAmount: 119.3 },
-  { id: 'others', label: 'Others', value: 1200, change: '+2.74%', changeAmount: 32 },
+  { id: 'overall', label: 'Overall', value: 24680.5, change: '+5.49%', changeAmount: 1284.2, color: '#6366f1' },
+  { id: 'equities', label: 'Equities', value: 17240, change: '+6.21%', changeAmount: 1008.4, color: '#2563eb' },
+  { id: 'uitfs', label: 'UITFs', value: 3480.5, change: '+3.71%', changeAmount: 124.5, color: '#0d9488' },
+  { id: 'mutual-fund', label: 'Mutual fund', value: 2760, change: '+4.52%', changeAmount: 119.3, color: '#d97706' },
+  { id: 'others', label: 'Others', value: 1200, change: '+2.74%', changeAmount: 32, color: '#7c3aed' },
 ]
 
 const categoryChartPoints = {
@@ -132,14 +188,14 @@ const rangeReturnMultipliers = { '1W': 0.22, '1M': 1, '3M': 2.6, '1Y': 6, ALL: 1
 
 const investmentAccounts = [
   { id: 'account-1', category: 'equities', name: 'Margin', accountNumber: 'JOHALEM-101-1-01-001', value: 9422.16, monthlyReturn: 5.2, color: '#2563eb' },
-  { id: 'account-2', category: 'equities', name: 'Discretionary', accountNumber: 'JOHALEM-102-2-01-002', value: 6218.4, monthlyReturn: 4.4, color: '#0f9f83' },
-  { id: 'account-3', category: 'equities', name: 'Broker-Assisted', accountNumber: 'JOHALEM-103-1-02-003', value: 1599.44, monthlyReturn: 7.6, color: '#8b5cf6' },
-  { id: 'account-4', category: 'uitfs', name: 'Discretionary UITF', accountNumber: 'JOHALEM-201-1-01-004', value: 2180.5, monthlyReturn: 3.8, color: '#0891b2' },
-  { id: 'account-5', category: 'uitfs', name: 'Broker-Assisted UITF', accountNumber: 'JOHALEM-202-2-01-005', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
-  { id: 'account-6', category: 'mutual-fund', name: 'Discretionary Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
-  { id: 'account-7', category: 'mutual-fund', name: 'Broker-Assisted Fund', accountNumber: 'JOHALEM-302-2-02-007', value: 1080, monthlyReturn: 5.6, color: '#db2777' },
-  { id: 'account-8', category: 'others', name: 'Margin Fixed Income', accountNumber: 'JOHALEM-401-1-01-008', value: 900, monthlyReturn: 1.1, color: '#64748b' },
-  { id: 'account-9', category: 'others', name: 'Discretionary Trust', accountNumber: 'JOHALEM-402-2-01-009', value: 300, monthlyReturn: 2.2, color: '#7c3aed' },
+  { id: 'account-2', category: 'equities', name: 'Discretionary', accountNumber: 'JOHALEM-102-2-01-002', value: 6218.4, monthlyReturn: 4.4, color: '#3b82f6' },
+  { id: 'account-3', category: 'equities', name: 'Broker-Assisted', accountNumber: 'JOHALEM-103-1-02-003', value: 1599.44, monthlyReturn: 7.6, color: '#60a5fa' },
+  { id: 'account-4', category: 'uitfs', name: 'BDO Equity Index Fund', accountNumber: 'JOHALEM-201-1-01-004', value: 2180.5, monthlyReturn: 3.8, color: '#0d9488' },
+  { id: 'account-5', category: 'uitfs', name: 'BPI Short Term Fund', accountNumber: 'JOHALEM-202-2-01-005', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
+  { id: 'account-6', category: 'mutual-fund', name: 'ALFM Growth Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
+  { id: 'account-7', category: 'mutual-fund', name: 'Philequity Fund', accountNumber: 'JOHALEM-302-2-02-007', value: 1080, monthlyReturn: 5.6, color: '#f59e0b' },
+  { id: 'account-8', category: 'others', name: 'Margin Fixed Income', accountNumber: 'JOHALEM-401-1-01-008', value: 900, monthlyReturn: 1.1, color: '#7c3aed' },
+  { id: 'account-9', category: 'others', name: 'Discretionary Trust', accountNumber: 'JOHALEM-402-2-01-009', value: 300, monthlyReturn: 2.2, color: '#8b5cf6' },
 ]
 
 const categoryBenchmarks = {
@@ -170,30 +226,31 @@ function formatReturn(value) {
   return `${value > 0 ? '+' : ''}${value.toFixed(2)}%`
 }
 
-function getCategoryAccounts(category) {
-  return category === 'overall' ? investmentAccounts : investmentAccounts.filter((account) => account.category === category)
+function getCategoryAccounts(category, accountsList = investmentAccounts) {
+  return category === 'overall' ? accountsList : accountsList.filter((account) => account.category === category)
 }
 
-function getCategoryChartSeries(category, selectedAccountId = null) {
-  const selectedAccount = investmentAccounts.find((account) => account.id === selectedAccountId)
+function getCategoryChartSeries(category, selectedAccountId = null, accountsList = investmentAccounts, categoriesList = portfolioCategories) {
+  const selectedAccount = accountsList.find((account) => account.id === selectedAccountId)
   const chartCategory = selectedAccount?.category || category
   const benchmark = categoryBenchmarks[chartCategory] || categoryBenchmarks.overall
-  const accounts = chartCategory === 'overall' ? [] : getCategoryAccounts(chartCategory)
+  const accounts = chartCategory === 'overall' ? [] : getCategoryAccounts(chartCategory, accountsList)
+  const overallCategory = categoriesList[0] || portfolioCategories[0]
   const portfolioSeries = selectedAccount
     ? [{ id: selectedAccount.id, name: selectedAccount.name, monthlyReturn: selectedAccount.monthlyReturn, color: selectedAccount.color }]
     : chartCategory === 'overall'
-      ? [{ id: 'portfolio', name: 'Total portfolio', monthlyReturn: Number(portfolioCategories[0].change.replace('%', '').replace('+', '')), color: '#2563eb' }]
+      ? [{ id: 'portfolio', name: 'Total portfolio', monthlyReturn: Number(overallCategory.change.replace('%', '').replace('+', '')), color: '#2563eb' }]
       : accounts.map((account) => ({ id: account.id, name: account.name, monthlyReturn: account.monthlyReturn, color: account.color }))
 
   return [...portfolioSeries, { id: 'benchmark', name: benchmark.name, monthlyReturn: benchmark.monthlyReturn, color: benchmark.color, benchmark: true }]
 }
 
-function getCategoryPerformanceData(category, range, selectedAccountId = null) {
-  const selectedAccount = investmentAccounts.find((account) => account.id === selectedAccountId)
+function getCategoryPerformanceData(category, range, selectedAccountId = null, accountsList = investmentAccounts, categoriesList = portfolioCategories) {
+  const selectedAccount = accountsList.find((account) => account.id === selectedAccountId)
   const chartCategory = selectedAccount?.category || category
-  const activeCategory = portfolioCategories.find((item) => item.id === chartCategory) || portfolioCategories[0]
-  const series = getCategoryChartSeries(activeCategory.id, selectedAccountId)
-  const trendData = getTrendData(activeCategory.id, range)
+  const activeCategory = categoriesList.find((item) => item.id === chartCategory) || categoriesList[0]
+  const series = getCategoryChartSeries(activeCategory.id, selectedAccountId, accountsList, categoriesList)
+  const trendData = getTrendData(activeCategory.id, range, categoriesList)
   const points = categoryChartPoints[activeCategory.id].slice(-rangePointCounts[range])
   const firstPoint = points[0]
   const lastPoint = points[points.length - 1]
@@ -211,8 +268,8 @@ function getCategoryPerformanceData(category, range, selectedAccountId = null) {
   })
 }
 
-function getTrendData(category, range) {
-  const activeCategory = portfolioCategories.find((item) => item.id === category) || portfolioCategories[0]
+function getTrendData(category, range, categoriesList = portfolioCategories) {
+  const activeCategory = categoriesList.find((item) => item.id === category) || categoriesList[0]
   const currentValue = activeCategory.value
   const points = categoryChartPoints[activeCategory.id].slice(-rangePointCounts[range])
   const firstPoint = points[0]
@@ -518,15 +575,6 @@ function MobileNavigation({ isTraderView }) {
   return <nav className="flex gap-1 overflow-x-auto border-b border-[#e8e9ec] bg-white px-3 py-2 lg:hidden" aria-label="Main navigation">{items.map((item) => <SidebarLink key={item.id} item={item} mobile />)}</nav>
 }
 
-function PageIntro({ title, subtitle, action }) {
-  return (
-    <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-      <div><h1 className="text-[26px] font-semibold tracking-tight text-[#262c3a] sm:text-[30px]">{title}</h1>{subtitle && <p className="mt-1.5 text-sm text-[#898d95]">{subtitle}</p>}</div>
-      {action}
-    </div>
-  )
-}
-
 function Card({ children, className = '', tone = 'white', ...props }) {
   const backgroundColor = tone === 'forest' ? '#2563eb' : tone === 'soft' ? '#f5f6f8' : '#ffffff'
   return <section {...props} data-tone={tone} style={{ backgroundColor }} className={`rounded-2xl border border-[#e9eaed] shadow-[0_2px_10px_rgba(35,61,46,0.025)] ${className}`}>{children}</section>
@@ -576,13 +624,13 @@ function TrendChart({ range, setRange, compact = false, category = null }) {
   )
 }
 
-function CategoryTrendChart({ range, setRange, category, selectedAccountId }) {
-  const categoryData = portfolioCategories.find((item) => item.id === category) || portfolioCategories[0]
-  const selectedAccount = investmentAccounts.find((account) => account.id === selectedAccountId)
+function CategoryTrendChart({ range, setRange, category, selectedAccountId, accounts = investmentAccounts, categories = portfolioCategories }) {
+  const categoryData = categories.find((item) => item.id === category) || categories[0]
+  const selectedAccount = accounts.find((account) => account.id === selectedAccountId)
   const chartCategory = selectedAccount?.category || categoryData.id
   const benchmark = categoryBenchmarks[chartCategory] || categoryBenchmarks.overall
-  const series = getCategoryChartSeries(categoryData.id, selectedAccountId)
-  const data = useMemo(() => getCategoryPerformanceData(categoryData.id, range, selectedAccountId), [categoryData.id, range, selectedAccountId])
+  const series = getCategoryChartSeries(categoryData.id, selectedAccountId, accounts, categories)
+  const data = useMemo(() => getCategoryPerformanceData(categoryData.id, range, selectedAccountId, accounts, categories), [categoryData.id, range, selectedAccountId, accounts, categories])
   const showLegend = categoryData.id === 'overall' || Boolean(selectedAccount)
 
   return (
@@ -626,33 +674,28 @@ function CategoryTrendChart({ range, setRange, category, selectedAccountId }) {
   )
 }
 
-function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount }) {
-  const categoryData = portfolioCategories.find((item) => item.id === category) || portfolioCategories[0]
-  const accounts = getCategoryAccounts(categoryData.id)
+function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount, accounts: allAccounts = investmentAccounts, categories = portfolioCategories }) {
+  const navigate = useNavigate()
+  const categoryData = categories.find((item) => item.id === category) || categories[0]
+  const accounts = getCategoryAccounts(categoryData.id, allAccounts)
   const multiplier = rangeReturnMultipliers[range]
-  const scrollRef = useRef(null)
 
-  const scrollAccounts = (direction) => {
-    scrollRef.current?.scrollBy({ left: direction * 280, behavior: 'smooth' })
+  const handleToggleAccount = (accountId, cardElement = null) => {
+    const nextId = selectedAccountId === accountId ? null : accountId
+    onSelectAccount(nextId)
+    if (nextId && cardElement) {
+      cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+    }
   }
 
   return (
     <section aria-label={`${categoryData.label} accounts`}>
-      <div className="group relative">
-        <button
-          type="button"
-          onClick={() => scrollAccounts(-1)}
-          aria-label="Scroll accounts left"
-          className="absolute left-1 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8eaee] bg-white/85 text-[#7b8190] shadow-xs backdrop-blur-xs transition hover:bg-white hover:text-[#2563eb] hover:shadow-sm dark:border-[#2f3542] dark:bg-[#1f232d]/85 dark:text-[#9ea3b0] dark:hover:bg-[#1f232d] dark:hover:text-[#60a5fa]"
-        >
-          <ChevronLeft size={14} />
-        </button>
-
+      <div className="relative">
         <div
-          ref={scrollRef}
-          className="scroll-pane flex w-full snap-x snap-mandatory gap-2 overflow-x-auto scroll-smooth pb-1"
+          className="visible-x-scrollbar flex w-full items-start snap-x snap-mandatory gap-2.5 overflow-x-scroll scroll-smooth pb-3 pt-0.5"
           aria-label="Scrollable investment accounts"
         >
+<<<<<<< HEAD
           {accounts.map((account) => (
             <button
               key={account.id}
@@ -679,15 +722,86 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
             </button>
           ))}
         </div>
+=======
+          {accounts.map((account) => {
+            const isSelected = selectedAccountId === account.id
+            const accountCategory = categories.find((item) => item.id === account.category)
+            const categoryColor = accountCategory?.color || account.color
+            return (
+              <div key={account.id} className="flex w-[calc((100%-10px)/2)] shrink-0 snap-start flex-col sm:w-[calc((100%-20px)/3)]">
+                <button
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={(event) => handleToggleAccount(account.id, event.currentTarget.parentElement)}
+                  className={`relative z-10 w-full rounded-xl border p-2.5 text-left transition ${
+                    isSelected
+                      ? 'account-card-selected border-[#d1d5db] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.06)]'
+                      : 'border-[#eceff3] bg-white hover:border-[#d5dae2] hover:bg-[#fafbfc]'
+                  }`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: categoryColor }} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[11px] font-semibold text-[#454b58]" title={account.name}>{account.name}</span>
+                      <span className="mt-0.5 flex items-center gap-1 text-[8.5px] tracking-tight">
+                        <span className="font-semibold" style={{ color: categoryColor }}>{accountCategory?.label}</span>
+                        <span className="text-[#c1c6d0]">·</span>
+                        <span className="truncate font-mono text-[#989da7]">{account.accountNumber}</span>
+                      </span>
+                    </span>
+                  </span>
+                  <span className="mt-1.5 block text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
+                  <span className="mt-1 flex items-center justify-between gap-1.5">
+                    <span className="text-[9px] text-[#9399a5]">{range} return</span>
+                    <span className="text-[9.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
+                  </span>
+                </button>
+>>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
 
-        <button
-          type="button"
-          onClick={() => scrollAccounts(1)}
-          aria-label="Scroll accounts right"
-          className="absolute right-1 top-1/2 z-10 flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-[#e8eaee] bg-white/85 text-[#7b8190] shadow-xs backdrop-blur-xs transition hover:bg-white hover:text-[#2563eb] hover:shadow-sm dark:border-[#2f3542] dark:bg-[#1f232d]/85 dark:text-[#9ea3b0] dark:hover:bg-[#1f232d] dark:hover:text-[#60a5fa]"
-        >
-          <ChevronRight size={14} />
-        </button>
+                {isSelected && (() => {
+                  const quickActions = getAccountQuickActions(account)
+                  return (
+                    <div
+                      role="region"
+                      aria-label={`Quick actions for ${account.name}`}
+                      className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#e0e3e9] bg-white px-2 pb-2 pt-4 shadow-xs"
+                    >
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {quickActions.primary.map((action) => (
+                          <button
+                            key={action.id}
+                            type="button"
+                            onClick={() => navigate(action.to)}
+                            className={
+                              action.primary
+                                ? 'inline-flex items-center justify-center gap-1 rounded-lg bg-[#2563eb] px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]'
+                                : 'inline-flex items-center justify-center gap-1 rounded-lg border border-[#dce1ea] bg-white px-2 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#f8f9fb]'
+                            }
+                          >
+                            {action.primary ? <Plus size={12} /> : <ArrowUpRight size={12} />}
+                            <span>{action.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                      <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-[#eef0f4] pt-1.5">
+                        {quickActions.fixed.map((action) => (
+                          <button
+                            key={action.id}
+                            type="button"
+                            onClick={() => navigate(action.to)}
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-[#e5e8ef] bg-[#f7f8fb] px-1 py-1.5 text-[9.5px] font-semibold text-[#475063] transition hover:border-[#c9d2e3] hover:bg-[#eff3fa] hover:text-[#2563eb] sm:text-[10px]"
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
@@ -713,28 +827,28 @@ function HoldingMark({ ticker, color }) {
   return <span className="flex size-10 shrink-0 items-center justify-center rounded-xl text-[11px] font-bold tracking-tight text-white" style={{ backgroundColor: color }}>{ticker.slice(0, 3)}</span>
 }
 
-function HoldingsTable({ limit }) {
-  const visible = limit ? holdings.slice(0, limit) : holdings
+function HoldingsTable({ limit, items = holdings }) {
+  const visible = limit ? items.slice(0, limit) : items
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[610px] text-left">
         <thead><tr className="border-b border-[#edeef0] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#a0a3aa]"><th className="px-5 py-3 font-semibold sm:px-6">Investment</th><th className="px-4 py-3 font-semibold">Units</th><th className="px-4 py-3 text-right font-semibold">Value</th><th className="px-5 py-3 text-right font-semibold sm:px-6">Return</th></tr></thead>
-        <tbody>{visible.map((holding) => <tr key={holding.ticker} className="border-b border-[#f0f1f2] last:border-0"><td className="px-5 py-4 sm:px-6"><div className="flex items-center gap-3"><HoldingMark ticker={holding.ticker} color={holding.color} /><div><p className="text-sm font-semibold text-[#393e4b]">{holding.name}</p><p className="mt-0.5 text-xs text-[#9b9ea4]">{holding.ticker} · {holding.type}</p></div></div></td><td className="px-4 py-4 text-xs text-[#7f838c]">{holding.units}</td><td className="px-4 py-4 text-right text-sm font-semibold text-[#3d424e]">{formatPeso(holding.value)}</td><td className="px-5 py-4 text-right sm:px-6"><Change value={`${holding.change > 0 ? '+' : ''}${holding.change.toFixed(2)}%`} /></td></tr>)}</tbody>
+        <tbody>{visible.map((holding) => <tr key={`${holding.accountId || 'global'}-${holding.ticker}`} className="border-b border-[#f0f1f2] last:border-0"><td className="px-5 py-4 sm:px-6"><div className="flex items-center gap-3"><HoldingMark ticker={holding.ticker} color={holding.color} /><div><p className="text-sm font-semibold text-[#393e4b]">{holding.name}</p><p className="mt-0.5 text-xs text-[#9b9ea4]">{holding.ticker} · {holding.type}</p></div></div></td><td className="px-4 py-4 text-xs text-[#7f838c]">{holding.units}</td><td className="px-4 py-4 text-right text-sm font-semibold text-[#3d424e]">{formatPeso(holding.value)}</td><td className="px-5 py-4 text-right sm:px-6"><Change value={`${holding.change > 0 ? '+' : ''}${holding.change.toFixed(2)}%`} /></td></tr>)}</tbody>
       </table>
     </div>
   )
 }
 
-function ActivityList({ limit }) {
+function ActivityList({ limit, items = activities }) {
   return (
     <div className="divide-y divide-[#eff0f2]">
-      {activities.slice(0, limit || activities.length).map((activity) => <div key={activity.title} className="flex items-center gap-3 py-4 first:pt-1 last:pb-0"><span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${activity.kind === 'income' ? 'bg-[#edf0f5] text-[#5e6e92]' : activity.kind === 'deposit' ? 'bg-[#f4efe8] text-[#b9824d]' : 'bg-[#eff2f5] text-[#75869b]'}`}><Icon name={activity.kind === 'invest' ? 'portfolio' : activity.kind === 'deposit' ? 'plus' : 'up'} size={16} /></span><div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-[#464b56]">{activity.title}</p><p className="mt-1 truncate text-[10px] text-[#a0a3aa]">{activity.detail}</p></div><span className={`shrink-0 text-xs font-semibold ${activity.amount.startsWith('+') ? 'text-[#485980]' : 'text-[#585c65]'}`}>{activity.amount}</span></div>)}
+      {items.slice(0, limit || items.length).map((activity) => <div key={`${activity.accountId || 'global'}-${activity.title}-${activity.detail}`} className="flex items-center gap-3 py-4 first:pt-1 last:pb-0"><span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${activity.kind === 'income' ? 'bg-[#edf0f5] text-[#5e6e92]' : activity.kind === 'deposit' ? 'bg-[#f4efe8] text-[#b9824d]' : 'bg-[#eff2f5] text-[#75869b]'}`}><Icon name={activity.kind === 'invest' ? 'portfolio' : activity.kind === 'deposit' ? 'plus' : 'up'} size={16} /></span><div className="min-w-0 flex-1"><p className="truncate text-xs font-semibold text-[#464b56]">{activity.title}</p><p className="mt-1 truncate text-[10px] text-[#a0a3aa]">{activity.detail}</p></div><span className={`shrink-0 text-xs font-semibold ${activity.amount.startsWith('+') ? 'text-[#485980]' : 'text-[#585c65]'}`}>{activity.amount}</span></div>)}
     </div>
   )
 }
 
-function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId }) {
-  const selectedData = portfolioCategories.find((item) => item.id === selectedCategory) || portfolioCategories[0]
+function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId, accounts = investmentAccounts, categories = portfolioCategories }) {
+  const selectedData = categories.find((item) => item.id === selectedCategory) || categories[0]
   const selectedPera = categoryPeraBalances[selectedCategory] || categoryPeraBalances.overall
   const selectedCash = categoryCashBalances[selectedCategory] || categoryCashBalances.overall
   const [balanceView, setBalanceView] = useState(() => {
@@ -774,6 +888,7 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
     <div className="space-y-4">
       <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-start">
         <div className="min-w-0 space-y-4">
+<<<<<<< HEAD
           <Card className="min-w-0 p-5 sm:p-6">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -821,7 +936,60 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                   Available Cash
                 </button>
               </div>
+=======
+          <div>
+            <div className="grid w-full grid-cols-2 items-end gap-0" role="tablist" aria-label="Balance view toggle">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={balanceView === 'assets'}
+                onClick={() => setBalanceView('assets')}
+                className={`relative flex items-center justify-center gap-1.5 whitespace-nowrap rounded-tl-2xl border-l border-t border-r border-[#e9eaed] px-3.5 py-2.5 text-xs font-semibold transition sm:px-4 ${
+                  balanceView === 'assets'
+                    ? 'attached-tab-active z-10 -mb-px bg-white pb-[11px] text-[#2563eb]'
+                    : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
+                }`}
+              >
+                <span>Total Assets</span>
+                <span className={`hidden text-[10px] font-normal sm:inline ${balanceView === 'assets' ? 'text-[#2563eb]/85' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={balanceView === 'cash'}
+                onClick={() => setBalanceView('cash')}
+                className={`relative flex items-center justify-center whitespace-nowrap rounded-tr-2xl border-t border-r border-[#e9eaed] px-3.5 py-2.5 text-xs font-semibold transition sm:px-4 ${
+                  balanceView === 'cash'
+                    ? 'attached-tab-active z-10 -mb-px bg-white pb-[11px] text-[#2563eb]'
+                    : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
+                }`}
+              >
+                Available Cash
+              </button>
+>>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
             </div>
+
+            <Card className="min-w-0 rounded-t-none p-5 sm:p-6">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <button
+                    type="button"
+                    aria-expanded={showChart}
+                    aria-label="Toggle to view chart"
+                    title="Toggle to view chart"
+                    onClick={() => setShowChart(!showChart)}
+                    className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
+                      showChart
+                        ? 'text-[#2563eb] dark:text-[#60a5fa]'
+                        : 'text-[#555c6b] dark:text-[#9da3b1]'
+                    }`}
+                  >
+                    <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
+                    <span>Toggle to view chart</span>
+                    <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
+                  </button>
+                </div>
+              </div>
 
             {balanceView === 'assets' ? (
               <div className="grid grid-cols-2 items-start gap-3 sm:gap-6">
@@ -878,21 +1046,50 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
 
             {showChart && (
               <div className="mt-4 min-w-0 border-t border-[#edeef0] pt-4">
-                <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} />
+                <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} accounts={accounts} categories={categories} />
               </div>
             )}
-          </Card>
+            </Card>
+          </div>
 
-          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} />
+          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} accounts={accounts} categories={categories} />
         </div>
 
-        <Card className="flex max-h-[360px] flex-col p-4 sm:p-5">
+        <Card className="flex flex-col p-4 sm:p-5">
           <h3 className="mb-3 text-xs font-semibold text-[#555c6a]">Categories</h3>
-          <div role="tablist" aria-label="Portfolio categories" className="scroll-pane min-h-0 flex-1 space-y-1 overflow-y-auto overscroll-contain">
-            {portfolioCategories.map((category) => <button key={category.id} type="button" role="tab" aria-selected={selectedCategory === category.id} onClick={() => { setSelectedCategory(category.id); setSelectedAccountId(null) }} className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-3 text-left transition ${selectedCategory === category.id ? 'bg-[#eff5ff] text-[#2563eb]' : 'text-[#777f8d] hover:bg-[#f8f9fb] hover:text-[#46536d]'}`}>
-              <span className="min-w-0"><span className="block truncate text-[11px] font-semibold">{category.label}</span><span className="mt-1 block text-[9px] text-[#969ca7]">{formatPeso(category.value)}</span></span>
-              {selectedCategory === category.id && <span className="size-1.5 shrink-0 rounded-full bg-[#3b82f6]" />}
-            </button>)}
+          <div role="tablist" aria-label="Portfolio categories" className="space-y-1.5">
+            {categories.map((category) => {
+              const isCategorySelected = selectedCategory === category.id
+              return (
+                <button
+                  key={category.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isCategorySelected}
+                  onClick={() => { setSelectedCategory(category.id); setSelectedAccountId(null) }}
+                  style={isCategorySelected ? { backgroundColor: `${category.color}14`, borderColor: `${category.color}40` } : undefined}
+                  className={`flex w-full items-center justify-between gap-2 rounded-lg border border-transparent px-3 py-2.5 text-left transition ${
+                    isCategorySelected
+                      ? ''
+                      : 'text-[#777f8d] hover:bg-[#f8f9fb] hover:text-[#46536d]'
+                  }`}
+                >
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
+                    <span className="min-w-0">
+                      <span
+                        className="block truncate text-[11px] font-semibold"
+                        style={isCategorySelected ? { color: category.color } : undefined}
+                      >
+                        {category.label}
+                      </span>
+                      <span className="mt-0.5 block text-[9px] text-[#969ca7]">{formatPeso(category.value)}</span>
+                    </span>
+                  </span>
+                  {isCategorySelected && <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />}
+                </button>
+              )
+            })}
           </div>
         </Card>
       </div>
@@ -905,13 +1102,26 @@ function HomePage() {
   const [range, setRange] = useState('1M')
   const [selectedCategory, setSelectedCategory] = useState('overall')
   const [selectedAccountId, setSelectedAccountId] = useState(null)
+  const scopedContent = useMemo(
+    () =>
+      getScopedAccountContent({
+        category: selectedCategory,
+        accountId: selectedAccountId,
+        holdings: accountHoldings,
+        activities: accountActivities,
+        defaultHoldings: holdings,
+        defaultActivities: activities,
+      }),
+    [selectedCategory, selectedAccountId],
+  )
+
   return (
     <div className="space-y-6">
       <PortfolioValueCard range={range} setRange={setRange} selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} selectedAccountId={selectedAccountId} setSelectedAccountId={setSelectedAccountId} />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(280px,0.8fr)]">
-        <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-2 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Your investments</h2><p className="mt-1 text-xs text-[#9a9da4]">A quick look at your holdings</p></div><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-semibold text-[#646e84] hover:text-[#313e5d]">See all</button></div><HoldingsTable limit={3} /></Card>
-        <Card className="p-5 sm:p-6"><div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-[#343a48]">Recent activity</h2><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-medium text-[#6f7789]">History</button></div><ActivityList limit={3} /></Card>
+        <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-3 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Your investments</h2></div><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-semibold text-[#646e84] hover:text-[#313e5d]">See all</button></div><HoldingsTable limit={3} items={scopedContent.holdings} /></Card>
+        <Card className="p-5 sm:p-6"><div className="mb-3 flex items-center justify-between"><h2 className="text-sm font-semibold text-[#343a48]">Recent activity</h2><button onClick={() => navigate('/portfolio')} type="button" className="text-xs font-medium text-[#6f7789]">History</button></div><ActivityList limit={3} items={scopedContent.activities} /></Card>
       </div>
 
       <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-[#e7e9ec] bg-[#f6f7f9] p-5 sm:flex-row sm:items-center sm:px-7"><div className="flex items-start gap-3"><span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#636f88] shadow-sm"><Icon name="learn" size={18} /></span><div><p className="text-sm font-semibold text-[#3d4351]">A little learning goes a long way</p><p className="mt-1 text-xs text-[#8c9099]">Explore bite-sized guides to investing with confidence.</p></div></div><button onClick={() => navigate('/learn')} type="button" className="inline-flex items-center gap-2 text-xs font-semibold text-[#525e79]">Explore the library <Icon name="arrow" size={14} /></button></div>
@@ -920,41 +1130,147 @@ function HomePage() {
 }
 
 function PortfolioPage() {
+  const location = useLocation()
+  return <PortfolioPageContent key={location.search} search={location.search} />
+}
+
+function PortfolioPageContent({ search }) {
   const navigate = useNavigate()
   const [range, setRange] = useState('1M')
+  const searchParams = new URLSearchParams(search)
+  const rawAction = (searchParams.get('action') || '').toLowerCase()
+  const selectedAccount = investmentAccounts.find((item) => item.id === searchParams.get('account')) || null
+  const isFundAction = selectedAccount
+    ? isFundCategory(selectedAccount.category)
+    : rawAction === 'subscribe' || rawAction === 'redeem'
+  const actionOptions = isFundAction ? ['Subscribe', 'Redeem'] : ['Buy', 'Sell']
+  const defaultAction =
+    rawAction === 'redeem'
+      ? 'Redeem'
+      : rawAction === 'subscribe'
+        ? 'Subscribe'
+        : rawAction === 'sell'
+          ? 'Sell'
+          : rawAction === 'buy'
+            ? 'Buy'
+            : actionOptions[0]
+  const showQuickOrder = Boolean(rawAction || selectedAccount)
+  const [orderAction, setOrderAction] = useState(defaultAction)
+  const instrumentOptions = isFundAction
+    ? investmentAccounts.filter((item) => isFundCategory(item.category)).map((item) => item.name)
+    : holdings.map((item) => `${item.ticker} · ${item.name}`)
+  const [instrument, setInstrument] = useState(
+    selectedAccount && isFundAction ? selectedAccount.name : instrumentOptions[0] || '',
+  )
+  const [orderAmount, setOrderAmount] = useState('')
+  const [orderNotice, setOrderNotice] = useState('')
+  const selectedCategory = selectedAccount
+    ? portfolioCategories.find((item) => item.id === selectedAccount.category)
+    : null
+
+  function handleQuickOrderSubmit(event) {
+    event.preventDefault()
+    if (!orderAmount || Number(orderAmount) <= 0) {
+      setOrderNotice('Enter an amount greater than ₱0 to continue.')
+      return
+    }
+    setOrderNotice(
+      `${orderAction} order for ${formatPeso(Number(orderAmount))} of ${instrument}${selectedAccount ? ` in ${selectedAccount.name}` : ''} is ready in this demo.`,
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <PageIntro title="Your portfolio" subtitle="Track your investments and see how they're growing." action={<button onClick={() => navigate('/products')} type="button" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#1d4ed8]"><Icon name="plus" size={16} />Explore investments</button>} />
+      {showQuickOrder && (
+        <Card className="p-5 sm:p-6">
+          <div className="mb-4 flex items-start justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              {selectedAccount && (
+                <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: selectedCategory?.color || selectedAccount.color }} />
+              )}
+              <div className="min-w-0">
+                <h2 className="text-sm font-semibold text-[#343a48]">
+                  {isFundAction ? 'Fund subscription & redemption' : 'Trade order'}
+                </h2>
+                {selectedAccount && (
+                  <p className="mt-0.5 flex flex-wrap items-center gap-1 text-[11px] text-[#8d93a0]">
+                    <span className="font-semibold text-[#454b58]">{selectedAccount.name}</span>
+                    {selectedCategory && (
+                      <>
+                        <span aria-hidden="true">·</span>
+                        <span className="font-semibold" style={{ color: selectedCategory.color }}>{selectedCategory.label}</span>
+                      </>
+                    )}
+                    <span aria-hidden="true">·</span>
+                    <span className="font-mono">{selectedAccount.accountNumber}</span>
+                    <span aria-hidden="true">·</span>
+                    <span className="font-semibold text-[#343a48]">{formatPeso(selectedAccount.value)}</span>
+                  </p>
+                )}
+              </div>
+            </div>
+            <button
+              type="button"
+              aria-label="Close quick action panel"
+              onClick={() => navigate('/portfolio')}
+              className="flex size-8 shrink-0 items-center justify-center rounded-lg text-[#8f939b] hover:bg-[#f3f4f6]"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div className="mb-4 flex max-w-sm rounded-xl bg-[#f2f3f5] p-1">
+            {actionOptions.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => { setOrderAction(item); setOrderNotice('') }}
+                className={`flex-1 rounded-lg py-2 text-xs font-semibold transition ${orderAction === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+          <form onSubmit={handleQuickOrderSubmit} className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,180px)_auto] sm:items-end">
+            <label className="block text-xs font-medium text-[#6f7480]">
+              {isFundAction ? 'Fund' : 'Investment'}
+              <select
+                value={instrument}
+                onChange={(event) => setInstrument(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-[#e4e6ea] bg-white px-3 py-2.5 text-xs font-medium text-[#393f4e] outline-none focus:border-[#828da4]"
+              >
+                {instrumentOptions.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </label>
+            <label className="block text-xs font-medium text-[#6f7480]">
+              Amount (PHP)
+              <input
+                inputMode="decimal"
+                value={orderAmount}
+                onChange={(event) => setOrderAmount(event.target.value)}
+                placeholder="₱0.00"
+                className="mt-1.5 w-full rounded-xl border border-[#e4e6ea] bg-white px-3 py-2.5 text-xs font-semibold text-[#393f4e] outline-none focus:border-[#828da4]"
+              />
+            </label>
+            <button type="submit" className="rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#1d4ed8]">
+              Review {orderAction.toLowerCase()}
+            </button>
+          </form>
+          {orderNotice && (
+            <p role="status" className={`mt-3 rounded-xl px-4 py-2.5 text-xs ${orderNotice.startsWith('Enter') ? 'bg-[#fcf3ec] text-[#a06b43]' : 'bg-[#edf0f6] text-[#485674]'}`}>
+              {orderNotice}
+            </p>
+          )}
+        </Card>
+      )}
       <div className="grid gap-4 sm:grid-cols-3">
         {[["Total value", formatPeso(24680.5), 'Including cash balance'], ['Total invested', formatPeso(21420), 'Across 4 positions'], ['Total return', `+${formatPeso(1284.2)}`, '+5.49% all time']].map(([label, value, detail], i) => <Card key={label} className="p-5"><p className="text-xs text-[#9498a0]">{label}</p><p className={`mt-3 text-2xl font-semibold tracking-tight ${i === 2 ? 'text-[#445680]' : 'text-[#353b48]'}`}>{value}</p><p className="mt-1 text-xs text-[#a0a3a9]">{detail}</p></Card>)}
       </div>
       <Card className="p-5 sm:p-6"><TrendChart range={range} setRange={setRange} /></Card>
-      <Card className="overflow-hidden"><div className="flex items-center justify-between px-5 pb-3 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Holdings</h2><p className="mt-1 text-xs text-[#9a9da4]">Your current investments</p></div><button type="button" className="rounded-lg border border-[#e6e8eb] px-3 py-2 text-xs font-medium text-[#717580] hover:bg-[#f7f8f9]">Download statement</button></div><HoldingsTable /></Card>
+      <Card className="overflow-hidden"><div className="flex flex-wrap items-center justify-between gap-3 px-5 pb-3 pt-5 sm:px-6 sm:pt-6"><div><h2 className="text-sm font-semibold text-[#343a48]">Holdings</h2><p className="mt-1 text-xs text-[#9a9da4]">Your current investments</p></div><div className="flex items-center gap-2"><button onClick={() => navigate('/products')} type="button" className="inline-flex items-center gap-1.5 rounded-lg bg-[#2563eb] px-3 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"><Icon name="plus" size={14} />Explore investments</button><button type="button" className="rounded-lg border border-[#e6e8eb] px-3 py-2 text-xs font-medium text-[#717580] hover:bg-[#f7f8f9]">Download statement</button></div></div><HoldingsTable /></Card>
       <Card className="p-5 sm:p-6"><h2 className="text-sm font-semibold text-[#343a48]">Activity</h2><div className="mt-4 grid gap-x-8 md:grid-cols-2"><ActivityList /></div></Card>
     </div>
-  )
-}
-
-function ProductCard({ product, onExplore }) {
-  const tints = { sage: 'bg-[#eaedf2] text-[#4a5878]', blue: 'bg-[#e9eff4] text-[#64839b]', sand: 'bg-[#f4eee5] text-[#ad8156]', lavender: 'bg-[#f0edf7] text-[#8574a5]', rose: 'bg-[#f5ebeb] text-[#ad7472]' }
-  return (
-    <Card className="flex flex-col p-5 transition hover:-translate-y-0.5 hover:shadow-md sm:p-6">
-      <div className="flex items-start justify-between">
-        <span className={`flex size-11 items-center justify-center rounded-[14px] text-xl ${tints[product.tint]}`}>{product.symbol}</span>
-        <div className="flex items-center gap-1.5">
-          {product.isNew && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white shadow-xs">
-              <Sparkles size={9} className="text-amber-300 fill-amber-300 animate-sparkle" />
-              New
-            </span>
-          )}
-          <span className="rounded-full bg-[#f5f6f7] px-2.5 py-1 text-[10px] font-medium text-[#828690]">{product.category}</span>
-        </div>
-      </div>
-      <h2 className="mt-5 text-[15px] font-semibold text-[#343a48]">{product.name}</h2><p className="mt-1.5 min-h-10 text-xs leading-5 text-[#90949c]">{product.detail}</p>
-      <div className="my-5 grid grid-cols-2 gap-y-3 border-y border-[#edeef0] py-4 text-xs"><span className="text-[#9a9da4]">Historical return</span><span className="text-right font-semibold text-[#4e5d80]">{product.return}</span><span className="text-[#9a9da4]">Annual fee</span><span className="text-right font-medium text-[#626772]">{product.fee}</span><span className="text-[#9a9da4]">Starting amount</span><span className="text-right font-medium text-[#626772]">{product.minimum}</span></div>
-      <div className="mt-auto flex items-center justify-between"><span className="text-[10px] text-[#a0a3aa]">{product.risk} risk · Demo data</span><button onClick={() => onExplore(product)} type="button" className="inline-flex items-center gap-1 text-xs font-semibold text-[#4d5b79] hover:text-[#2e3b5a]">Explore <Icon name="arrow" size={13} /></button></div>
-    </Card>
   )
 }
 
@@ -963,56 +1279,218 @@ function ProductsPage() {
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
-  const categories = ['All', 'Index funds', 'Fixed income', 'Cash', 'Retirement']
-  const filtered = useMemo(() => products.filter((product) => (category === 'All' || product.category === category) && `${product.name} ${product.detail} ${product.category}`.toLowerCase().includes(search.toLowerCase())), [category, search])
+  const categories = ['All', 'Stocks & ETFs', 'Mutual Funds', 'UITFs', 'Fixed Income', 'Cash']
+  const filtered = useMemo(() => filterProducts(products, { category, search }), [category, search])
+  const tints = {
+    sage: 'bg-[#eaedf2] text-[#4a5878]',
+    blue: 'bg-[#e9eff4] text-[#436895]',
+    sand: 'bg-[#f4eee5] text-[#9b6e41]',
+    lavender: 'bg-[#f0edf7] text-[#726096]',
+    rose: 'bg-[#f5ebeb] text-[#9d605e]',
+  }
+
   return (
     <div>
-      <PageIntro title="Explore products" subtitle="Find options that fit your goals and investing style." />
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex gap-1 overflow-x-auto rounded-xl bg-[#edeef1] p-1">{categories.map((item) => <button key={item} onClick={() => setCategory(item)} type="button" className={`shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition ${category === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#898d96] hover:text-[#50596c]'}`}>{item}</button>)}</div>
-        <label className="flex items-center gap-2 rounded-xl border border-[#e6e8eb] bg-white px-3 py-2.5 text-[#9599a0]"><Icon name="search" size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search products" className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-40" /></label>
-      </div>
-      <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <p className="text-xs text-[#999ca3]">{filtered.length} options to explore</p>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#eff6ff] px-2 py-0.5 text-[10px] font-semibold text-[#1d4ed8]">
-            <Sparkles size={10} className="text-amber-500 fill-amber-400" />
-            New funds added
-          </span>
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-3 border-b border-[#edeef0] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div role="tablist" aria-label="Product categories" className="flex gap-1 overflow-x-auto">
+            {categories.map((item) => {
+              const active = category === item
+              return (
+                <button
+                  key={item}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setCategory(item)}
+                  type="button"
+                  className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition ${
+                    active
+                      ? 'bg-[#eff4ff] font-semibold text-[#2563eb]'
+                      : 'text-[#7f8490] hover:bg-[#f6f7f9] hover:text-[#424957]'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </div>
+          <label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e6e8eb] bg-[#fafbfc] px-2.5 py-1.5 text-[#9599a0] focus-within:border-[#9aa5b8] focus-within:bg-white">
+            <Icon name="search" size={13} />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search products"
+              aria-label="Search products"
+              className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-32"
+            />
+          </label>
         </div>
-        <span className="text-[10px] text-[#a7aaaf]">Returns shown are illustrative</span>
-      </div>
-      {filtered.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{filtered.map((product) => <ProductCard key={product.id} product={product} onExplore={setSelectedProduct} />)}</div> : <Card className="p-12 text-center"><p className="text-sm font-medium text-[#666b76]">No matching products</p><p className="mt-1 text-xs text-[#9a9da4]">Try a different search or category.</p></Card>}
-      {selectedProduct && <Modal title={selectedProduct.name} onClose={() => setSelectedProduct(null)}><p className="text-sm leading-6 text-[#7f838d]">{selectedProduct.detail}. This sample product page is for exploring the experience. Product details and performance shown here are illustrative.</p><div className="mt-5 rounded-xl bg-[#f5f6f8] p-4"><p className="text-xs text-[#9397a0]">Minimum investment</p><p className="mt-1 font-semibold text-[#404656]">{selectedProduct.minimum}</p></div><button onClick={() => { setSelectedProduct(null); navigate('/funding') }} type="button" className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Continue to funding</button></Modal>}
+
+        {filtered.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px] text-left">
+              <thead>
+                <tr className="border-b border-[#edeef0] text-[10px] font-semibold uppercase tracking-[0.07em] text-[#9ca0a8]">
+                  <th className="px-4 py-3 font-semibold sm:px-5">Product</th>
+                  {category === 'All' && <th className="px-3 py-3 font-semibold whitespace-nowrap">Category</th>}
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Risk</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Min.</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Fee</th>
+                  <th className="px-3 py-3 text-right font-semibold whitespace-nowrap">Return</th>
+                  <th className="px-4 py-3 text-right font-semibold sm:px-5"><span className="sr-only">Action</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((product) => (
+                  <tr key={product.id} className="border-b border-[#f0f1f2] transition last:border-0 hover:bg-[#fafbfc]">
+                    <td className="max-w-[230px] px-4 py-3 sm:px-5">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`flex size-8 shrink-0 items-center justify-center rounded-lg text-[10px] font-bold tracking-tight ${tints[product.tint]}`}>
+                          {product.symbol}
+                        </span>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="truncate text-xs font-semibold text-[#343a48]">{product.name}</span>
+                            {product.isNew && (
+                              <span className="inline-flex shrink-0 items-center rounded-full bg-[#eff6ff] px-1.5 py-0.5 text-[9px] font-semibold text-[#2563eb]">
+                                New
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-0.5 truncate text-[11px] text-[#9398a3]">{product.detail}</p>
+                        </div>
+                      </div>
+                    </td>
+                    {category === 'All' && <td className="px-3 py-3 text-[11px] text-[#69707d] whitespace-nowrap">{product.category}</td>}
+                    <td className="px-3 py-3 text-[11px] text-[#69707d] whitespace-nowrap">{product.risk}</td>
+                    <td className="px-3 py-3 text-right text-xs font-medium text-[#464c5a] whitespace-nowrap">{product.minimum}</td>
+                    <td className="px-3 py-3 text-right text-[11px] text-[#797f8c] whitespace-nowrap">{product.fee}</td>
+                    <td className="px-3 py-3 text-right text-xs font-semibold text-[#2563eb] whitespace-nowrap">{product.return}</td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap sm:px-5">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedProduct(product)}
+                        className="inline-flex items-center gap-1 rounded-lg border border-[#e4e7ed] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#454d5e] transition hover:border-[#b9c6db] hover:text-[#2563eb]"
+                      >
+                        <span>Explore</span>
+                        <Icon name="arrow" size={11} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="p-12 text-center">
+            <p className="text-sm font-medium text-[#666b76]">No matching products</p>
+            <p className="mt-1 text-xs text-[#9a9da4]">Try a different search or category tab.</p>
+          </div>
+        )}
+      </Card>
+
+      {selectedProduct && (
+        <Modal title={selectedProduct.name} onClose={() => setSelectedProduct(null)}>
+          <p className="text-xs font-medium text-[#8a909c]">{selectedProduct.category} · {selectedProduct.risk} risk</p>
+          <p className="mt-3 text-sm leading-6 text-[#6f7480]">{selectedProduct.detail}. Product details and historical returns shown here are illustrative.</p>
+          <div className="mt-5 grid grid-cols-3 gap-3 rounded-xl bg-[#f5f6f8] p-4">
+            <div><p className="text-[10px] text-[#9397a0]">Min. invest</p><p className="mt-1 text-xs font-semibold text-[#404656]">{selectedProduct.minimum}</p></div>
+            <div><p className="text-[10px] text-[#9397a0]">Annual fee</p><p className="mt-1 text-xs font-semibold text-[#404656]">{selectedProduct.fee}</p></div>
+            <div><p className="text-[10px] text-[#9397a0]">Return</p><p className="mt-1 text-xs font-semibold text-[#2563eb]">{selectedProduct.return}</p></div>
+          </div>
+          <button
+            onClick={() => {
+              const isFund = selectedProduct.category === 'UITFs' || selectedProduct.category === 'Mutual Funds'
+              setSelectedProduct(null)
+              navigate(isFund ? '/portfolio?action=subscribe' : '/funding')
+            }}
+            type="button"
+            className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]"
+          >
+            {selectedProduct.category === 'UITFs' || selectedProduct.category === 'Mutual Funds' ? 'Continue to subscribe' : 'Continue to funding'}
+          </button>
+        </Modal>
+      )}
     </div>
   )
 }
 
 function FundingPage() {
-  const [mode, setMode] = useState('Add money')
+  const location = useLocation()
+  return <FundingPageContent key={location.search} search={location.search} />
+}
+
+function FundingPageContent({ search }) {
+  const searchParams = new URLSearchParams(search)
+  const rawMode = searchParams.get('mode')
+  const initialMode = rawMode === 'withdraw' ? 'Withdraw' : rawMode === 'transfer' ? 'Transfer' : 'Add money'
+  const selectedAccount = investmentAccounts.find((item) => item.id === searchParams.get('account')) || null
+  const selectedCategory = selectedAccount ? portfolioCategories.find((item) => item.id === selectedAccount.category) : null
+  const transferTargets = investmentAccounts.filter((item) => item.id !== selectedAccount?.id)
+  const [mode, setMode] = useState(initialMode)
   const [amount, setAmount] = useState('')
   const [method, setMethod] = useState('bank')
+  const [transferTargetId, setTransferTargetId] = useState(transferTargets[0]?.id || '')
   const [notice, setNotice] = useState('')
   const methods = [{ id: 'bank', name: 'Bank transfer', detail: '1–3 business days', mark: 'BK' }, { id: 'debit', name: 'Debit card', detail: 'Usually instant', mark: '••' }]
+  const availableBalance = selectedAccount ? selectedAccount.value : 3260.5
+  const destinationAccount = transferTargets.find((item) => item.id === transferTargetId) || transferTargets[0]
   function handleSubmit(event) {
     event.preventDefault()
     if (!amount || Number(amount) <= 0) {
       setNotice('Enter an amount greater than ₱0 to continue.')
       return
     }
-    setNotice(`${mode} request for ${formatPeso(Number(amount))} is ready in this demo.`)
+    if (mode === 'Transfer') {
+      setNotice(`Transfer request for ${formatPeso(Number(amount))}${selectedAccount ? ` from ${selectedAccount.name}` : ''}${destinationAccount ? ` to ${destinationAccount.name}` : ''} is ready in this demo.`)
+      return
+    }
+    setNotice(`${mode} request for ${formatPeso(Number(amount))}${selectedAccount ? ` (${selectedAccount.name})` : ''} is ready in this demo.`)
   }
   return (
     <div>
-      <PageIntro title="Move money" subtitle="Add funds or transfer money out of your account." />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(280px,0.7fr)]">
         <Card className="p-5 sm:p-7">
-          <div className="mb-7 flex rounded-xl bg-[#f2f3f5] p-1">{['Add money', 'Withdraw'].map((item) => <button key={item} onClick={() => { setMode(item); setNotice('') }} type="button" className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${mode === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}>{item}</button>)}</div>
+          {selectedAccount && (
+            <div className="mb-5 flex items-center justify-between gap-3 rounded-xl border border-[#e6e9ef] bg-[#f8f9fb] px-4 py-3">
+              <div className="flex min-w-0 items-center gap-2.5">
+                <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: selectedCategory?.color || selectedAccount.color }} />
+                <div className="min-w-0">
+                  <p className="truncate text-xs font-semibold text-[#343a48]">{selectedAccount.name}</p>
+                  <p className="mt-0.5 flex items-center gap-1 truncate text-[10px] text-[#8d93a0]">
+                    {selectedCategory && <span className="font-semibold" style={{ color: selectedCategory.color }}>{selectedCategory.label}</span>}
+                    {selectedCategory && <span aria-hidden="true">·</span>}
+                    <span className="font-mono">{selectedAccount.accountNumber}</span>
+                  </p>
+                </div>
+              </div>
+              <span className="shrink-0 text-xs font-semibold text-[#343a48]">{formatPeso(selectedAccount.value)}</span>
+            </div>
+          )}
+          <div className="mb-7 flex rounded-xl bg-[#f2f3f5] p-1">{['Add money', 'Withdraw', 'Transfer'].map((item) => <button key={item} onClick={() => { setMode(item); setNotice('') }} type="button" className={`flex-1 rounded-lg py-2.5 text-sm font-semibold transition ${mode === item ? 'bg-white text-[#3b455b] shadow-sm' : 'text-[#92969d]'}`}>{item}</button>)}</div>
           <form onSubmit={handleSubmit}>
-            <label className="block text-xs font-semibold text-[#595e6a]" htmlFor="amount">{mode === 'Add money' ? 'How much would you like to add?' : 'How much would you like to withdraw?'}</label>
+            <label className="block text-xs font-semibold text-[#595e6a]" htmlFor="amount">{mode === 'Add money' ? 'How much would you like to add?' : mode === 'Withdraw' ? 'How much would you like to withdraw?' : 'How much would you like to transfer?'}</label>
             <div className="mt-3 flex items-center rounded-xl border border-[#e4e6ea] px-4 py-4 focus-within:border-[#828da4]"><span className="mr-2 text-xl text-[#9a9ea5]">₱</span><input id="amount" inputMode="decimal" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="0.00" className="w-full bg-transparent text-2xl font-semibold tracking-tight text-[#393f4e] outline-none placeholder:text-[#c1c4c9]" /><span className="text-xs text-[#9b9fa6]">PHP</span></div>
-            <p className="mt-2 text-[10px] text-[#9da0a7]">{mode === 'Add money' ? `Available balance: ${formatPeso(3260.5)}` : `Withdrawable balance: ${formatPeso(3260.5)}`}</p>
-            <div className="mt-7"><p className="mb-3 text-xs font-semibold text-[#595e6a]">Choose a method</p><div className="space-y-2">{methods.map((item) => <button key={item.id} onClick={() => setMethod(item.id)} type="button" className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${method === item.id ? 'border-[#7f8aa1] bg-[#f6f7fa]' : 'border-[#e9eaed] hover:bg-[#fafafb]'}`}><span className="flex size-10 items-center justify-center rounded-lg bg-white text-[10px] font-bold text-[#666f81] shadow-sm">{item.mark}</span><span className="flex-1"><span className="block text-xs font-semibold text-[#525763]">{item.name}</span><span className="mt-1 block text-[10px] text-[#9a9da4]">{item.detail}</span></span><span className={`flex size-4 items-center justify-center rounded-full border ${method === item.id ? 'border-[#546282] bg-[#546282]' : 'border-[#d5d8dd]'}`}>{method === item.id && <span className="size-1.5 rounded-full bg-white" />}</span></button>)}</div></div>
+            <p className="mt-2 text-[10px] text-[#9da0a7]">{mode === 'Add money' ? `Available balance: ${formatPeso(availableBalance)}` : mode === 'Withdraw' ? `Withdrawable balance: ${formatPeso(availableBalance)}` : `Transferable balance: ${formatPeso(availableBalance)}`}</p>
+            {mode === 'Transfer' ? (
+              <div className="mt-7">
+                <label className="mb-3 block text-xs font-semibold text-[#595e6a]" htmlFor="transfer-destination">Transfer to account</label>
+                <select
+                  id="transfer-destination"
+                  value={transferTargetId}
+                  onChange={(event) => setTransferTargetId(event.target.value)}
+                  className="w-full rounded-xl border border-[#e4e6ea] bg-white px-4 py-3 text-xs font-semibold text-[#393f4e] outline-none focus:border-[#828da4]"
+                >
+                  {transferTargets.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name} · {item.accountNumber} ({formatPeso(item.value)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="mt-7"><p className="mb-3 text-xs font-semibold text-[#595e6a]">Choose a method</p><div className="space-y-2">{methods.map((item) => <button key={item.id} onClick={() => setMethod(item.id)} type="button" className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${method === item.id ? 'border-[#7f8aa1] bg-[#f6f7fa]' : 'border-[#e9eaed] hover:bg-[#fafafb]'}`}><span className="flex size-10 items-center justify-center rounded-lg bg-white text-[10px] font-bold text-[#666f81] shadow-sm">{item.mark}</span><span className="flex-1"><span className="block text-xs font-semibold text-[#525763]">{item.name}</span><span className="mt-1 block text-[10px] text-[#9a9da4]">{item.detail}</span></span><span className={`flex size-4 items-center justify-center rounded-full border ${method === item.id ? 'border-[#546282] bg-[#546282]' : 'border-[#d5d8dd]'}`}>{method === item.id && <span className="size-1.5 rounded-full bg-white" />}</span></button>)}</div></div>
+            )}
             {notice && <p role="status" className={`mt-5 rounded-xl px-4 py-3 text-xs ${notice.startsWith('Enter') ? 'bg-[#fcf3ec] text-[#a06b43]' : 'bg-[#edf0f6] text-[#485674]'}`}>{notice}</p>}
             <button type="submit" className="mt-6 w-full rounded-xl bg-[#2563eb] px-4 py-3.5 text-sm font-semibold text-white transition hover:bg-[#1d4ed8]">Review {mode.toLowerCase()}</button>
             <p className="mt-3 text-center text-[10px] leading-5 text-[#a0a3aa]">Demo only. No funds will be moved.</p>
@@ -1032,7 +1510,6 @@ function ProfilePage() {
   const [notifications, setNotifications] = useState(true)
   return (
     <div>
-      <PageIntro title="Your profile" subtitle="Manage your personal details and preferences." />
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_310px]">
         <div className="space-y-6">
           <Card className="p-5 sm:p-7"><div className="mb-6 flex items-center gap-4 border-b border-[#edeef0] pb-6"><Avatar className="size-16 rounded-2xl" iconSize={26} /><div><h2 className="text-sm font-semibold text-[#3f4553]">Alex Johnson</h2><p className="mt-1 text-xs text-[#9498a0]">Balanced risk profile · Member since 2023</p></div><button type="button" className="ml-auto rounded-lg border border-[#e6e8eb] px-3 py-2 text-xs font-medium text-[#727680] hover:bg-[#f7f8f9]">Change photo</button></div>
@@ -1050,7 +1527,6 @@ function ProfilePage() {
 function SettingsPage({ darkMode, setDarkMode }) {
   return (
     <div>
-      <PageIntro title="Settings" subtitle="Manage your app preferences." />
       <Card className="max-w-2xl p-5 sm:p-7">
         <div className="flex items-center justify-between gap-4">
           <div><h2 className="text-sm font-semibold text-[#424856]">Appearance</h2><p className="mt-1 text-xs text-[#9296a0]">Choose day or night mode.</p></div>
@@ -1069,7 +1545,6 @@ function FaqPage() {
   ]
   return (
     <div>
-      <PageIntro title="Frequently asked questions" subtitle="Quick answers about this investment dashboard." />
       <div className="max-w-3xl space-y-3">{questions.map(([question, answer]) => <Card key={question} className="p-5"><h2 className="text-sm font-semibold text-[#424856]">{question}</h2><p className="mt-2 text-xs leading-5 text-[#858a95]">{answer}</p></Card>)}</div>
     </div>
   )
@@ -1078,8 +1553,7 @@ function FaqPage() {
 function PolicyPage({ title, documentName }) {
   return (
     <div>
-      <PageIntro title={title} subtitle={`Information about Caballes-Go Securities ${documentName.toLowerCase()}.`} />
-      <Card className="max-w-3xl p-5 sm:p-7"><p className="text-sm leading-6 text-[#747a87]">The approved CGSI {documentName.toLowerCase()} is not included in this demo. Please refer to Caballes-Go Securities’ official materials for the current document.</p></Card>
+      <Card className="max-w-3xl p-5 sm:p-7"><h2 className="mb-2 text-sm font-semibold text-[#343a48]">{title}</h2><p className="text-sm leading-6 text-[#747a87]">The approved CGSI {documentName.toLowerCase()} is not included in this demo. Please refer to Caballes-Go Securities’ official materials for the current document.</p></Card>
     </div>
   )
 }
@@ -1088,8 +1562,7 @@ function SignOutPage() {
   const navigate = useNavigate()
   return (
     <div>
-      <PageIntro title="Sign out" subtitle="End your current session." />
-      <Card className="max-w-xl p-5 sm:p-7"><p className="text-sm leading-6 text-[#747a87]">This prototype is using a demo account, so there is no live session to end.</p><button type="button" onClick={() => navigate('/home')} className="mt-5 rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1d4ed8]">Return to dashboard</button></Card>
+      <Card className="max-w-xl p-5 sm:p-7"><h2 className="mb-2 text-sm font-semibold text-[#343a48]">Sign out</h2><p className="text-sm leading-6 text-[#747a87]">This prototype is using a demo account, so there is no live session to end.</p><button type="button" onClick={() => navigate('/home')} className="mt-5 rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white hover:bg-[#1d4ed8]">Return to dashboard</button></Card>
     </div>
   )
 }
@@ -1106,7 +1579,6 @@ function LearnPage() {
   const featured = articles[0]
   return (
     <div>
-      <PageIntro title="Learn at your pace" subtitle="Clear, practical guides for your investing journey." />
       <div className="mb-6 flex items-center gap-3 rounded-xl border border-[#e5e8ed] bg-[#f1f4f7] px-4 py-3"><span className="flex size-8 items-center justify-center rounded-lg bg-white text-[#626e86]"><Icon name="learn" size={16} /></span><p className="text-xs text-[#717887]"><span className="font-semibold">2 new learning alerts:</span> fresh guides on diversification and investing habits.</p></div>
       <button onClick={() => setSelectedArticle(featured)} type="button" className="mb-7 grid w-full overflow-hidden rounded-2xl border border-[#e8eaed] bg-[#e9ecf1] text-left transition hover:shadow-md md:grid-cols-[1.1fr_0.9fr]">
         <div className="p-6 sm:p-9"><span className="rounded-full bg-white/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#677081]">Featured guide · {featured.length}</span><h2 className="mt-5 max-w-md text-2xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-3xl">{featured.title}</h2><p className="mt-3 max-w-md text-sm leading-6 text-[#7d838d]">A friendly introduction to the ideas behind long-term investing and how to get started thoughtfully.</p><span className="mt-6 inline-flex items-center gap-2 text-xs font-semibold text-[#4e5b75]">Read the guide <Icon name="arrow" size={14} /></span></div>
@@ -1131,10 +1603,116 @@ function MessagesPage() {
   const [sent, setSent] = useState(false)
   return (
     <div>
-      <PageIntro title="Messages" subtitle="Updates and notes about your account." />
       <Card className="grid min-h-[580px] overflow-hidden md:grid-cols-[300px_minmax(0,1fr)]">
         <div className="border-b border-[#edeef0] md:border-b-0 md:border-r"><div className="border-b border-[#edeef0] p-4"><label className="flex items-center gap-2 rounded-lg bg-[#f5f6f7] px-3 py-2 text-[#9b9ea5]"><Icon name="search" size={15} /><input placeholder="Search messages" className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]" /></label></div><div className="flex overflow-x-auto md:block">{threads.map((thread) => <button key={thread.id} onClick={() => { setActiveThread(thread); setSent(false) }} type="button" className={`min-w-[250px] flex-1 border-b border-[#f0f1f2] p-4 text-left transition hover:bg-[#fafafb] md:w-full ${activeThread.id === thread.id ? 'bg-[#f5f6f8]' : 'bg-white'}`}><span className="flex items-start gap-3"><span className={`flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold text-[#677083] ${thread.color}`}>{thread.avatar}</span><span className="min-w-0 flex-1"><span className="flex items-center justify-between gap-2"><span className="truncate text-xs font-semibold text-[#494e5a]">{thread.title}</span><span className="shrink-0 text-[9px] text-[#a0a3aa]">{thread.time}</span></span><span className="mt-1 block truncate text-[10px] text-[#989ca3]">{thread.preview}</span></span></span></button>)}</div></div>
         <div className="flex min-h-[440px] flex-col"><div className="flex items-center gap-3 border-b border-[#edeef0] px-5 py-4"><span className={`flex size-9 items-center justify-center rounded-full text-xs font-semibold text-[#677083] ${activeThread.color}`}>{activeThread.avatar}</span><span><span className="block text-xs font-semibold text-[#484d59]">{activeThread.sender}</span><span className="mt-0.5 block text-[10px] text-[#9a9da4]">Account updates</span></span><span className="ml-auto rounded-full bg-[#f4f5f7] px-2.5 py-1 text-[9px] font-medium text-[#8a8e98]">{activeThread.time}</span></div><div className="flex-1 p-5 sm:p-7"><div className="max-w-xl rounded-2xl rounded-tl-sm bg-[#f4f5f7] p-4 sm:p-5"><p className="text-sm font-semibold text-[#434957]">{activeThread.title}</p><p className="mt-3 text-xs leading-6 text-[#7d818b]">{activeThread.preview}</p><p className="mt-3 text-xs leading-6 text-[#7d818b]">You can view more details anytime in your account. If you have questions, just reply to this message and our team will be happy to help.</p><p className="mt-4 text-[9px] text-[#a1a4aa]">{activeThread.time} · {activeThread.sender}</p></div>{sent && <div className="ml-auto mt-4 max-w-sm rounded-2xl rounded-tr-sm bg-[#eaedf2] p-4 text-xs text-[#555e71]">{reply || 'Thanks for the update.'}<p className="mt-2 text-right text-[9px] text-[#959aa3]">Just now · You</p></div>}</div><form onSubmit={(event) => { event.preventDefault(); if (reply.trim()) setSent(true) }} className="flex items-center gap-2 border-t border-[#edeef0] p-4"><input value={reply} onChange={(event) => setReply(event.target.value)} placeholder="Write a reply..." className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-4 py-3 text-xs text-[#525763] outline-none placeholder:text-[#a5a8ae]" /><button aria-label="Send reply" type="submit" className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"><Icon name="send" size={17} /></button></form></div>
+      </Card>
+    </div>
+  )
+}
+
+const initialNotifications = [
+  { id: 'n1', title: 'New in Learn', description: 'Two new guides on diversification and consistent investing habits are ready for you.', time: 'Today · 9:30 AM', category: 'Learning', icon: 'learn', tint: 'bg-[#edf0f4] text-[#5f6d8a]', route: '/learn', actionLabel: 'Open Learn', unread: true },
+  { id: 'n2', title: 'Your weekly summary', description: 'Your total portfolio is up 1.2% this week across Equities and UITFs.', time: 'Yesterday · 6:00 PM', category: 'Portfolio', icon: 'portfolio', tint: 'bg-[#f5f1e9] text-[#aa8354]', route: '/portfolio', actionLabel: 'View Portfolio', unread: true },
+  { id: 'n3', title: 'Scheduled deposit completed', description: '₱500.00 bank transfer settled into your Margin cash balance.', time: 'Oct 10, 2026', category: 'Funding', icon: 'funding', tint: 'bg-[#eaf0fb] text-[#3a66c4]', route: '/funding', actionLabel: 'View Funding', unread: false },
+  { id: 'n4', title: 'Monthly statement ready', description: 'Your September account statement is available in your Profile and Messages.', time: 'Oct 01, 2026', category: 'Account', icon: 'messages', tint: 'bg-[#edf2e9] text-[#5c7847]', route: '/profile', actionLabel: 'Open Profile', unread: false },
+]
+
+function NotificationsPage() {
+  const navigate = useNavigate()
+  const [filter, setFilter] = useState('all')
+  const [items, setItems] = useState(initialNotifications)
+  const unreadCount = items.filter((item) => item.unread).length
+  const visibleItems = filter === 'unread' ? items.filter((item) => item.unread) : items
+
+  const markRead = (id) => {
+    setItems((prev) => prev.map((item) => (item.id === id ? { ...item, unread: false } : item)))
+  }
+
+  const markAllRead = () => {
+    setItems((prev) => prev.map((item) => ({ ...item, unread: false })))
+  }
+
+  return (
+    <div>
+      <Card className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#edeef0] pb-4">
+          <div className="flex items-center gap-2.5">
+            <h2 className="text-sm font-semibold text-[#343a48]">Notifications</h2>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-[#f5ebdf] px-2 py-0.5 text-[10px] font-bold text-[#a87543]">
+                {unreadCount} new
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <div role="tablist" aria-label="Filter notifications" className="inline-flex rounded-xl border border-[#e6e8eb] bg-[#f6f7f9] p-0.5">
+              {[{ id: 'all', label: 'All' }, { id: 'unread', label: 'Unread' }].map((tab) => (
+                <button
+                  key={tab.id}
+                  role="tab"
+                  aria-selected={filter === tab.id}
+                  type="button"
+                  onClick={() => setFilter(tab.id)}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition ${filter === tab.id ? 'bg-white text-[#2563eb] shadow-2xs' : 'text-[#777c87] hover:text-[#343a48]'}`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={markAllRead}
+              disabled={unreadCount === 0}
+              className="rounded-xl border border-[#e6e8eb] px-3 py-1.5 text-xs font-medium text-[#5f6675] transition hover:bg-[#f6f7f9] disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              Mark all read
+            </button>
+          </div>
+        </div>
+
+        {visibleItems.length === 0 ? (
+          <div className="py-12 text-center">
+            <p className="text-sm font-medium text-[#4a505e]">You’re all caught up</p>
+            <p className="mt-1 text-xs text-[#8e939e]">No unread notifications right now.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-[#edeef0]">
+            {visibleItems.map((item) => (
+              <div key={item.id} className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => markRead(item.id)}
+                  className="flex min-w-0 flex-1 items-start gap-3.5 text-left"
+                >
+                  <span className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${item.tint}`}>
+                    <Icon name={item.icon} size={17} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="truncate text-xs font-semibold text-[#3f4553]">{item.title}</span>
+                      {item.unread && <span aria-label="Unread" className="size-2 shrink-0 rounded-full bg-[#2563eb]" />}
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-[#7d828e]">{item.description}</span>
+                    <span className="mt-1 block text-[10px] text-[#9ca0a9]">{item.category} · {item.time}</span>
+                  </span>
+                </button>
+                <div className="flex shrink-0 items-center gap-2 sm:pl-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      markRead(item.id)
+                      navigate(item.route)
+                    }}
+                    className="rounded-xl border border-[#e6e8eb] px-3 py-1.5 text-xs font-medium text-[#2563eb] transition hover:bg-[#eff5ff]"
+                  >
+                    {item.actionLabel}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   )
@@ -2615,6 +3193,7 @@ function ClientsPage() {
             window.localStorage.setItem('morrow-theme', darkMode ? 'night' : 'day')
           }, [darkMode])
 
+<<<<<<< HEAD
           return (
           <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
             <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
@@ -2648,6 +3227,39 @@ function ClientsPage() {
                   </div>
                 </div>
               </main>
+=======
+  return (
+    <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
+      <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
+        <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} isTraderView={isClientsPage} />
+        <main className="flex min-w-0 flex-1 flex-col bg-[#fbfbfc] xl:h-screen xl:min-h-0 xl:overflow-hidden">
+          <Header darkMode={darkMode} setDarkMode={setDarkMode} isTraderView={isClientsPage} />
+          <MobileNavigation isTraderView={isClientsPage} />
+          <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9 xl:min-h-0 xl:overflow-hidden">
+            <div className={`grid w-full items-start gap-6 xl:h-full xl:min-h-0 ${isClientsPage ? 'grid-cols-1' : 'xl:grid-cols-[minmax(0,1fr)_280px]'} xl:grid-rows-1 xl:items-stretch 2xl:gap-8`}>
+              <div className="min-w-0 scroll-pane xl:min-h-0 xl:overflow-y-auto xl:overscroll-contain xl:pr-2">
+                {!isClientsPage && <AnnouncementBanner />}
+                <Routes>
+                  <Route path="/" element={<Navigate to="/home" replace />} />
+                  <Route path="/home" element={<HomePage />} />
+                  <Route path="/clients" element={<ClientsPage />} />
+                  <Route path="/portfolio" element={<PortfolioPage />} />
+                  <Route path="/products" element={<ProductsPage />} />
+                  <Route path="/funding" element={<FundingPage />} />
+                  <Route path="/learn" element={<LearnPage />} />
+                  <Route path="/messages" element={<MessagesPage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
+                  <Route path="/faq" element={<FaqPage />} />
+                  <Route path="/terms-of-service" element={<PolicyPage title="Terms of Service" documentName="Terms of Service" />} />
+                  <Route path="/privacy-policy" element={<PolicyPage title="Privacy Policy" documentName="Privacy Policy" />} />
+                  <Route path="/sign-out" element={<SignOutPage />} />
+                  <Route path="*" element={<Navigate to="/home" replace />} />
+                </Routes>
+              </div>
+              {!isClientsPage && <CommunityRightRail />}
+>>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
             </div>
           </div>
           )
