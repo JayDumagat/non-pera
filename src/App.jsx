@@ -9,6 +9,8 @@ import {
   Bell,
   BookOpen,
   BriefcaseBusiness,
+  Calendar,
+  CalendarDays,
   Check,
   CheckCircle2,
   ChevronDown,
@@ -796,13 +798,13 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                     }`}
                   >
                     <div className="flex items-start justify-between gap-1.5">
-                      <span className="flex min-w-0 flex-1 items-center gap-2">
-                        <span className="flex h-8 min-w-8 max-w-[60px] shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#eceff3] bg-[#ffffff] px-1 py-1">
+                      <span className="flex min-w-0 flex-1 items-center gap-2.5">
+                        <span className="flex size-8 shrink-0 items-center justify-center">
                           <img
                             src={logoSrc}
                             alt=""
                             aria-hidden="true"
-                            className="h-full w-auto max-w-full object-contain"
+                            className="size-full object-contain"
                           />
                         </span>
                         <span className="line-clamp-2 min-w-0 flex-1 text-[13px] font-semibold leading-snug text-[#343a48] sm:text-sm" title={account.name}>
@@ -1777,91 +1779,345 @@ function FundingPageContent({ search }) {
 
 const reportDocuments = [
   {
-    id: 'rep-stmt-oct',
-    title: 'Monthly Portfolio Statement',
+    id: 'rep-soa-oct-2026',
+    title: 'Monthly Statement of Account (SOA)',
     period: 'October 2026',
+    rangeKey: 'October 2026',
     category: 'Statements',
-    accountScope: 'All accounts',
+    accountScope: 'All accounts (Consolidated)',
     generatedAt: 'Nov 01, 2026',
-    format: 'CSV',
+    format: 'PDF',
+    fileSize: '248 KB',
+    status: 'Official',
+    refNo: 'SOA-2026-10-88392',
     netValue: 24680.5,
     peraValue: 18450.0,
     cashValue: 3260.5,
-    summary: 'Consolidated holdings valuation, cash wallet ledger, and realized/unrealized monthly performance across Equities, UITFs, and Mutual funds.',
+    summary: 'Official monthly consolidated balance, asset allocation, cash wallet transactions, and realized/unrealized portfolio performance across Equities, UITFs, and Mutual Funds.',
   },
   {
-    id: 'rep-pera-tax',
-    title: 'PERA Contribution & Tax Credit Summary',
-    period: 'FY 2026 YTD',
-    category: 'Tax & PERA',
-    accountScope: 'PERA Portfolio',
-    generatedAt: 'Oct 31, 2026',
-    format: 'CSV',
-    netValue: 18450.0,
-    peraValue: 18450.0,
-    cashValue: 1850.0,
-    summary: 'Eligible Republic Act No. 9505 PERA contributions qualifying for the 5% income tax credit certificate.',
-  },
-  {
-    id: 'rep-trades-q3',
-    title: 'Equities Trade Confirmation Ledger',
-    period: 'Q3 2026',
-    category: 'Trade Logs',
-    accountScope: 'Equities (Margin & Discretionary)',
-    generatedAt: 'Oct 15, 2026',
-    format: 'CSV',
-    netValue: 17240.0,
-    peraValue: 13100.0,
-    cashValue: 2150.0,
-    summary: 'Executed buy/sell trade confirmations, broker commissions, and PSE settlement timestamps.',
-  },
-  {
-    id: 'rep-funds-oct',
+    id: 'rep-funds-oct-2026',
     title: 'UITF & Mutual Fund Valuation Report',
     period: 'October 2026',
+    rangeKey: 'October 2026',
     category: 'Statements',
     accountScope: 'UITFs & Mutual funds',
     generatedAt: 'Nov 01, 2026',
-    format: 'CSV',
+    format: 'PDF',
+    fileSize: '184 KB',
+    status: 'Official',
+    refNo: 'NAV-2026-10-41022',
     netValue: 6240.5,
     peraValue: 4350.0,
     cashValue: 910.5,
-    summary: 'Monthly NavPU and NAVPS unit valuation breakdown for BDO Equity Index Fund, BPI Short Term Fund, ALFM Growth Fund, and Philequity Fund.',
+    summary: 'Monthly NavPU and NAVPS unit valuation, benchmark comparisons, and distributions for BDO Equity Index Fund, BPI Short Term Fund, and ALFM Growth Fund.',
   },
   {
-    id: 'rep-dividends',
+    id: 'rep-trades-oct-2026',
+    title: 'Equities Monthly Trade Confirmation Ledger',
+    period: 'October 2026',
+    rangeKey: 'October 2026',
+    category: 'Trade Logs',
+    accountScope: 'Equities Direct',
+    generatedAt: 'Nov 01, 2026',
+    format: 'CSV',
+    fileSize: '54 KB',
+    status: 'Audited',
+    refNo: 'TRD-2026-10-77192',
+    netValue: 15180.0,
+    peraValue: 11200.0,
+    cashValue: 2350.0,
+    summary: 'Executed buy and sell orders, broker commissions, SEC/PSE transaction fees, clearing fees, and settlement timestamps for the month of October.',
+  },
+  {
+    id: 'rep-soa-sep-2026',
+    title: 'Monthly Statement of Account (SOA)',
+    period: 'September 2026',
+    rangeKey: 'September 2026',
+    category: 'Statements',
+    accountScope: 'All accounts (Consolidated)',
+    generatedAt: 'Oct 01, 2026',
+    format: 'PDF',
+    fileSize: '242 KB',
+    status: 'Official',
+    refNo: 'SOA-2026-09-88104',
+    netValue: 23890.0,
+    peraValue: 17900.0,
+    cashValue: 2840.0,
+    summary: 'Official monthly consolidated balance, holdings breakdown, and cash balances for September 2026.',
+  },
+  {
+    id: 'rep-trades-sep-2026',
+    title: 'Equities Monthly Trade Blotter',
+    period: 'September 2026',
+    rangeKey: 'September 2026',
+    category: 'Trade Logs',
+    accountScope: 'Equities Direct',
+    generatedAt: 'Oct 01, 2026',
+    format: 'CSV',
+    fileSize: '49 KB',
+    status: 'Audited',
+    refNo: 'TRD-2026-09-76810',
+    netValue: 14750.0,
+    peraValue: 10800.0,
+    cashValue: 2100.0,
+    summary: 'Full trade confirmations and execution records for all September 2026 market transactions.',
+  },
+  {
+    id: 'rep-soa-q3-2026',
+    title: 'Quarterly Consolidated Portfolio Review',
+    period: 'Q3 2026',
+    rangeKey: 'Q3 2026',
+    category: 'Statements',
+    accountScope: 'Consolidated Portfolio',
+    generatedAt: 'Oct 05, 2026',
+    format: 'PDF',
+    fileSize: '512 KB',
+    status: 'Official',
+    refNo: 'QPR-2026-Q3-30911',
+    netValue: 23890.0,
+    peraValue: 17900.0,
+    cashValue: 2840.0,
+    summary: 'Comprehensive third quarter analysis covering macroeconomic trends, portfolio yield, asset class attribution, and fee summaries.',
+  },
+  {
+    id: 'rep-trades-q3-2026',
+    title: 'Q3 Multi-Asset Trade & Execution Ledger',
+    period: 'Q3 2026',
+    rangeKey: 'Q3 2026',
+    category: 'Trade Logs',
+    accountScope: 'Equities & Funds',
+    generatedAt: 'Oct 05, 2026',
+    format: 'CSV',
+    fileSize: '128 KB',
+    status: 'Audited',
+    refNo: 'TRD-2026-Q3-66120',
+    netValue: 17240.0,
+    peraValue: 13100.0,
+    cashValue: 2150.0,
+    summary: 'Quarterly trade confirmations, broker assisted transaction notes, and settlement ledger for Q3 2026.',
+  },
+  {
+    id: 'rep-soa-q2-2026',
+    title: 'Quarterly Consolidated Portfolio Review',
+    period: 'Q2 2026',
+    rangeKey: 'Q2 2026',
+    category: 'Statements',
+    accountScope: 'Consolidated Portfolio',
+    generatedAt: 'Jul 05, 2026',
+    format: 'PDF',
+    fileSize: '496 KB',
+    status: 'Official',
+    refNo: 'QPR-2026-Q2-20815',
+    netValue: 21950.0,
+    peraValue: 16200.0,
+    cashValue: 2450.0,
+    summary: 'Comprehensive second quarter portfolio valuation, performance benchmarking against PSEi, and cash activity.',
+  },
+  {
+    id: 'rep-pera-ytd-2026',
+    title: 'PERA Contribution & 5% Tax Credit Summary',
+    period: 'FY 2026 YTD',
+    rangeKey: 'FY 2026 YTD',
+    category: 'Tax & PERA',
+    accountScope: 'PERA Portfolio',
+    generatedAt: 'Oct 31, 2026',
+    format: 'PDF',
+    fileSize: '320 KB',
+    status: 'BIR Certified',
+    refNo: 'BIR-PERA-2026-9505',
+    netValue: 18450.0,
+    peraValue: 18450.0,
+    cashValue: 1850.0,
+    summary: 'Eligible Republic Act No. 9505 PERA contributions qualifying for the 5% income tax credit certificate (TCC) filed with the Bureau of Internal Revenue.',
+  },
+  {
+    id: 'rep-div-ytd-2026',
     title: 'Dividend & Coupon Distribution Schedule',
-    period: '2026 YTD',
+    period: 'FY 2026 YTD',
+    rangeKey: 'FY 2026 YTD',
     category: 'Tax & PERA',
     accountScope: 'All accounts',
     generatedAt: 'Oct 28, 2026',
     format: 'CSV',
+    fileSize: '62 KB',
+    status: 'Official',
+    refNo: 'DIV-2026-YTD-1102',
     netValue: 1284.2,
     peraValue: 684.2,
     cashValue: 3260.5,
-    summary: 'Gross cash dividends, retail treasury bond coupons, and final withholding tax deductions.',
+    summary: 'Gross cash dividends, retail treasury bond (RTB) coupons, withholding tax receipts, and net credit distributions.',
+  },
+  {
+    id: 'rep-cgt-ytd-2026',
+    title: 'Capital Gains & Stock Transaction Tax Summary',
+    period: 'FY 2026 YTD',
+    rangeKey: 'FY 2026 YTD',
+    category: 'Tax & PERA',
+    accountScope: 'Non-PERA & PERA Equities',
+    generatedAt: 'Oct 31, 2026',
+    format: 'PDF',
+    fileSize: '210 KB',
+    status: 'Audited',
+    refNo: 'CGT-2026-YTD-0842',
+    netValue: 24680.5,
+    peraValue: 18450.0,
+    cashValue: 3260.5,
+    summary: 'Realized capital gains and losses, 0.6% Stock Transaction Tax (STT) remitted, and tax exempt PERA asset disposals.',
+  },
+  {
+    id: 'rep-annual-2025',
+    title: 'Annual Consolidated Financial Statement 2025',
+    period: 'FY 2025',
+    rangeKey: 'FY 2025',
+    category: 'Statements',
+    accountScope: 'All accounts',
+    generatedAt: 'Jan 15, 2026',
+    format: 'PDF',
+    fileSize: '840 KB',
+    status: 'Archived',
+    refNo: 'ANN-2025-00192',
+    netValue: 19800.0,
+    peraValue: 14500.0,
+    cashValue: 2100.0,
+    summary: 'Full calendar year audited closing statement, holding valuations, dividend yield, and total return analysis for FY 2025.',
+  },
+  {
+    id: 'rep-bir-2025',
+    title: 'Annual BIR Form 2307 & PERA Tax Certificate 2025',
+    period: 'FY 2025',
+    rangeKey: 'FY 2025',
+    category: 'Tax & PERA',
+    accountScope: 'PERA & Withholding Tax',
+    generatedAt: 'Jan 20, 2026',
+    format: 'PDF',
+    fileSize: '380 KB',
+    status: 'BIR Certified',
+    refNo: 'BIR-2025-2307-551',
+    netValue: 14500.0,
+    peraValue: 14500.0,
+    cashValue: 1450.0,
+    summary: 'Official Bureau of Internal Revenue Form 2307 certificate of creditable tax withheld and PERA 5% tax credit release certificate for tax year 2025.',
   },
 ]
 
+const REPORT_TYPES_CONFIG = [
+  {
+    id: 'soa',
+    title: 'Statement of Account (SOA)',
+    category: 'Statements',
+    description: 'Consolidated balances, monthly holdings valuation, cash ledger, and returns.',
+  },
+  {
+    id: 'holdings',
+    title: 'Portfolio Holdings & Valuation Report',
+    category: 'Statements',
+    description: 'Detailed snapshot of individual stock lots, fund units, NAVPS valuations, and weights.',
+  },
+  {
+    id: 'pera-tax',
+    title: 'PERA 5% Tax Credit Certificate & Ledger',
+    category: 'Tax & PERA',
+    description: 'Official Republic Act No. 9505 documentation for annual 5% tax credit filing.',
+  },
+  {
+    id: 'trade-blotter',
+    title: 'Equities Trade Blotter & Execution Ledger',
+    category: 'Trade Logs',
+    description: 'Itemized list of executed orders, timestamps, broker commissions, and clearing fees.',
+  },
+  {
+    id: 'cgt',
+    title: 'Capital Gains & Stock Transaction Tax Report',
+    category: 'Tax & PERA',
+    description: 'Realized gains and losses computation and Stock Transaction Tax (STT) records.',
+  },
+  {
+    id: 'dividends',
+    title: 'Dividend & Fixed Income Yield Schedule',
+    category: 'Tax & PERA',
+    description: 'Cash dividends received, RTB coupon payments, and withholding tax certificates.',
+  },
+  {
+    id: 'cash-flow',
+    title: 'Cash Flow & Settlement Ledger',
+    category: 'Statements',
+    description: 'Full record of wallet deposits, withdrawals, transfers, and trade settlements.',
+  },
+]
+
+const REPORT_RANGE_PRESETS = [
+  'October 2026',
+  'September 2026',
+  'Q3 2026',
+  'Q2 2026',
+  'FY 2026 YTD',
+  'FY 2025',
+  'Custom Date Range',
+]
+
 function ReportsPage() {
+  const [reports, setReports] = useState(reportDocuments)
   const [category, setCategory] = useState('All')
+  const [range, setRange] = useState('All')
   const [search, setSearch] = useState('')
   const [previewReport, setPreviewReport] = useState(null)
   const [downloadNotice, setDownloadNotice] = useState('')
-  const categories = ['All', 'Statements', 'Tax & PERA', 'Trade Logs']
-  const filtered = useMemo(() => filterReports(reportDocuments, { category, search }), [category, search])
+  const [requestModalOpen, setRequestModalOpen] = useState(false)
+
+  // Request Report Modal Form State
+  const [reqType, setReqType] = useState('soa')
+  const [reqRangePreset, setReqRangePreset] = useState('October 2026')
+  const [reqStartDate, setReqStartDate] = useState('2026-09-01')
+  const [reqEndDate, setReqEndDate] = useState('2026-10-31')
+  const [reqAccountScope, setReqAccountScope] = useState('All accounts (Consolidated)')
+  const [reqFormat, setReqFormat] = useState('PDF')
+  const [reqIncludeFees, setReqIncludeFees] = useState(true)
+  const [reqIncludeTimestamps, setReqIncludeTimestamps] = useState(true)
+  const [reqSendEmail, setReqSendEmail] = useState(false)
+
+  const categories = ['All', 'Statements', 'Tax & PERA', 'Trade Logs', 'Custom Requests']
+  const availableRanges = ['All', 'October 2026', 'September 2026', 'Q3 2026', 'Q2 2026', 'FY 2026 YTD', 'FY 2025']
+
+  const customReportsCount = useMemo(() => reports.filter((r) => r.isCustom).length, [reports])
+
+  const filtered = useMemo(
+    () => filterReports(reports, { category, range, search }),
+    [reports, category, range, search]
+  )
 
   const handleDownloadReport = (report) => {
     const csvRows = [
+      ['================================================================='],
+      ['CGSI SECURITIES (PHILIPPINES) INC. - OFFICIAL FINANCIAL REPORT'],
+      ['================================================================='],
       ['Report Title', report.title],
-      ['Period', report.period],
+      ['Reference Number', report.refNo || `REF-${report.id}`],
+      ['Reporting Period / Range', report.period],
       ['Category', report.category],
       ['Account Scope', report.accountScope],
       ['Generated Date', report.generatedAt],
-      ['Net Asset Value (PHP)', report.netValue.toFixed(2)],
-      ['PERA Asset Value (PHP)', report.peraValue.toFixed(2)],
-      ['Available Cash (PHP)', report.cashValue.toFixed(2)],
-      ['Summary', report.summary],
+      ['Document Status', report.status || 'Official'],
+      ['Classification', report.isCustom ? 'Custom On-Demand Request' : 'Scheduled Brokerage Statement'],
+      ['-----------------------------------------------------------------'],
+      ['FINANCIAL SUMMARY'],
+      ['-----------------------------------------------------------------'],
+      ['Net Portfolio Asset Value (PHP)', report.netValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })],
+      ['PERA Tax-Exempt Assets (PHP)', report.peraValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })],
+      ['Cash Wallet & Settled Funds (PHP)', report.cashValue.toLocaleString('en-PH', { minimumFractionDigits: 2 })],
+      ['Summary / Scope Notes', report.summary],
+      ['-----------------------------------------------------------------'],
+      ['PORTFOLIO HOLDINGS & ASSET ALLOCATION SNAPSHOT'],
+      ['-----------------------------------------------------------------'],
+      ['Asset Description', 'Units/Shares', 'NavPU / Price', 'Total Value (PHP)', 'Allocation'],
+      ['BDO Equity Index Fund (UITF)', '846.15 shares', '₱1.30', '₱1,100.50', '21.5%'],
+      ['BPI Short Term Fund (UITF)', '742.86 shares', '₱1.05', '₱780.00', '15.2%'],
+      ['ALFM Growth Fund (Mutual Fund)', '573.33 shares', '₱1.50', '₱860.00', '16.8%'],
+      ['ATRAM Philippine Equity MF', '387.50 shares', '₱1.60', '₱620.00', '12.1%'],
+      ['SM Investments Corp (SM)', '50 shares', '₱902.00', '₱45,100.00', '25.4%'],
+      ['Ayala Land Inc (ALI)', '400 shares', '₱34.50', '₱13,800.00', '9.0%'],
+      ['-----------------------------------------------------------------'],
+      ['Disclaimer: Generated by CGSI Online Trading Platform. Governed by PSE, SEC, and BSP guidelines.'],
     ]
     const csvContent = csvRows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n')
     try {
@@ -1869,7 +2125,7 @@ function ReportsPage() {
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
-      link.download = `${report.id}.csv`
+      link.download = `${report.id}.${(report.format || 'CSV').toLowerCase()}`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
@@ -1880,160 +2136,602 @@ function ReportsPage() {
     setDownloadNotice(`Downloaded ${report.title} (${report.period}).`)
   }
 
+  const handleCreateReportRequest = (event) => {
+    event.preventDefault()
+    const selectedConfig = REPORT_TYPES_CONFIG.find((item) => item.id === reqType) || REPORT_TYPES_CONFIG[0]
+
+    let computedPeriod = reqRangePreset
+    let computedRangeKey = reqRangePreset
+    if (reqRangePreset === 'Custom Date Range') {
+      computedPeriod = `${reqStartDate} to ${reqEndDate}`
+      computedRangeKey = 'Custom Range'
+    }
+
+    let netValue = 24680.5
+    let peraValue = 18450.0
+    let cashValue = 3260.5
+
+    if (reqAccountScope.includes('PERA')) {
+      netValue = 18450.0
+      cashValue = 1850.0
+    } else if (reqAccountScope.includes('Non-PERA')) {
+      netValue = 6230.5
+      peraValue = 0.0
+      cashValue = 1410.5
+    } else if (reqAccountScope.includes('Equities')) {
+      netValue = 15180.0
+      peraValue = 11200.0
+      cashValue = 2350.0
+    } else if (reqAccountScope.includes('UITFs')) {
+      netValue = 6240.5
+      peraValue = 4350.0
+      cashValue = 910.5
+    }
+
+    const uniqueNum = Math.floor(10000 + Math.random() * 90000)
+    const newReport = {
+      id: `rep-req-${reqType}-${Date.now()}`,
+      title: selectedConfig.title,
+      period: computedPeriod,
+      rangeKey: computedRangeKey,
+      category: selectedConfig.category,
+      accountScope: reqAccountScope,
+      generatedAt: 'Just now',
+      format: reqFormat,
+      fileSize: reqFormat === 'PDF' ? '280 KB' : reqFormat === 'XLSX' ? '118 KB' : '52 KB',
+      status: 'Custom Request',
+      refNo: `REQ-2026-${uniqueNum}`,
+      netValue,
+      peraValue,
+      cashValue,
+      summary: `${selectedConfig.description} Custom on-demand request generated for ${reqAccountScope} covering ${computedPeriod}.${reqIncludeFees ? ' Includes detailed fee breakdown.' : ''}${reqIncludeTimestamps ? ' Includes execution audit timestamps.' : ''}`,
+      isCustom: true,
+      options: {
+        includeFees: reqIncludeFees,
+        includeTimestamps: reqIncludeTimestamps,
+        sendEmail: reqSendEmail,
+      },
+    }
+
+    setReports((prev) => [newReport, ...prev])
+    setRange('All')
+    setCategory('All')
+    setDownloadNotice(`Generated new report "${newReport.title}" (${newReport.period}). It is now available in your reports list below.`)
+    setRequestModalOpen(false)
+  }
+
+  const openRequestModalWithPresetRange = (presetRange) => {
+    if (presetRange && presetRange !== 'All') {
+      setReqRangePreset(presetRange)
+    }
+    setRequestModalOpen(true)
+  }
+
   return (
     <div className="space-y-6">
+      {/* Header with Title and Request Report CTA */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-xl font-bold tracking-tight text-[#2d3343] sm:text-2xl">Reports & Statements</h1>
+          <p className="mt-1 text-xs text-[#717b8f] sm:text-sm">
+            Access official monthly statements and BIR tax forms, or request custom on-demand reports for any period.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => openRequestModalWithPresetRange(range !== 'All' ? range : 'October 2026')}
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2563eb] px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-[#1d4ed8] focus:outline-none focus:ring-2 focus:ring-[#2563eb]/50"
+        >
+          <Plus size={15} />
+          <span>Request a Report</span>
+        </button>
+      </div>
+
+      {/* Summary Cards */}
       <div className="grid gap-4 sm:grid-cols-3">
-        {[
-          ['Available statements', `${reportDocuments.length} reports`, 'Updated Nov 01, 2026'],
-          ['Total reported assets', formatPeso(24680.5), 'Non-PERA + PERA combined'],
-          ['PERA 2026 tax credit base', formatPeso(18450), 'RA 9505 eligible contributions'],
-        ].map(([label, value, detail]) => (
-          <Card key={label} className="p-5">
-            <p className="text-xs text-[#9498a0]">{label}</p>
-            <p className="mt-2.5 text-xl font-semibold tracking-tight text-[#353b48]">{value}</p>
-            <p className="mt-1 text-[11px] text-[#a0a3a9]">{detail}</p>
-          </Card>
-        ))}
+        <Card className="p-4 sm:p-5">
+          <p className="text-xs font-medium text-[#9498a0]">Available Statements</p>
+          <p className="mt-2 text-xl font-bold tracking-tight text-[#353b48]">{reports.length} Reports</p>
+          <p className="mt-1 text-[11px] text-[#a0a3a9]">Updated through Oct 2026 · {customReportsCount} custom</p>
+        </Card>
+        <Card className="p-4 sm:p-5">
+          <p className="text-xs font-medium text-[#9498a0]">Active Range Filter</p>
+          <p className="mt-2 text-xl font-bold tracking-tight text-[#353b48]">
+            {range === 'All' ? 'All Reporting Periods' : range}
+          </p>
+          <p className="mt-1 text-[11px] text-[#a0a3a9]">
+            {filtered.length} matching document{filtered.length === 1 ? '' : 's'} displayed
+          </p>
+        </Card>
+        <Card className="p-4 sm:p-5">
+          <p className="text-xs font-medium text-[#9498a0]">PERA 2026 Tax Credit Base</p>
+          <p className="mt-2 text-xl font-bold tracking-tight text-[#353b48]">{formatPeso(18450)}</p>
+          <p className="mt-1 text-[11px] text-[#a0a3a9]">RA 9505 eligible contributions (5% TCC)</p>
+        </Card>
       </div>
 
       {downloadNotice && (
-        <p role="status" className="rounded-xl bg-[#edf0f6] px-4 py-3 text-xs font-medium text-[#485674]">
-          {downloadNotice}
-        </p>
+        <div role="status" className="flex items-center justify-between rounded-xl border border-[#c7d7f9] bg-[#eff4ff] px-4 py-3 text-xs font-medium text-[#1e40af]">
+          <span>{downloadNotice}</span>
+          <button
+            type="button"
+            onClick={() => setDownloadNotice('')}
+            className="text-[#3b82f6] hover:text-[#1d4ed8]"
+            aria-label="Dismiss notice"
+          >
+            <X size={14} />
+          </button>
+        </div>
       )}
 
+      {/* Readily Available Reports Main Card */}
       <Card className="overflow-hidden">
-        <div className="flex flex-col gap-3 border-b border-[#edeef0] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
-          <div role="tablist" aria-label="Report categories" className="flex gap-1 overflow-x-auto">
-            {categories.map((item) => {
-              const active = category === item
-              return (
-                <button
-                  key={item}
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setCategory(item)}
-                  type="button"
-                  className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition ${
-                    active
-                      ? 'bg-[#eff4ff] font-semibold text-[#2563eb]'
-                      : 'text-[#7f8490] hover:bg-[#f6f7f9] hover:text-[#424957]'
-                  }`}
+        {/* Controls Bar: Range Selector, Category Pills, Search */}
+        <div className="flex flex-col gap-3.5 border-b border-[#edeef0] p-4 sm:px-5">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            {/* Left: Range Selector & Category Pills */}
+            <div className="flex flex-wrap items-center gap-3">
+              {/* Dedicated Date Range Filter */}
+              <div className="inline-flex items-center gap-2 rounded-lg border border-[#e2e8f0] bg-[#fafbfc] px-2.5 py-1.5 shadow-xs">
+                <CalendarDays size={14} className="text-[#2563eb]" />
+                <span className="text-xs font-semibold text-[#5a6272]">Range:</span>
+                <select
+                  value={range}
+                  onChange={(event) => setRange(event.target.value)}
+                  aria-label="Select report date range"
+                  className="bg-transparent text-xs font-semibold text-[#343a48] outline-none cursor-pointer"
                 >
-                  {item}
-                </button>
-              )
-            })}
+                  {availableRanges.map((r) => (
+                    <option key={r} value={r}>
+                      {r === 'All' ? 'All Ranges' : r}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Category Segmented Tabs */}
+              <div role="tablist" aria-label="Report categories" className="flex items-center gap-1 overflow-x-auto">
+                {categories.map((item) => {
+                  const active = category === item
+                  const isCustomTab = item === 'Custom Requests'
+                  return (
+                    <button
+                      key={item}
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setCategory(item)}
+                      type="button"
+                      className={`inline-flex items-center gap-1.5 shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition ${
+                        active
+                          ? 'bg-[#eff4ff] font-semibold text-[#2563eb]'
+                          : 'text-[#7f8490] hover:bg-[#f6f7f9] hover:text-[#424957]'
+                      }`}
+                    >
+                      <span>{item}</span>
+                      {isCustomTab && customReportsCount > 0 && (
+                        <span className="rounded-full bg-[#2563eb]/10 px-1.5 py-0.2 text-[10px] font-bold text-[#2563eb]">
+                          {customReportsCount}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Right: Search Input */}
+            <div className="flex items-center gap-2">
+              <label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e6e8eb] bg-[#fafbfc] px-2.5 py-1.5 text-[#9599a0] focus-within:border-[#9aa5b8] focus-within:bg-white">
+                <Search size={13} />
+                <input
+                  value={search}
+                  onChange={(event) => setSearch(event.target.value)}
+                  placeholder="Search reports..."
+                  aria-label="Search reports"
+                  className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-44"
+                />
+                {search && (
+                  <button
+                    type="button"
+                    onClick={() => setSearch('')}
+                    aria-label="Clear search"
+                    className="text-[#9ca3af] hover:text-[#4b5563]"
+                  >
+                    <X size={12} />
+                  </button>
+                )}
+              </label>
+            </div>
           </div>
-          <label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e6e8eb] bg-[#fafbfc] px-2.5 py-1.5 text-[#9599a0] focus-within:border-[#9aa5b8] focus-within:bg-white">
-            <Icon name="search" size={13} />
-            <input
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search reports"
-              aria-label="Search reports"
-              className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-36"
-            />
-          </label>
         </div>
 
+        {/* Readily Available Reports Table */}
         {filtered.length ? (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] text-left">
+            <table className="w-full min-w-[700px] text-left">
               <thead>
                 <tr className="border-b border-[#edeef0] text-[10px] font-semibold uppercase tracking-[0.07em] text-[#9ca0a8]">
-                  <th className="px-4 py-3 font-semibold sm:px-5">Report</th>
+                  <th className="px-4 py-3 font-semibold sm:px-5">Report Document</th>
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Period / Range</th>
                   {category === 'All' && <th className="px-3 py-3 font-semibold whitespace-nowrap">Category</th>}
                   <th className="px-3 py-3 font-semibold whitespace-nowrap">Scope</th>
-                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Generated</th>
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Status & Generated</th>
                   <th className="px-4 py-3 text-right font-semibold sm:px-5">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((report) => (
-                  <tr key={report.id} className="border-b border-[#f0f1f3] transition hover:bg-[#fafbfc] last:border-b-0">
-                    <td className="px-4 py-3.5 sm:px-5">
-                      <p className="text-xs font-semibold text-[#343a48]">{report.title}</p>
-                      <p className="mt-0.5 text-[11px] text-[#8d929e]">{report.period}</p>
-                    </td>
-                    {category === 'All' && (
-                      <td className="px-3 py-3.5 text-xs text-[#6e7482] whitespace-nowrap">{report.category}</td>
-                    )}
-                    <td className="px-3 py-3.5 text-xs text-[#6e7482]">{report.accountScope}</td>
-                    <td className="px-3 py-3.5 text-xs text-[#8d929e] whitespace-nowrap">{report.generatedAt}</td>
-                    <td className="px-4 py-3.5 text-right sm:px-5">
-                      <div className="inline-flex items-center gap-1.5">
-                        <button
-                          type="button"
-                          onClick={() => setPreviewReport(report)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-[#dce1ea] bg-[#f8f9fb] px-2.5 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#eff3fa] hover:text-[#2563eb]"
-                        >
-                          <Eye size={12} />
-                          <span>Preview</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDownloadReport(report)}
-                          className="inline-flex items-center gap-1 rounded-lg bg-[#2563eb] px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]"
-                        >
-                          <Download size={12} />
-                          <span>{report.format}</span>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {filtered.map((report) => {
+                  const isCustom = report.isCustom
+                  return (
+                    <tr key={report.id} className="border-b border-[#f0f1f3] transition hover:bg-[#fafbfc] last:border-b-0">
+                      <td className="px-4 py-3.5 sm:px-5">
+                        <div className="flex items-start gap-2.5">
+                          <div className={`mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg ${
+                            isCustom ? 'bg-[#ede9fe] text-[#7c3aed]' : 'bg-[#eff4ff] text-[#2563eb]'
+                          }`}>
+                            <FileText size={14} />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <p className="text-xs font-semibold text-[#343a48]">{report.title}</p>
+                              {isCustom ? (
+                                <span className="rounded-full bg-[#f3e8ff] px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase text-[#7e22ce]">
+                                  CUSTOM
+                                </span>
+                              ) : report.status === 'BIR Certified' ? (
+                                <span className="rounded-full bg-[#ecfdf5] px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase text-[#047857]">
+                                  BIR FORM
+                                </span>
+                              ) : report.status === 'Official' ? (
+                                <span className="rounded-full bg-[#eff6ff] px-2 py-0.5 text-[9px] font-bold tracking-wide uppercase text-[#1d4ed8]">
+                                  OFFICIAL
+                                </span>
+                              ) : null}
+                            </div>
+                            <p className="mt-0.5 text-[11px] text-[#8d929e]">Ref: {report.refNo || report.id}</p>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="px-3 py-3.5 whitespace-nowrap">
+                        <span className="inline-flex items-center gap-1 rounded-md bg-[#f1f5f9] px-2 py-1 text-[11px] font-semibold text-[#475569]">
+                          <Calendar size={11} className="text-[#64748b]" />
+                          <span>{report.period}</span>
+                        </span>
+                      </td>
+
+                      {category === 'All' && (
+                        <td className="px-3 py-3.5 text-xs text-[#6e7482] whitespace-nowrap">
+                          <span className="rounded-md border border-[#e2e8f0] bg-white px-2 py-0.5 text-[11px] font-medium text-[#4b5563]">
+                            {report.category}
+                          </span>
+                        </td>
+                      )}
+
+                      <td className="px-3 py-3.5 text-xs text-[#6e7482]">{report.accountScope}</td>
+
+                      <td className="px-3 py-3.5 text-xs whitespace-nowrap">
+                        <p className="font-medium text-[#4b5563]">{report.generatedAt}</p>
+                        <p className="text-[10px] text-[#9ca3af]">{report.format} · {report.fileSize || '300 KB'}</p>
+                      </td>
+
+                      <td className="px-4 py-3.5 text-right sm:px-5">
+                        <div className="inline-flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewReport(report)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-[#dce1ea] bg-[#f8f9fb] px-2.5 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#eff3fa] hover:text-[#2563eb]"
+                          >
+                            <Eye size={12} />
+                            <span>Preview</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDownloadReport(report)}
+                            className="inline-flex items-center gap-1 rounded-lg bg-[#2563eb] px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]"
+                          >
+                            <Download size={12} />
+                            <span>{report.format || 'Download'}</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           </div>
         ) : (
-          <div className="px-6 py-10 text-center">
-            <p className="text-xs font-semibold text-[#484d59]">No reports match your filter</p>
-            <p className="mt-1 text-[11px] text-[#9599a2]">Try another category or search term.</p>
+          <div className="px-6 py-12 text-center">
+            <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#f1f5f9] text-[#64748b]">
+              <CalendarDays size={22} />
+            </div>
+            <p className="mt-3 text-sm font-semibold text-[#343a48]">No reports found for the selected filter</p>
+            <p className="mt-1 text-xs text-[#8c94a4]">
+              {range !== 'All' ? `There are no pre-generated reports filed under "${range}".` : 'No reports match your current filter or search criteria.'}
+            </p>
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setRange('All')
+                  setCategory('All')
+                  setSearch('')
+                }}
+                className="rounded-lg border border-[#d8dce4] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5563] hover:bg-[#f9fafb]"
+              >
+                Reset filters
+              </button>
+              <button
+                type="button"
+                onClick={() => openRequestModalWithPresetRange(range !== 'All' ? range : 'October 2026')}
+                className="rounded-lg bg-[#2563eb] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+              >
+                Request a report for {range !== 'All' ? `"${range}"` : 'this period'}
+              </button>
+            </div>
           </div>
         )}
       </Card>
 
-      {previewReport && (
-        <Modal title={previewReport.title} onClose={() => setPreviewReport(null)}>
-          <div className="mt-2 space-y-4 text-xs text-[#525a6b]">
-            <p className="text-[11px] text-[#8d929e]">
-              {previewReport.period} · {previewReport.accountScope} · Generated {previewReport.generatedAt}
+      {/* Request a Report Modal */}
+      {requestModalOpen && (
+        <Modal title="Request a Report" onClose={() => setRequestModalOpen(false)} maxWidth="max-w-xl">
+          <form onSubmit={handleCreateReportRequest} className="mt-3 space-y-4 text-xs text-[#4b5563]">
+            <p className="text-xs text-[#717b8f]">
+              Choose the statement or report you need, specify the date range, and select your preferred output format.
             </p>
-            <p className="leading-relaxed">{previewReport.summary}</p>
-            <div className="grid grid-cols-3 gap-2.5 rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3">
+
+            {/* 1. Report Type */}
+            <div>
+              <label htmlFor="req-report-type" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                1. Report Type (What you need)
+              </label>
+              <select
+                id="req-report-type"
+                value={reqType}
+                onChange={(event) => setReqType(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-[#d8dce4] bg-white px-3 py-2 text-xs font-semibold text-[#343a48] shadow-xs outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]"
+              >
+                {REPORT_TYPES_CONFIG.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.title} ({item.category})
+                  </option>
+                ))}
+              </select>
+              <p className="mt-1 text-[11px] text-[#8c94a4]">
+                {REPORT_TYPES_CONFIG.find((item) => item.id === reqType)?.description}
+              </p>
+            </div>
+
+            {/* 2. Reporting Period / Range */}
+            <div>
+              <label htmlFor="req-range-preset" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                2. Reporting Range (Certain range)
+              </label>
+              <select
+                id="req-range-preset"
+                value={reqRangePreset}
+                onChange={(event) => setReqRangePreset(event.target.value)}
+                className="mt-1.5 w-full rounded-xl border border-[#d8dce4] bg-white px-3 py-2 text-xs font-semibold text-[#343a48] shadow-xs outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]"
+              >
+                {REPORT_RANGE_PRESETS.map((preset) => (
+                  <option key={preset} value={preset}>
+                    {preset}
+                  </option>
+                ))}
+              </select>
+
+              {/* Custom Date Inputs if Custom Date Range chosen */}
+              {reqRangePreset === 'Custom Date Range' && (
+                <div className="mt-2.5 grid grid-cols-2 gap-3 rounded-xl border border-[#e2e8f0] bg-[#f8fafc] p-3">
+                  <div>
+                    <label htmlFor="req-start-date" className="block text-[10px] font-semibold text-[#64748b]">
+                      Start Date
+                    </label>
+                    <input
+                      id="req-start-date"
+                      type="date"
+                      value={reqStartDate}
+                      onChange={(event) => setReqStartDate(event.target.value)}
+                      className="mt-1 w-full rounded-lg border border-[#cbd5e1] bg-white px-2.5 py-1.5 text-xs text-[#334155] outline-none focus:border-[#2563eb]"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="req-end-date" className="block text-[10px] font-semibold text-[#64748b]">
+                      End Date
+                    </label>
+                    <input
+                      id="req-end-date"
+                      type="date"
+                      value={reqEndDate}
+                      onChange={(event) => setReqEndDate(event.target.value)}
+                      className="mt-1 w-full rounded-lg border border-[#cbd5e1] bg-white px-2.5 py-1.5 text-xs text-[#334155] outline-none focus:border-[#2563eb]"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 3. Account Scope & Output Format */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <p className="text-[10px] text-[#8d929e]">Net Value</p>
-                <p className="mt-1 text-sm font-semibold text-[#343a48]">{formatPeso(previewReport.netValue)}</p>
+                <label htmlFor="req-account-scope" className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                  3. Account Scope
+                </label>
+                <select
+                  id="req-account-scope"
+                  value={reqAccountScope}
+                  onChange={(event) => setReqAccountScope(event.target.value)}
+                  className="mt-1.5 w-full rounded-xl border border-[#d8dce4] bg-white px-3 py-2 text-xs font-semibold text-[#343a48] shadow-xs outline-none focus:border-[#2563eb] focus:ring-1 focus:ring-[#2563eb]"
+                >
+                  <option value="All accounts (Consolidated)">All accounts (Consolidated)</option>
+                  <option value="PERA Portfolio Only">PERA Portfolio Only</option>
+                  <option value="Non-PERA Accounts Only">Non-PERA Accounts Only</option>
+                  <option value="Equities Direct">Equities Direct</option>
+                  <option value="UITFs & Mutual funds">UITFs & Mutual funds</option>
+                </select>
               </div>
+
               <div>
-                <p className="text-[10px] text-[#8d929e]">PERA Value</p>
-                <p className="mt-1 text-sm font-semibold text-[#343a48]">{formatPeso(previewReport.peraValue)}</p>
-              </div>
-              <div>
-                <p className="text-[10px] text-[#8d929e]">Cash Wallet</p>
-                <p className="mt-1 text-sm font-semibold text-[#343a48]">{formatPeso(previewReport.cashValue)}</p>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-[#64748b]">
+                  4. File Format
+                </label>
+                <div className="mt-1.5 flex gap-2">
+                  {['PDF', 'CSV', 'XLSX'].map((fmt) => {
+                    const active = reqFormat === fmt
+                    return (
+                      <button
+                        key={fmt}
+                        type="button"
+                        onClick={() => setReqFormat(fmt)}
+                        className={`flex-1 rounded-xl border py-2 text-center text-xs font-semibold transition ${
+                          active
+                            ? 'border-[#2563eb] bg-[#eff4ff] text-[#2563eb]'
+                            : 'border-[#d8dce4] bg-white text-[#4b5563] hover:bg-[#f8fafc]'
+                        }`}
+                      >
+                        {fmt}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 pt-1">
+
+            {/* 5. Inclusions & Options */}
+            <div className="space-y-2 rounded-xl border border-[#e5e7eb] bg-[#fafbfc] p-3 text-xs">
+              <span className="block font-semibold text-[#374151]">Options & Inclusions:</span>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reqIncludeFees}
+                  onChange={(event) => setReqIncludeFees(event.target.checked)}
+                  className="rounded text-[#2563eb] focus:ring-[#2563eb]"
+                />
+                <span className="text-[#4b5563]">Include detailed fee, broker commission & tax breakdowns</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reqIncludeTimestamps}
+                  onChange={(event) => setReqIncludeTimestamps(event.target.checked)}
+                  className="rounded text-[#2563eb] focus:ring-[#2563eb]"
+                />
+                <span className="text-[#4b5563]">Include trade execution timestamps and order ticket IDs</span>
+              </label>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={reqSendEmail}
+                  onChange={(event) => setReqSendEmail(event.target.checked)}
+                  className="rounded text-[#2563eb] focus:ring-[#2563eb]"
+                />
+                <span className="text-[#4b5563]">Email copy to registered address (investor@cgsi.com.ph)</span>
+              </label>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
-                onClick={() => setPreviewReport(null)}
+                onClick={() => setRequestModalOpen(false)}
                 className="rounded-xl border border-[#dce1ea] px-4 py-2 text-xs font-semibold text-[#434a58] hover:bg-[#f6f7f9]"
               >
-                Close
+                Cancel
               </button>
               <button
-                type="button"
-                onClick={() => {
-                  handleDownloadReport(previewReport)
-                  setPreviewReport(null)
-                }}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+                type="submit"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1d4ed8]"
               >
-                <Download size={13} />
-                <span>Download {previewReport.format}</span>
+                <Check size={14} />
+                <span>Generate & Request Report</span>
               </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Report Preview Modal */}
+      {previewReport && (
+        <Modal title={previewReport.title} onClose={() => setPreviewReport(null)} maxWidth="max-w-2xl">
+          <div className="mt-2 space-y-4 text-xs text-[#525a6b]">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#f1f5f9] pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 rounded-md bg-[#eff6ff] px-2 py-0.5 text-[11px] font-semibold text-[#1e40af]">
+                  <Calendar size={11} />
+                  <span>{previewReport.period}</span>
+                </span>
+                <span className="text-[11px] text-[#8d929e]">· {previewReport.accountScope}</span>
+              </div>
+              <span className="text-[11px] font-mono text-[#64748b]">
+                Ref: {previewReport.refNo || previewReport.id}
+              </span>
+            </div>
+
+            <p className="leading-relaxed text-[#374151]">{previewReport.summary}</p>
+
+            <div className="grid grid-cols-3 gap-2.5 rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3.5">
+              <div>
+                <p className="text-[10px] uppercase font-bold text-[#8d929e]">Net Asset Value</p>
+                <p className="mt-1 text-base font-bold text-[#2563eb]">{formatPeso(previewReport.netValue)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-[#8d929e]">PERA Value</p>
+                <p className="mt-1 text-base font-bold text-[#343a48]">{formatPeso(previewReport.peraValue)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase font-bold text-[#8d929e]">Cash Wallet</p>
+                <p className="mt-1 text-base font-bold text-[#343a48]">{formatPeso(previewReport.cashValue)}</p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-[#e2e8f0] bg-white p-3">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748b]">Sample Ledger Breakdown</p>
+              <div className="mt-2 space-y-1.5 font-mono text-[11px]">
+                <div className="flex justify-between border-b border-[#f1f5f9] pb-1 text-[#64748b]">
+                  <span>BDO Equity Index Fund (UITF)</span>
+                  <span className="font-semibold text-[#1e293b]">₱1,100.50 (21.5%)</span>
+                </div>
+                <div className="flex justify-between border-b border-[#f1f5f9] pb-1 text-[#64748b]">
+                  <span>ALFM Growth Fund (Mutual Fund)</span>
+                  <span className="font-semibold text-[#1e293b]">₱860.00 (16.8%)</span>
+                </div>
+                <div className="flex justify-between border-b border-[#f1f5f9] pb-1 text-[#64748b]">
+                  <span>BPI Short Term Fund (UITF)</span>
+                  <span className="font-semibold text-[#1e293b]">₱780.00 (15.2%)</span>
+                </div>
+                <div className="flex justify-between text-[#64748b]">
+                  <span>Settled Cash Reserve (Cash Wallet)</span>
+                  <span className="font-semibold text-[#1e293b]">₱3,260.50</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between pt-1">
+              <span className="text-[10px] text-[#9ca3af]">
+                Generated {previewReport.generatedAt} · Format: {previewReport.format}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPreviewReport(null)}
+                  className="rounded-xl border border-[#dce1ea] px-4 py-2 text-xs font-semibold text-[#434a58] hover:bg-[#f6f7f9]"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDownloadReport(previewReport)
+                    setPreviewReport(null)
+                  }}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1d4ed8]"
+                >
+                  <Download size={13} />
+                  <span>Download {previewReport.format}</span>
+                </button>
+              </div>
             </div>
           </div>
         </Modal>
@@ -2255,8 +2953,8 @@ function NotificationsPage() {
   )
 }
 
-function Modal({ title, children, onClose }) {
-  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151a25]/35 p-4 backdrop-blur-[2px]" role="presentation" onClick={onClose}><section role="dialog" aria-modal="true" aria-label={title} onClick={(event) => event.stopPropagation()} className="w-full max-w-md rounded-2xl border border-[#e7e9ec] bg-white p-6 shadow-2xl"><div className="flex items-start justify-between gap-4"><h2 className="text-lg font-semibold text-[#343a48]">{title}</h2><button onClick={onClose} type="button" aria-label="Close dialog" className="flex size-8 items-center justify-center rounded-lg text-[#8f939b] hover:bg-[#f3f4f6]">×</button></div>{children}</section></div>
+function Modal({ title, children, onClose, maxWidth = 'max-w-md' }) {
+  return <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#151a25]/35 p-4 backdrop-blur-[2px]" role="presentation" onClick={onClose}><section role="dialog" aria-modal="true" aria-label={title} onClick={(event) => event.stopPropagation()} className={`w-full ${maxWidth} rounded-2xl border border-[#e7e9ec] bg-white p-6 shadow-2xl`}><div className="flex items-start justify-between gap-4"><h2 className="text-lg font-semibold text-[#343a48]">{title}</h2><button onClick={onClose} type="button" aria-label="Close dialog" className="flex size-8 items-center justify-center rounded-lg text-[#8f939b] hover:bg-[#f3f4f6]">×</button></div>{children}</section></div>
 }
 
 const featuredInvestors = [

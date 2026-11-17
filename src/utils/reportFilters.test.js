@@ -21,3 +21,9 @@ test('filterReports filters by search across title, period, accountScope, and fo
   assert.deepEqual(filterReports(sampleReports, { search: 'csv' }).map((item) => item.id), ['r3'])
   assert.deepEqual(filterReports(sampleReports, { search: 'october' }).map((item) => item.id), ['r1'])
 })
+
+test('filterReports filters by date range', () => {
+  assert.deepEqual(filterReports(sampleReports, { range: 'Q3 2026' }).map((item) => item.id), ['r3'])
+  assert.deepEqual(filterReports(sampleReports, { range: 'October 2026' }).map((item) => item.id), ['r1'])
+})
+

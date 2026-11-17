@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { DEFAULT_INVESTOR_PROFILE, formatInvestorProfileSubtitle } from './investorProfile'
+import { DEFAULT_INVESTOR_PROFILE, formatInvestorProfileSubtitle } from './investorProfile.js'
 
 test('formats risk profile in uppercase with PERA Contributor and Employer Linked in parentheses', () => {
   assert.equal(
