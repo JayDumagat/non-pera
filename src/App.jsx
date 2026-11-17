@@ -41,25 +41,29 @@ import {
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
-  { label: 'Invest', items: [
-    { id: 'portfolio', label: 'Portfolio', icon: 'portfolio' },
-    {
-      id: 'products',
-      label: 'Products',
-      icon: 'products',
-      badge: {
-        text: 'New',
-        icon: 'sparkles',
-        title: 'New products available on the Products page',
+  {
+    label: 'Invest', items: [
+      { id: 'portfolio', label: 'Portfolio', icon: 'portfolio' },
+      {
+        id: 'products',
+        label: 'Products',
+        icon: 'products',
+        badge: {
+          text: 'New',
+          icon: 'sparkles',
+          title: 'New products available on the Products page',
+        },
       },
-    },
-    { id: 'funding', label: 'Funding', icon: 'funding' },
-  ] },
+      { id: 'funding', label: 'Funding', icon: 'funding' },
+    ]
+  },
   { label: 'Discover', items: [{ id: 'learn', label: 'Learn', icon: 'learn', badge: '2' }] },
-  { label: 'Account', items: [
-    { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
-    { id: 'profile', label: 'Profile', icon: 'profile' },
-  ] },
+  {
+    label: 'Account', items: [
+      { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
+      { id: 'profile', label: 'Profile', icon: 'profile' },
+    ]
+  },
 ]
 
 const traderNavigationSections = [
@@ -655,11 +659,10 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
               type="button"
               aria-pressed={selectedAccountId === account.id}
               onClick={() => onSelectAccount(selectedAccountId === account.id ? null : account.id)}
-              className={`w-[164px] shrink-0 snap-start rounded-xl border p-2 text-left transition ${
-                selectedAccountId === account.id
+              className={`w-[164px] shrink-0 snap-start rounded-xl border p-2 text-left transition ${selectedAccountId === account.id
                   ? 'border-[#7aa8ff] bg-[#f2f7ff] shadow-[0_0_0_1px_rgba(59,130,246,0.12)]'
                   : 'border-[#e9ebef] bg-white hover:border-[#c8d9f7] hover:bg-[#fbfdff]'
-              }`}
+                }`}
             >
               <span className="flex items-center gap-1.5">
                 <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: account.color }} />
@@ -780,11 +783,10 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                   aria-label="Toggle to view chart"
                   title="Toggle to view chart"
                   onClick={() => setShowChart(!showChart)}
-                  className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
-                    showChart
+                  className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${showChart
                       ? 'text-[#2563eb] dark:text-[#60a5fa]'
                       : 'text-[#555c6b] dark:text-[#9da3b1]'
-                  }`}
+                    }`}
                 >
                   <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
                   <span>Toggle to view chart</span>
@@ -798,11 +800,10 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                   role="tab"
                   aria-selected={balanceView === 'assets'}
                   onClick={() => setBalanceView('assets')}
-                  className={`flex flex-col items-center justify-center rounded-lg px-3 py-1 text-center text-xs font-semibold leading-tight transition ${
-                    balanceView === 'assets'
+                  className={`flex flex-col items-center justify-center rounded-lg px-3 py-1 text-center text-xs font-semibold leading-tight transition ${balanceView === 'assets'
                       ? 'bg-white text-[#2563eb] shadow-sm'
                       : 'text-[#7e8490] hover:text-[#343a48]'
-                  }`}
+                    }`}
                 >
                   <span>Total Assets</span>
                   <span className={`text-[10px] font-normal ${balanceView === 'assets' ? 'text-[#2563eb]' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
@@ -812,11 +813,10 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                   role="tab"
                   aria-selected={balanceView === 'cash'}
                   onClick={() => setBalanceView('cash')}
-                  className={`flex h-full items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                    balanceView === 'cash'
+                  className={`flex h-full items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition ${balanceView === 'cash'
                       ? 'bg-white text-[#2563eb] shadow-sm'
                       : 'text-[#7e8490] hover:text-[#343a48]'
-                  }`}
+                    }`}
                 >
                   Available Cash
                 </button>
@@ -1561,11 +1561,11 @@ function ClientsPage() {
       prev.map((c) =>
         c.id === selectedClient.id
           ? {
-              ...c,
-              orders: [newOrder, ...c.orders],
-              messages: [...c.messages, advisoryNote],
-              pendingOrderCount: c.pendingOrderCount + 1,
-            }
+            ...c,
+            orders: [newOrder, ...c.orders],
+            messages: [...c.messages, advisoryNote],
+            pendingOrderCount: c.pendingOrderCount + 1,
+          }
           : c
       )
     )
@@ -1579,10 +1579,10 @@ function ClientsPage() {
       prev.map((c) =>
         c.id === selectedClient.id
           ? {
-              ...c,
-              orders: c.orders.map((o) => (o.id === orderId ? { ...o, status: 'CANCELLED' } : o)),
-              pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
-            }
+            ...c,
+            orders: c.orders.map((o) => (o.id === orderId ? { ...o, status: 'CANCELLED' } : o)),
+            pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
+          }
           : c
       )
     )
@@ -1625,13 +1625,13 @@ function ClientsPage() {
       prev.map((c) =>
         c.id === selectedClient.id
           ? {
-              ...c,
-              orders: c.orders.map((o) => (o.id === order.id ? { ...o, status: 'EXECUTED' } : o)),
-              trades: [newTrade, ...(c.trades || [])],
-              messages: [...c.messages, execNote],
-              pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
-              cash: order.side === 'BUY' ? Math.max(0, c.cash - net) : c.cash + net,
-            }
+            ...c,
+            orders: c.orders.map((o) => (o.id === order.id ? { ...o, status: 'EXECUTED' } : o)),
+            trades: [newTrade, ...(c.trades || [])],
+            messages: [...c.messages, execNote],
+            pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
+            cash: order.side === 'BUY' ? Math.max(0, c.cash - net) : c.cash + net,
+          }
           : c
       )
     )
@@ -1668,15 +1668,13 @@ function ClientsPage() {
               <button
                 type="button"
                 onClick={() => setLeftTab('clients')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
-                  leftTab === 'clients' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                }`}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${leftTab === 'clients' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                  }`}
               >
                 <Users size={13} />
                 <span>Clients</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${
-                  leftTab === 'clients' ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#4b5563]'
-                }`}>
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${leftTab === 'clients' ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#4b5563]'
+                  }`}>
                   {clients.length}
                 </span>
               </button>
@@ -1684,19 +1682,17 @@ function ClientsPage() {
               <button
                 type="button"
                 onClick={() => setLeftTab('orders')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
-                  leftTab === 'orders' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                }`}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${leftTab === 'orders' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                  }`}
               >
                 <ArrowUpDown size={13} />
                 <span>Orders</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${
-                  leftTab === 'orders'
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${leftTab === 'orders'
                     ? 'bg-[#2563eb] text-white'
                     : pendingOrdersCount > 0
-                    ? 'bg-[#fef3c7] text-[#92400e]'
-                    : 'bg-[#e5e7eb] text-[#4b5563]'
-                }`}>
+                      ? 'bg-[#fef3c7] text-[#92400e]'
+                      : 'bg-[#e5e7eb] text-[#4b5563]'
+                  }`}>
                   {allDeskOrders.length}
                 </span>
               </button>
@@ -1737,9 +1733,8 @@ function ClientsPage() {
                     key={f.id}
                     type="button"
                     onClick={() => setCategoryFilter(f.id)}
-                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${
-                      categoryFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
-                    }`}
+                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${categoryFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
+                      }`}
                   >
                     {f.label}
                   </button>
@@ -1757,9 +1752,8 @@ function ClientsPage() {
                     key={f.id}
                     type="button"
                     onClick={() => setOrderFilter(f.id)}
-                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${
-                      orderFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
-                    }`}
+                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${orderFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
+                      }`}
                   >
                     {f.label}
                   </button>
@@ -1832,23 +1826,21 @@ function ClientsPage() {
                         setSelectedOrderId(order.id)
                         setActiveTab('orders')
                       }}
-                      className={`group relative w-full text-left p-3.5 transition border-b border-[#f1f3f6] border-l-[3.5px] ${
-                        isSelected
+                      className={`group relative w-full text-left p-3.5 transition border-b border-[#f1f3f6] border-l-[3.5px] ${isSelected
                           ? 'border-l-[#2563eb] bg-[#eff6ff]/90'
                           : 'border-l-transparent bg-white hover:bg-[#f8fafc]'
-                      }`}
+                        }`}
                     >
                       {/* Top Row: Side Badge + Ticker + Type | Total Estimated Value (Primary Hierarchy) */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span
-                            className={`rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${
-                              order.side === 'BUY'
+                            className={`rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${order.side === 'BUY'
                                 ? 'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]'
                                 : order.side === 'SELL'
-                                ? 'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]'
-                                : 'bg-[#e0e7ff] text-[#4338ca] border border-[#c7d2fe]'
-                            }`}
+                                  ? 'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]'
+                                  : 'bg-[#e0e7ff] text-[#4338ca] border border-[#c7d2fe]'
+                              }`}
                           >
                             {order.side}
                           </span>
@@ -1872,13 +1864,12 @@ function ClientsPage() {
                           <span className="font-semibold text-[#1e293b] tabular-nums">₱{order.price.toFixed(2)}</span>
                         </div>
                         <span
-                          className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold ${
-                            order.status === 'PENDING'
+                          className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold ${order.status === 'PENDING'
                               ? 'bg-[#fef3c7] text-[#92400e] border border-[#fde68a]'
                               : order.status === 'EXECUTED'
-                              ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
-                              : 'bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]'
-                          }`}
+                                ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
+                                : 'bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]'
+                            }`}
                         >
                           {order.status === 'PENDING' && (
                             <span className="size-1.5 rounded-full bg-[#d97706] animate-pulse" />
@@ -1917,8 +1908,8 @@ function ClientsPage() {
                     {searchQuery
                       ? `No orders matching "${searchQuery}"`
                       : orderFilter === 'PENDING'
-                      ? 'No pending orders waiting for execution.'
-                      : 'No orders match this filter.'}
+                        ? 'No pending orders waiting for execution.'
+                        : 'No orders match this filter.'}
                   </p>
                 </div>
               )
@@ -1930,746 +1921,736 @@ function ClientsPage() {
         <div className="flex min-w-0 flex-1 flex-col border-b border-[#edeef0] xl:border-b-0 xl:border-r">
           {/* Client Summary Top Bar - Broker-Assisted Trading Account Card */}
           <div className="border-b border-[#edeef0] bg-[#fafbfc] p-4 sm:p-5">
-            <div className="flex items-center gap-3">
-              <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
-                {selectedClient.avatar}
-              </span>
-              <div>
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
-                  <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
-                    Broker-Assisted Account
-                  </span>
-                  <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
-                    {selectedClient.category}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
+                      {selectedClient.avatar}
+                    </span>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                        <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
+                        <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
+                          Broker-Assisted Account
+                        </span>
+                        <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
+                          {selectedClient.category}
+                        </span>
+                      </div>
+                      <p className="mt-0.5 text-xs text-[#8a909d]">
+                        Account #{selectedClient.accountNumber} · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Broker-Assisted Trading Stats Grid */}
+                  <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Buying Power</p>
+                        <span className="size-1.5 rounded-full bg-[#10b981]" title="Funds Settled" />
+                      </div>
+                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash)}</p>
+                      <p className="mt-0.5 text-[10px] text-[#059669] font-medium">Ready for immediate fill</p>
+                    </div>
+
+                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Trading Facility</p>
+                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash * 1.5 + 500000)}</p>
+                      <p className="mt-0.5 text-[10px] text-[#6b7280]">Approved intraday credit buffer</p>
+                    </div>
+
+                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">T+2 Clearing Balance</p>
+                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">
+                        {formatPeso((selectedClient.trades && selectedClient.trades[0]?.net) || 181743.60)}
+                      </p>
+                      <p className="mt-0.5 text-[10px] text-[#2563eb] font-medium">Next settlement cycle (PSE T+2)</p>
+                    </div>
+
+                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Assisted Commission</p>
+                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">0.25% PSE Standard</p>
+                      <p className="mt-0.5 text-[10px] text-[#d97706] font-medium">
+                        {selectedClient.orders.filter((o) => o.status === 'PENDING').length} active orders pending fill
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <p className="mt-0.5 text-xs text-[#8a909d]">
-                  Account #{selectedClient.accountNumber} · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
-                </p>
-              </div>
-            </div>
 
-            {/* Broker-Assisted Trading Stats Grid */}
-            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Buying Power</p>
-                  <span className="size-1.5 rounded-full bg-[#10b981]" title="Funds Settled" />
-                </div>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash)}</p>
-                <p className="mt-0.5 text-[10px] text-[#059669] font-medium">Ready for immediate fill</p>
-              </div>
-
-              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Trading Facility</p>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash * 1.5 + 500000)}</p>
-                <p className="mt-0.5 text-[10px] text-[#6b7280]">Approved intraday credit buffer</p>
-              </div>
-
-              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">T+2 Clearing Balance</p>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">
-                  {formatPeso((selectedClient.trades && selectedClient.trades[0]?.net) || 181743.60)}
-                </p>
-                <p className="mt-0.5 text-[10px] text-[#2563eb] font-medium">Next settlement cycle (PSE T+2)</p>
-              </div>
-
-              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Assisted Commission</p>
-                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">0.25% PSE Standard</p>
-                <p className="mt-0.5 text-[10px] text-[#d97706] font-medium">
-                  {selectedClient.orders.filter((o) => o.status === 'PENDING').length} active orders pending fill
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Middle Tabs: Trades vs Orders */}
-          <div className="flex border-b border-[#edeef0] bg-[#fafbfc] px-5 text-xs font-semibold">
-            {[
-              { id: 'trades', label: 'Trades', badge: (selectedClient.trades || []).length },
-              { id: 'orders', label: 'Orders', badge: (selectedClient.orders || []).length },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative flex items-center gap-1.5 py-3 px-3 transition ${
-                  activeTab === tab.id
-                    ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]'
-                    : 'text-[#6b7280] hover:text-[#2563eb]'
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`rounded-full px-1.5 py-0.2 text-[9px] ${
-                    activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'
-                  }`}
-                >
-                  {tab.badge}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {/* Middle Tab 1: Trades (Executed Trades & Confirmations) */}
-          {activeTab === 'trades' && (
-            <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                <div>
-                  <h3 className="text-sm font-semibold text-[#1f2937]">Executed Trades &amp; Confirmations</h3>
-                  <p className="text-[11px] text-[#8e94a0]">
-                    Broker-assisted transaction logs, fill confirmations, and T+2 settlement records for {selectedClient.name}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => triggerToast(`Exported ${selectedClient.trades?.length || 0} trade confirmation slips for ${selectedClient.name}`)}
-                  className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9] self-start sm:self-auto"
-                >
-                  Export Confirmations
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Traded Value</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">
-                    {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.gross || 0), 0))}
-                  </p>
-                  <p className="mt-0.5 text-[10px] text-[#2563eb]">Gross turnover across {(selectedClient.trades || []).length} trades</p>
-                </div>
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Commission</p>
-                  <p className="mt-1 text-sm font-bold text-[#059669]">
-                    {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.commission || 0), 0))}
-                  </p>
-                  <p className="mt-0.5 text-[10px] text-[#059669]">Broker assisted rate (0.25%)</p>
-                </div>
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Settlement Status</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE T+2 Standard</p>
-                  <p className="mt-0.5 text-[10px] text-[#d97706]">Clearing &amp; custody assured</p>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
-                <table className="w-full min-w-[700px] text-left">
-                  <thead>
-                    <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
-                      <th className="px-3.5 py-2.5">Trade Ref</th>
-                      <th className="px-2.5 py-2.5">Side</th>
-                      <th className="px-2.5 py-2.5">Security</th>
-                      <th className="px-2.5 py-2.5 text-right">Shares</th>
-                      <th className="px-2.5 py-2.5 text-right">Fill Price</th>
-                      <th className="px-2.5 py-2.5 text-right">Gross Value</th>
-                      <th className="px-2.5 py-2.5 text-right">Comm &amp; Fees</th>
-                      <th className="px-2.5 py-2.5 text-right">Net Settlement</th>
-                      <th className="px-2.5 py-2.5">Settlement</th>
-                      <th className="px-2.5 py-2.5">Execution Time</th>
-                      <th className="px-2.5 py-2.5">Channel</th>
-                      <th className="px-3 py-2.5 text-right">Slip</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#f2f4f6] text-xs">
-                    {(selectedClient.trades || []).map((t) => (
-                      <tr key={t.id} className="hover:bg-[#f9fafb] transition">
-                        <td className="px-3.5 py-3 font-mono text-[11px] font-bold text-[#334155]">{t.id}</td>
-                        <td className="px-2.5 py-3">
-                          <span
-                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
-                              t.side === 'BUY' ? 'bg-[#dcfce7] text-[#15803d]' : 'bg-[#fee2e2] text-[#b91c1c]'
-                            }`}
-                          >
-                            {t.side}
-                          </span>
-                        </td>
-                        <td className="px-2.5 py-3">
-                          <span className="font-bold text-[#1e293b]">{t.ticker}</span>
-                          <span className="block text-[10px] text-[#8e94a0]">{t.name}</span>
-                        </td>
-                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{t.shares.toLocaleString()}</td>
-                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{t.price.toFixed(2)}</td>
-                        <td className="px-2.5 py-3 text-right text-[#475467]">{formatPeso(t.gross)}</td>
-                        <td className="px-2.5 py-3 text-right text-[11px] text-[#64748b]">₱{(t.commission + (t.fees || 0)).toFixed(2)}</td>
-                        <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(t.net)}</td>
-                        <td className="px-2.5 py-3">
-                          <span
-                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold ${
-                              t.status === 'SETTLED' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#fef3c7] text-[#92400e]'
-                            }`}
-                          >
-                            {t.settlement}
-                          </span>
-                        </td>
-                        <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{t.time}</td>
-                        <td className="px-2.5 py-3 text-[10px] text-[#64748b]">{t.channel}</td>
-                        <td className="px-3 py-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() => triggerToast(`CGSI Confirmation Slip #${t.id}: ${t.side} ${t.shares.toLocaleString()} ${t.ticker} @ ₱${t.price.toFixed(2)} net ${formatPeso(t.net)}`)}
-                            className="rounded-lg bg-[#eff6ff] px-2.5 py-1 text-[11px] font-semibold text-[#2563eb] hover:bg-[#dbeafe] transition"
-                          >
-                            Slip
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Middle Tab 2: Orders (Client Order Book) */}
-          {activeTab === 'orders' && (
-            <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                <div>
-                  <h3 className="text-sm font-semibold text-[#1f2937]">Client Order Book</h3>
-                  <p className="text-[11px] text-[#8e94a0]">
-                    Real-time working orders queued for execution on the PSE for {selectedClient.name}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrderTicker('SMPH')
-                    setOrderPrice(32.50)
-                    setOrderShares(1000)
-                    setOrderSide('BUY')
-                    setOrderModalOpen(true)
-                  }}
-                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition shadow-xs self-start sm:self-auto"
-                >
-                  <Plus size={14} />
-                  <span>+ Place Client Order</span>
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Pending Fills</p>
-                  <p className="mt-1 text-sm font-bold text-[#d97706]">
-                    {selectedClient.orders.filter((o) => o.status === 'PENDING').length} orders
-                  </p>
-                  <p className="mt-0.5 text-[10px] text-[#6b7280]">Awaiting price match on PSE</p>
-                </div>
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Queued Capital</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">
-                    {formatPeso(
-                      selectedClient.orders
-                        .filter((o) => o.status === 'PENDING')
-                        .reduce((acc, o) => acc + o.shares * o.price, 0)
-                    )}
-                  </p>
-                  <p className="mt-0.5 text-[10px] text-[#2563eb]">Committed order value</p>
-                </div>
-                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Exchange Gateway</p>
-                  <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE Direct FIX</p>
-                  <p className="mt-0.5 text-[10px] text-[#059669]">Continuous trading session</p>
-                </div>
-              </div>
-
-              <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
-                <table className="w-full min-w-[640px] text-left">
-                  <thead>
-                    <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
-                      <th className="px-3.5 py-2.5">Order ID</th>
-                      <th className="px-2.5 py-2.5">Side</th>
-                      <th className="px-2.5 py-2.5">Ticker</th>
-                      <th className="px-2.5 py-2.5 text-right">Quantity</th>
-                      <th className="px-2.5 py-2.5 text-right">Price</th>
-                      <th className="px-2.5 py-2.5">Type</th>
-                      <th className="px-2.5 py-2.5">Status</th>
-                      <th className="px-2.5 py-2.5">Timestamp</th>
-                      <th className="px-3.5 py-2.5 text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#f2f4f6] text-xs">
-                    {selectedClient.orders.map((o) => (
-                      <tr
-                        key={o.id}
-                        className={`transition ${
-                          o.id === selectedOrderId
-                            ? 'bg-[#eff6ff] ring-1 ring-[#93c5fd]'
-                            : 'hover:bg-[#f9fafb]'
+                {/* Middle Tabs: Trades vs Orders */}
+                <div className="flex border-b border-[#edeef0] bg-[#fafbfc] px-5 text-xs font-semibold">
+                  {[
+                    { id: 'trades', label: 'Trades', badge: (selectedClient.trades || []).length },
+                    { id: 'orders', label: 'Orders', badge: (selectedClient.orders || []).length },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`relative flex items-center gap-1.5 py-3 px-3 transition ${activeTab === tab.id
+                          ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]'
+                          : 'text-[#6b7280] hover:text-[#2563eb]'
                         }`}
-                      >
-                        <td className="px-3.5 py-3 font-mono text-[11px] font-semibold text-[#475467]">{o.id}</td>
-                        <td className="px-2.5 py-3">
-                          <span
-                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
-                              o.side === 'BUY'
-                                ? 'bg-[#dcfce7] text-[#15803d]'
-                                : o.side === 'SELL'
-                                ? 'bg-[#fee2e2] text-[#b91c1c]'
-                                : 'bg-[#e0e7ff] text-[#4338ca]'
-                            }`}
-                          >
-                            {o.side}
-                          </span>
-                        </td>
-                        <td className="px-2.5 py-3 font-bold text-[#1e293b]">{o.ticker}</td>
-                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{o.shares.toLocaleString()}</td>
-                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{o.price.toFixed(2)}</td>
-                        <td className="px-2.5 py-3 text-[#64748b]">{o.type}</td>
-                        <td className="px-2.5 py-3">
-                          <span
-                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
-                              o.status === 'EXECUTED'
-                                ? 'bg-[#ecfdf5] text-[#059669]'
-                                : o.status === 'PENDING'
-                                ? 'bg-[#fef3c7] text-[#92400e]'
-                                : 'bg-[#f1f5f9] text-[#64748b]'
-                            }`}
-                          >
-                            {o.status}
-                          </span>
-                        </td>
-                        <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{o.date}</td>
-                        <td className="px-3.5 py-3 text-right">
-                          {o.status === 'PENDING' ? (
-                            <div className="flex items-center justify-end gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => handleExecuteOrder(o)}
-                                className="rounded-md bg-[#eff6ff] px-2 py-1 text-[11px] font-bold text-[#2563eb] hover:bg-[#dbeafe] transition"
-                              >
-                                Fill Order
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleCancelOrder(o.id)}
-                                className="rounded-md bg-[#fef2f2] px-2 py-1 text-[11px] font-semibold text-[#dc2626] hover:bg-[#fee2e2] transition"
-                              >
-                                Cancel
-                              </button>
-                            </div>
-                          ) : (
-                            <span className="text-[10px] font-medium text-[#9ca3af]">
-                              {o.status === 'EXECUTED' ? '✓ Filled' : 'Cancelled'}
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Panel 3: Messaging Panel (Right - Similar size to Panel 1, with Historical & Live tabs) */}
-        <div className="flex flex-col bg-[#fafbfc]">
-          {/* Messaging Panel Header & Tabs */}
-          <div className="border-b border-[#edeef0] bg-white p-3.5 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <MessageCircle size={16} className="text-[#2563eb]" />
-                <h3 className="text-xs font-bold text-[#1e293b]">Client Messages</h3>
-              </div>
-            </div>
-
-            {/* Search Field */}
-            <label className="flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-2.5 py-1.5 text-[#9ca3af] focus-within:border-[#2563eb] focus-within:bg-white transition">
-              <Search size={13} />
-              <input
-                value={messageSearch}
-                onChange={(e) => setMessageSearch(e.target.value)}
-                placeholder="Search messages..."
-                className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
-              />
-              {messageSearch && (
-                <button
-                  type="button"
-                  onClick={() => setMessageSearch('')}
-                  className="text-[#9ca3af] hover:text-[#4b5563]"
-                  aria-label="Clear message search"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </label>
-
-            {/* Chat Mode Tabs: Today vs Previous */}
-            <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
-              <button
-                type="button"
-                onClick={() => setChatMode('live')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
-                  chatMode === 'live' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                }`}
-              >
-                <MessageCircle size={12} />
-                <span>Today</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setChatMode('historical')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
-                  chatMode === 'historical' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                }`}
-              >
-                <Clock size={12} />
-                <span>Previous</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Chat Messages Body */}
-          <div className="scroll-pane flex-1 space-y-3 overflow-y-auto p-3.5">
-            {(() => {
-              const activeMessages = chatMode === 'live'
-                ? (selectedClient.messages || [])
-                : (selectedClient.previousMessages || [])
-
-              const displayedMessages = messageSearch.trim()
-                ? activeMessages.filter(
-                    (msg) =>
-                      msg.text.toLowerCase().includes(messageSearch.toLowerCase()) ||
-                      msg.sender.toLowerCase().includes(messageSearch.toLowerCase())
-                  )
-                : activeMessages
-
-              if (displayedMessages.length === 0) {
-                return (
-                  <div className="p-8 text-center text-xs text-[#9ca3af]">
-                    {messageSearch
-                      ? `No messages match "${messageSearch}"`
-                      : chatMode === 'live'
-                      ? 'No messages today yet.'
-                      : 'No previous conversations recorded.'}
-                  </div>
-                )
-              }
-
-              return displayedMessages.map((msg) => {
-                const isAgent = !msg.isClient
-                return (
-                  <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
-                    <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
-                      <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
-                      <span>·</span>
-                      <span>{msg.time}</span>
-                    </div>
-                    <div
-                      className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${
-                        isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
-                      }`}
                     >
-                      <p>{msg.text}</p>
+                      <span>{tab.label}</span>
+                      <span
+                        className={`rounded-full px-1.5 py-0.2 text-[9px] ${activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'
+                          }`}
+                      >
+                        {tab.badge}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+
+                {/* Middle Tab 1: Trades (Executed Trades & Confirmations) */}
+                {activeTab === 'trades' && (
+                  <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+                    <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                      <div>
+                        <h3 className="text-sm font-semibold text-[#1f2937]">Executed Trades &amp; Confirmations</h3>
+                        <p className="text-[11px] text-[#8e94a0]">
+                          Broker-assisted transaction logs, fill confirmations, and T+2 settlement records for {selectedClient.name}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => triggerToast(`Exported ${selectedClient.trades?.length || 0} trade confirmation slips for ${selectedClient.name}`)}
+                        className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9] self-start sm:self-auto"
+                      >
+                        Export Confirmations
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Traded Value</p>
+                        <p className="mt-1 text-sm font-bold text-[#1f2937]">
+                          {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.gross || 0), 0))}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#2563eb]">Gross turnover across {(selectedClient.trades || []).length} trades</p>
+                      </div>
+                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Commission</p>
+                        <p className="mt-1 text-sm font-bold text-[#059669]">
+                          {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.commission || 0), 0))}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#059669]">Broker assisted rate (0.25%)</p>
+                      </div>
+                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Settlement Status</p>
+                        <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE T+2 Standard</p>
+                        <p className="mt-0.5 text-[10px] text-[#d97706]">Clearing &amp; custody assured</p>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
+                      <table className="w-full min-w-[700px] text-left">
+                        <thead>
+                          <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
+                            <th className="px-3.5 py-2.5">Trade Ref</th>
+                            <th className="px-2.5 py-2.5">Side</th>
+                            <th className="px-2.5 py-2.5">Security</th>
+                            <th className="px-2.5 py-2.5 text-right">Shares</th>
+                            <th className="px-2.5 py-2.5 text-right">Fill Price</th>
+                            <th className="px-2.5 py-2.5 text-right">Gross Value</th>
+                            <th className="px-2.5 py-2.5 text-right">Comm &amp; Fees</th>
+                            <th className="px-2.5 py-2.5 text-right">Net Settlement</th>
+                            <th className="px-2.5 py-2.5">Settlement</th>
+                            <th className="px-2.5 py-2.5">Execution Time</th>
+                            <th className="px-2.5 py-2.5">Channel</th>
+                            <th className="px-3 py-2.5 text-right">Slip</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#f2f4f6] text-xs">
+                          {(selectedClient.trades || []).map((t) => (
+                            <tr key={t.id} className="hover:bg-[#f9fafb] transition">
+                              <td className="px-3.5 py-3 font-mono text-[11px] font-bold text-[#334155]">{t.id}</td>
+                              <td className="px-2.5 py-3">
+                                <span
+                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${t.side === 'BUY' ? 'bg-[#dcfce7] text-[#15803d]' : 'bg-[#fee2e2] text-[#b91c1c]'
+                                    }`}
+                                >
+                                  {t.side}
+                                </span>
+                              </td>
+                              <td className="px-2.5 py-3">
+                                <span className="font-bold text-[#1e293b]">{t.ticker}</span>
+                                <span className="block text-[10px] text-[#8e94a0]">{t.name}</span>
+                              </td>
+                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{t.shares.toLocaleString()}</td>
+                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{t.price.toFixed(2)}</td>
+                              <td className="px-2.5 py-3 text-right text-[#475467]">{formatPeso(t.gross)}</td>
+                              <td className="px-2.5 py-3 text-right text-[11px] text-[#64748b]">₱{(t.commission + (t.fees || 0)).toFixed(2)}</td>
+                              <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(t.net)}</td>
+                              <td className="px-2.5 py-3">
+                                <span
+                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold ${t.status === 'SETTLED' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#fef3c7] text-[#92400e]'
+                                    }`}
+                                >
+                                  {t.settlement}
+                                </span>
+                              </td>
+                              <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{t.time}</td>
+                              <td className="px-2.5 py-3 text-[10px] text-[#64748b]">{t.channel}</td>
+                              <td className="px-3 py-3 text-right">
+                                <button
+                                  type="button"
+                                  onClick={() => triggerToast(`CGSI Confirmation Slip #${t.id}: ${t.side} ${t.shares.toLocaleString()} ${t.ticker} @ ₱${t.price.toFixed(2)} net ${formatPeso(t.net)}`)}
+                                  className="rounded-lg bg-[#eff6ff] px-2.5 py-1 text-[11px] font-semibold text-[#2563eb] hover:bg-[#dbeafe] transition"
+                                >
+                                  Slip
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                )
-              })
-            })()}
+                )}
+
+                {/* Middle Tab 2: Orders (Client Order Book) */}
+                {activeTab === 'orders' && (
+                  <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+                    <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                      <div>
+                        <h3 className="text-sm font-semibold text-[#1f2937]">Client Order Book</h3>
+                        <p className="text-[11px] text-[#8e94a0]">
+                          Real-time working orders queued for execution on the PSE for {selectedClient.name}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setOrderTicker('SMPH')
+                          setOrderPrice(32.50)
+                          setOrderShares(1000)
+                          setOrderSide('BUY')
+                          setOrderModalOpen(true)
+                        }}
+                        className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition shadow-xs self-start sm:self-auto"
+                      >
+                        <Plus size={14} />
+                        <span>+ Place Client Order</span>
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Pending Fills</p>
+                        <p className="mt-1 text-sm font-bold text-[#d97706]">
+                          {selectedClient.orders.filter((o) => o.status === 'PENDING').length} orders
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#6b7280]">Awaiting price match on PSE</p>
+                      </div>
+                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Queued Capital</p>
+                        <p className="mt-1 text-sm font-bold text-[#1f2937]">
+                          {formatPeso(
+                            selectedClient.orders
+                              .filter((o) => o.status === 'PENDING')
+                              .reduce((acc, o) => acc + o.shares * o.price, 0)
+                          )}
+                        </p>
+                        <p className="mt-0.5 text-[10px] text-[#2563eb]">Committed order value</p>
+                      </div>
+                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Exchange Gateway</p>
+                        <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE Direct FIX</p>
+                        <p className="mt-0.5 text-[10px] text-[#059669]">Continuous trading session</p>
+                      </div>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
+                      <table className="w-full min-w-[640px] text-left">
+                        <thead>
+                          <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
+                            <th className="px-3.5 py-2.5">Order ID</th>
+                            <th className="px-2.5 py-2.5">Side</th>
+                            <th className="px-2.5 py-2.5">Ticker</th>
+                            <th className="px-2.5 py-2.5 text-right">Quantity</th>
+                            <th className="px-2.5 py-2.5 text-right">Price</th>
+                            <th className="px-2.5 py-2.5">Type</th>
+                            <th className="px-2.5 py-2.5">Status</th>
+                            <th className="px-2.5 py-2.5">Timestamp</th>
+                            <th className="px-3.5 py-2.5 text-right">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-[#f2f4f6] text-xs">
+                          {selectedClient.orders.map((o) => (
+                            <tr
+                              key={o.id}
+                              className={`transition ${o.id === selectedOrderId
+                                  ? 'bg-[#eff6ff] ring-1 ring-[#93c5fd]'
+                                  : 'hover:bg-[#f9fafb]'
+                                }`}
+                            >
+                              <td className="px-3.5 py-3 font-mono text-[11px] font-semibold text-[#475467]">{o.id}</td>
+                              <td className="px-2.5 py-3">
+                                <span
+                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${o.side === 'BUY'
+                                      ? 'bg-[#dcfce7] text-[#15803d]'
+                                      : o.side === 'SELL'
+                                        ? 'bg-[#fee2e2] text-[#b91c1c]'
+                                        : 'bg-[#e0e7ff] text-[#4338ca]'
+                                    }`}
+                                >
+                                  {o.side}
+                                </span>
+                              </td>
+                              <td className="px-2.5 py-3 font-bold text-[#1e293b]">{o.ticker}</td>
+                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{o.shares.toLocaleString()}</td>
+                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{o.price.toFixed(2)}</td>
+                              <td className="px-2.5 py-3 text-[#64748b]">{o.type}</td>
+                              <td className="px-2.5 py-3">
+                                <span
+                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${o.status === 'EXECUTED'
+                                      ? 'bg-[#ecfdf5] text-[#059669]'
+                                      : o.status === 'PENDING'
+                                        ? 'bg-[#fef3c7] text-[#92400e]'
+                                        : 'bg-[#f1f5f9] text-[#64748b]'
+                                    }`}
+                                >
+                                  {o.status}
+                                </span>
+                              </td>
+                              <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{o.date}</td>
+                              <td className="px-3.5 py-3 text-right">
+                                {o.status === 'PENDING' ? (
+                                  <div className="flex items-center justify-end gap-1.5">
+                                    <button
+                                      type="button"
+                                      onClick={() => handleExecuteOrder(o)}
+                                      className="rounded-md bg-[#eff6ff] px-2 py-1 text-[11px] font-bold text-[#2563eb] hover:bg-[#dbeafe] transition"
+                                    >
+                                      Fill Order
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleCancelOrder(o.id)}
+                                      className="rounded-md bg-[#fef2f2] px-2 py-1 text-[11px] font-semibold text-[#dc2626] hover:bg-[#fee2e2] transition"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <span className="text-[10px] font-medium text-[#9ca3af]">
+                                    {o.status === 'EXECUTED' ? '✓ Filled' : 'Cancelled'}
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Panel 3: Messaging Panel (Right - Similar size to Panel 1, with Historical & Live tabs) */}
+              <div className="flex flex-col bg-[#fafbfc]">
+                {/* Messaging Panel Header & Tabs */}
+                <div className="border-b border-[#edeef0] bg-white p-3.5 space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MessageCircle size={16} className="text-[#2563eb]" />
+                      <h3 className="text-xs font-bold text-[#1e293b]">Client Messages</h3>
+                    </div>
+                  </div>
+
+                  {/* Search Field */}
+                  <label className="flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-2.5 py-1.5 text-[#9ca3af] focus-within:border-[#2563eb] focus-within:bg-white transition">
+                    <Search size={13} />
+                    <input
+                      value={messageSearch}
+                      onChange={(e) => setMessageSearch(e.target.value)}
+                      placeholder="Search messages..."
+                      className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
+                    />
+                    {messageSearch && (
+                      <button
+                        type="button"
+                        onClick={() => setMessageSearch('')}
+                        className="text-[#9ca3af] hover:text-[#4b5563]"
+                        aria-label="Clear message search"
+                      >
+                        <X size={12} />
+                      </button>
+                    )}
+                  </label>
+
+                  {/* Chat Mode Tabs: Today vs Previous */}
+                  <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
+                    <button
+                      type="button"
+                      onClick={() => setChatMode('live')}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${chatMode === 'live' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                        }`}
+                    >
+                      <MessageCircle size={12} />
+                      <span>Today</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setChatMode('historical')}
+                      className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${chatMode === 'historical' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                        }`}
+                    >
+                      <Clock size={12} />
+                      <span>Previous</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Chat Messages Body */}
+                <div className="scroll-pane flex-1 space-y-3 overflow-y-auto p-3.5">
+                  {(() => {
+                    const activeMessages = chatMode === 'live'
+                      ? (selectedClient.messages || [])
+                      : (selectedClient.previousMessages || [])
+
+                    const displayedMessages = messageSearch.trim()
+                      ? activeMessages.filter(
+                        (msg) =>
+                          msg.text.toLowerCase().includes(messageSearch.toLowerCase()) ||
+                          msg.sender.toLowerCase().includes(messageSearch.toLowerCase())
+                      )
+                      : activeMessages
+
+                    if (displayedMessages.length === 0) {
+                      return (
+                        <div className="p-8 text-center text-xs text-[#9ca3af]">
+                          {messageSearch
+                            ? `No messages match "${messageSearch}"`
+                            : chatMode === 'live'
+                              ? 'No messages today yet.'
+                              : 'No previous conversations recorded.'}
+                        </div>
+                      )
+                    }
+
+                    return displayedMessages.map((msg) => {
+                      const isAgent = !msg.isClient
+                      return (
+                        <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
+                          <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
+                            <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
+                            <span>·</span>
+                            <span>{msg.time}</span>
+                          </div>
+                          <div
+                            className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
+                              }`}
+                          >
+                            <p>{msg.text}</p>
+                          </div>
+                        </div>
+                      )
+                    })
+                  })()}
+                </div>
+
+                {/* Quick Reply Suggestions */}
+                {chatMode === 'live' && (
+                  <div className="border-t border-[#edeef0] bg-white px-3 py-1.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
+                    {[
+                      'Execution confirmed on PSE.',
+                      'Sending dividend forecast.',
+                      'PERA tax deduction applied.',
+                    ].map((chip) => (
+                      <button
+                        key={chip}
+                        type="button"
+                        onClick={() => setReplyText(chip)}
+                        className="shrink-0 rounded-lg border border-[#e0e4ec] bg-[#f8f9fa] px-2 py-0.5 text-[#475467] transition hover:border-[#2563eb] hover:bg-white hover:text-[#2563eb]"
+                      >
+                        {chip}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Chat Input */}
+                <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 border-t border-[#edeef0] bg-white p-2.5">
+                  <input
+                    value={replyText}
+                    onChange={(e) => setReplyText(e.target.value)}
+                    placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Send a message...'}
+                    className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-3 py-2 text-xs text-[#374151] outline-none placeholder:text-[#a0a5ad]"
+                  />
+                  <button
+                    type="submit"
+                    aria-label="Send message"
+                    className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"
+                  >
+                    <Send size={14} />
+                  </button>
+                </form>
+              </div>
+            </Card>
+
+            {/* Place Order Modal */}
+            {orderModalOpen && (
+              <Modal title={`Place Order · ${selectedClient.name}`} onClose={() => setOrderModalOpen(false)}>
+                <form onSubmit={handlePlaceOrder} className="mt-3 space-y-4">
+                  <div className="rounded-xl bg-[#f8f9fb] p-3 border border-[#e5e7eb] flex items-center justify-between text-xs">
+                    <div>
+                      <span className="text-[#8e94a0]">Client Account:</span>{' '}
+                      <span className="font-semibold text-[#1e293b]">{selectedClient.name} ({selectedClient.accountNumber})</span>
+                    </div>
+                    <span className="font-bold text-[#059669]">{formatPeso(selectedClient.cash)} Cash</span>
+                  </div>
+
+                  {/* Side: Buy / Sell */}
+                  <div>
+                    <label className="block text-[11px] font-semibold text-[#475467] mb-1.5">Order Side</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setOrderSide('BUY')}
+                        className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'BUY' ? 'bg-[#15803d] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
+                      >
+                        BUY
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOrderSide('SELL')}
+                        className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'SELL' ? 'bg-[#b91c1c] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
+                      >
+                        SELL
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Ticker & Shares */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">PSE Ticker Symbol</label>
+                      <select
+                        value={orderTicker}
+                        onChange={(e) => {
+                          const sym = e.target.value
+                          setOrderTicker(sym)
+                          if (sym === 'SMPH') setOrderPrice(32.80)
+                          if (sym === 'BDO') setOrderPrice(154.50)
+                          if (sym === 'ALI') setOrderPrice(34.20)
+                          if (sym === 'FMETF') setOrderPrice(108.50)
+                          if (sym === 'AC') setOrderPrice(642.00)
+                          if (sym === 'ICT') setOrderPrice(307.00)
+                          if (sym === 'NVDA') setOrderPrice(560.00)
+                          if (sym === 'BND') setOrderPrice(53.20)
+                        }}
+                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                      >
+                        <option value="SMPH">SMPH · SM Prime Holdings</option>
+                        <option value="BDO">BDO · BDO Unibank</option>
+                        <option value="ALI">ALI · Ayala Land Inc.</option>
+                        <option value="FMETF">FMETF · First Metro ETF</option>
+                        <option value="AC">AC · Ayala Corporation</option>
+                        <option value="ICT">ICT · International Container</option>
+                        <option value="NVDA">NVDA · Nvidia Corp CDR</option>
+                        <option value="BND">BND · Total Bond Fund</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">Quantity (Shares)</label>
+                      <input
+                        type="number"
+                        min="1"
+                        step="1"
+                        value={orderShares}
+                        onChange={(e) => setOrderShares(e.target.value)}
+                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Order Type & Price */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">Order Type</label>
+                      <select
+                        value={orderType}
+                        onChange={(e) => setOrderType(e.target.value)}
+                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                      >
+                        <option value="LIMIT">Limit Order</option>
+                        <option value="MARKET">Market Order</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">Execution Price (₱)</label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.05"
+                        value={orderPrice}
+                        onChange={(e) => setOrderPrice(e.target.value)}
+                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Estimated Total */}
+                  <div className="rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3 flex items-center justify-between">
+                    <span className="text-xs text-[#64748b]">Estimated Order Value</span>
+                    <span className="text-sm font-bold text-[#1e293b]">
+                      {formatPeso(Number(orderShares || 0) * Number(orderPrice || 0))}
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setOrderModalOpen(false)}
+                      className="rounded-xl border border-[#d2d6df] px-4 py-2 text-xs font-semibold text-[#525866] hover:bg-[#f6f7f9]"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="rounded-xl bg-[#2563eb] px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1d4ed8]"
+                    >
+                      Submit Order to PSE
+                    </button>
+                  </div>
+                </form>
+              </Modal>
+            )}
           </div>
-
-          {/* Quick Reply Suggestions */}
-          {chatMode === 'live' && (
-            <div className="border-t border-[#edeef0] bg-white px-3 py-1.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
-              {[
-                'Execution confirmed on PSE.',
-                'Sending dividend forecast.',
-                'PERA tax deduction applied.',
-              ].map((chip) => (
-                <button
-                  key={chip}
-                  type="button"
-                  onClick={() => setReplyText(chip)}
-                  className="shrink-0 rounded-lg border border-[#e0e4ec] bg-[#f8f9fa] px-2 py-0.5 text-[#475467] transition hover:border-[#2563eb] hover:bg-white hover:text-[#2563eb]"
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Chat Input */}
-          <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 border-t border-[#edeef0] bg-white p-2.5">
-            <input
-              value={replyText}
-              onChange={(e) => setReplyText(e.target.value)}
-              placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Send a message...'}
-              className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-3 py-2 text-xs text-[#374151] outline-none placeholder:text-[#a0a5ad]"
-            />
-            <button
-              type="submit"
-              aria-label="Send message"
-              className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"
-            >
-              <Send size={14} />
-            </button>
-          </form>
-        </div>
-      </Card>
-
-      {/* Place Order Modal */}
-      {orderModalOpen && (
-        <Modal title={`Place Order · ${selectedClient.name}`} onClose={() => setOrderModalOpen(false)}>
-          <form onSubmit={handlePlaceOrder} className="mt-3 space-y-4">
-            <div className="rounded-xl bg-[#f8f9fb] p-3 border border-[#e5e7eb] flex items-center justify-between text-xs">
-              <div>
-                <span className="text-[#8e94a0]">Client Account:</span>{' '}
-                <span className="font-semibold text-[#1e293b]">{selectedClient.name} ({selectedClient.accountNumber})</span>
-              </div>
-              <span className="font-bold text-[#059669]">{formatPeso(selectedClient.cash)} Cash</span>
-            </div>
-
-            {/* Side: Buy / Sell */}
-            <div>
-              <label className="block text-[11px] font-semibold text-[#475467] mb-1.5">Order Side</label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setOrderSide('BUY')}
-                  className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'BUY' ? 'bg-[#15803d] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
-                >
-                  BUY
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setOrderSide('SELL')}
-                  className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'SELL' ? 'bg-[#b91c1c] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
-                >
-                  SELL
-                </button>
-              </div>
-            </div>
-
-            {/* Ticker & Shares */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-[#475467] mb-1">PSE Ticker Symbol</label>
-                <select
-                  value={orderTicker}
-                  onChange={(e) => {
-                    const sym = e.target.value
-                    setOrderTicker(sym)
-                    if (sym === 'SMPH') setOrderPrice(32.80)
-                    if (sym === 'BDO') setOrderPrice(154.50)
-                    if (sym === 'ALI') setOrderPrice(34.20)
-                    if (sym === 'FMETF') setOrderPrice(108.50)
-                    if (sym === 'AC') setOrderPrice(642.00)
-                    if (sym === 'ICT') setOrderPrice(307.00)
-                    if (sym === 'NVDA') setOrderPrice(560.00)
-                    if (sym === 'BND') setOrderPrice(53.20)
-                  }}
-                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                >
-                  <option value="SMPH">SMPH · SM Prime Holdings</option>
-                  <option value="BDO">BDO · BDO Unibank</option>
-                  <option value="ALI">ALI · Ayala Land Inc.</option>
-                  <option value="FMETF">FMETF · First Metro ETF</option>
-                  <option value="AC">AC · Ayala Corporation</option>
-                  <option value="ICT">ICT · International Container</option>
-                  <option value="NVDA">NVDA · Nvidia Corp CDR</option>
-                  <option value="BND">BND · Total Bond Fund</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Quantity (Shares)</label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={orderShares}
-                  onChange={(e) => setOrderShares(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                />
-              </div>
-            </div>
-
-            {/* Order Type & Price */}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Order Type</label>
-                <select
-                  value={orderType}
-                  onChange={(e) => setOrderType(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                >
-                  <option value="LIMIT">Limit Order</option>
-                  <option value="MARKET">Market Order</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Execution Price (₱)</label>
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.05"
-                  value={orderPrice}
-                  onChange={(e) => setOrderPrice(e.target.value)}
-                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                />
-              </div>
-            </div>
-
-            {/* Estimated Total */}
-            <div className="rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3 flex items-center justify-between">
-              <span className="text-xs text-[#64748b]">Estimated Order Value</span>
-              <span className="text-sm font-bold text-[#1e293b]">
-                {formatPeso(Number(orderShares || 0) * Number(orderPrice || 0))}
-              </span>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setOrderModalOpen(false)}
-                className="rounded-xl border border-[#d2d6df] px-4 py-2 text-xs font-semibold text-[#525866] hover:bg-[#f6f7f9]"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-xl bg-[#2563eb] px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1d4ed8]"
-              >
-                Submit Order to PSE
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
-    </div>
-  )
+          )
 }
 
-function AnnouncementBanner() {
+          function AnnouncementBanner() {
   const [visible, setVisible] = useState(true)
-  const [showModal, setShowModal] = useState(false)
+          const [showModal, setShowModal] = useState(false)
 
-  if (!visible) return null
+          if (!visible) return null
 
-  return (
-    <>
-      <aside
-        aria-label="Important announcement"
-        className="mb-4 flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#dbe3f0] bg-[#f0f4fc] px-3.5 py-2 text-xs text-[#31394a] shadow-xs sm:mb-5 sm:px-4"
-      >
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-white shadow-2xs">
-            <Sparkles size={13} strokeWidth={2.2} />
-          </span>
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
-            <span className="rounded-md border border-[#d0dcf5] bg-white/80 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e40af]">
-              Announcement
-            </span>
-            <span className="truncate font-semibold text-[#222938]">
-              Updated 2026 PSE continuous trading schedule &amp; PERA contribution guidelines
-            </span>
-            <span className="hidden text-[#657085] xl:inline">
-              — Personal Equity maximum tax-credit limits are now in effect.
-            </span>
-          </div>
-        </div>
+          return (
+          <>
+            <aside
+              aria-label="Important announcement"
+              className="mb-4 flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#dbe3f0] bg-[#f0f4fc] px-3.5 py-2 text-xs text-[#31394a] shadow-xs sm:mb-5 sm:px-4"
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-white shadow-2xs">
+                  <Sparkles size={13} strokeWidth={2.2} />
+                </span>
+                <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+                  <span className="rounded-md border border-[#d0dcf5] bg-white/80 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e40af]">
+                    Announcement
+                  </span>
+                  <span className="truncate font-semibold text-[#222938]">
+                    Updated 2026 PSE continuous trading schedule &amp; PERA contribution guidelines
+                  </span>
+                  <span className="hidden text-[#657085] xl:inline">
+                    — Personal Equity maximum tax-credit limits are now in effect.
+                  </span>
+                </div>
+              </div>
 
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
-          <button
-            type="button"
-            onClick={() => setShowModal(true)}
-            className="rounded-lg px-2 py-1 text-[11px] font-semibold text-[#2563eb] transition hover:bg-[#e2ecfd]"
-          >
-            Details
-          </button>
-          <span className="h-3.5 w-px bg-[#d5deed]" aria-hidden="true" />
-          <button
-            type="button"
-            onClick={() => setVisible(false)}
-            aria-label="Dismiss announcement"
-            className="flex size-6 items-center justify-center rounded-lg text-[#7c8698] transition hover:bg-[#e2ecfd] hover:text-[#202738]"
-          >
-            <X size={14} strokeWidth={2.2} />
-          </button>
-        </div>
-      </aside>
+              <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(true)}
+                  className="rounded-lg px-2 py-1 text-[11px] font-semibold text-[#2563eb] transition hover:bg-[#e2ecfd]"
+                >
+                  Details
+                </button>
+                <span className="h-3.5 w-px bg-[#d5deed]" aria-hidden="true" />
+                <button
+                  type="button"
+                  onClick={() => setVisible(false)}
+                  aria-label="Dismiss announcement"
+                  className="flex size-6 items-center justify-center rounded-lg text-[#7c8698] transition hover:bg-[#e2ecfd] hover:text-[#202738]"
+                >
+                  <X size={14} strokeWidth={2.2} />
+                </button>
+              </div>
+            </aside>
 
-      {showModal && (
-        <Modal title="2026 Market & PERA Contribution Guidelines" onClose={() => setShowModal(false)}>
-          <div className="mt-2 space-y-3.5 text-xs leading-relaxed text-[#525a6b]">
-            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
-              <p className="text-sm font-semibold text-[#1e293b]">Philippine Stock Exchange (PSE) Schedule</p>
-              <p className="mt-1 text-[#64748b]">Continuous trading sessions run Monday to Friday from 9:30 AM to 3:00 PM PHT. Pre-open starts at 9:00 AM.</p>
-            </div>
-            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
-              <p className="text-sm font-semibold text-[#1e293b]">PERA Tax-Exempt Contribution Limits</p>
-              <p className="mt-1 text-[#64748b]">Under Republic Act No. 9505, annual contributions up to ₱200,000 for local residents (₱400,000 for Overseas Filipino Workers) qualify for a 5% income tax credit and tax-free investment earnings upon retirement.</p>
-            </div>
-            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
-              <p className="text-sm font-semibold text-[#1e293b]">Zero Custody Surcharges</p>
-              <p className="mt-1 text-[#64748b]">Caballes-Go Securities charges zero custody maintenance fees for all verified PERA and non-PERA retail portfolios.</p>
-            </div>
-            <div className="flex justify-end pt-2">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
-              >
-                Got it
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-    </>
-  )
+            {showModal && (
+              <Modal title="2026 Market & PERA Contribution Guidelines" onClose={() => setShowModal(false)}>
+                <div className="mt-2 space-y-3.5 text-xs leading-relaxed text-[#525a6b]">
+                  <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+                    <p className="text-sm font-semibold text-[#1e293b]">Philippine Stock Exchange (PSE) Schedule</p>
+                    <p className="mt-1 text-[#64748b]">Continuous trading sessions run Monday to Friday from 9:30 AM to 3:00 PM PHT. Pre-open starts at 9:00 AM.</p>
+                  </div>
+                  <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+                    <p className="text-sm font-semibold text-[#1e293b]">PERA Tax-Exempt Contribution Limits</p>
+                    <p className="mt-1 text-[#64748b]">Under Republic Act No. 9505, annual contributions up to ₱200,000 for local residents (₱400,000 for Overseas Filipino Workers) qualify for a 5% income tax credit and tax-free investment earnings upon retirement.</p>
+                  </div>
+                  <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+                    <p className="text-sm font-semibold text-[#1e293b]">Zero Custody Surcharges</p>
+                    <p className="mt-1 text-[#64748b]">Caballes-Go Securities charges zero custody maintenance fees for all verified PERA and non-PERA retail portfolios.</p>
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowModal(false)}
+                      className="rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+                    >
+                      Got it
+                    </button>
+                  </div>
+                </div>
+              </Modal>
+            )}
+          </>
+          )
 }
 
-function App() {
+          function App() {
   const [darkMode, setDarkMode] = useState(() => window.localStorage.getItem('morrow-theme') === 'night')
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const location = useLocation()
-  const isClientsPage = location.pathname.startsWith('/clients')
+          const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+          const location = useLocation()
+          const isClientsPage = location.pathname.startsWith('/clients')
 
   useEffect(() => {
-    window.localStorage.setItem('morrow-theme', darkMode ? 'night' : 'day')
-  }, [darkMode])
+            window.localStorage.setItem('morrow-theme', darkMode ? 'night' : 'day')
+          }, [darkMode])
 
-  return (
-    <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
-      <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
-        <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} isTraderView={isClientsPage} />
-        <main className="flex min-w-0 flex-1 flex-col bg-[#fbfbfc] xl:h-screen xl:min-h-0 xl:overflow-hidden">
-          <Header darkMode={darkMode} setDarkMode={setDarkMode} isTraderView={isClientsPage} />
-          <MobileNavigation isTraderView={isClientsPage} />
-          <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9 xl:min-h-0 xl:overflow-hidden">
-            <div className={`grid w-full items-start gap-6 xl:h-full xl:min-h-0 ${isClientsPage ? 'grid-cols-1' : 'xl:grid-cols-[minmax(0,1fr)_280px]'} xl:grid-rows-1 xl:items-stretch 2xl:gap-8`}>
-              <div className="min-w-0 scroll-pane xl:min-h-0 xl:overflow-y-auto xl:overscroll-contain xl:pr-2">
-                {!isClientsPage && <AnnouncementBanner />}
-                <Routes>
-                  <Route path="/" element={<Navigate to="/home" replace />} />
-                  <Route path="/home" element={<HomePage />} />
-                  <Route path="/clients" element={<ClientsPage />} />
-                  <Route path="/portfolio" element={<PortfolioPage />} />
-                  <Route path="/products" element={<ProductsPage />} />
-                  <Route path="/funding" element={<FundingPage />} />
-                  <Route path="/learn" element={<LearnPage />} />
-                  <Route path="/messages" element={<MessagesPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
-                  <Route path="/faq" element={<FaqPage />} />
-                  <Route path="/terms-of-service" element={<PolicyPage title="Terms of Service" documentName="Terms of Service" />} />
-                  <Route path="/privacy-policy" element={<PolicyPage title="Privacy Policy" documentName="Privacy Policy" />} />
-                  <Route path="/sign-out" element={<SignOutPage />} />
-                  <Route path="*" element={<Navigate to="/home" replace />} />
-                </Routes>
-              </div>
-              {!isClientsPage && <CommunityRightRail />}
+          return (
+          <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
+            <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
+              <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} isTraderView={isClientsPage} />
+              <main className="flex min-w-0 flex-1 flex-col bg-[#fbfbfc] xl:h-screen xl:min-h-0 xl:overflow-hidden">
+                <Header darkMode={darkMode} setDarkMode={setDarkMode} isTraderView={isClientsPage} />
+                <MobileNavigation isTraderView={isClientsPage} />
+                <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9 xl:min-h-0 xl:overflow-hidden">
+                  <div className={`grid w-full items-start gap-6 xl:h-full xl:min-h-0 ${isClientsPage ? 'grid-cols-1' : 'xl:grid-cols-[minmax(0,1fr)_280px]'} xl:grid-rows-1 xl:items-stretch 2xl:gap-8`}>
+                    <div className="min-w-0 scroll-pane xl:min-h-0 xl:overflow-y-auto xl:overscroll-contain xl:pr-2">
+                      {!isClientsPage && <AnnouncementBanner />}
+                      <Routes>
+                        <Route path="/" element={<Navigate to="/home" replace />} />
+                        <Route path="/home" element={<HomePage />} />
+                        <Route path="/clients" element={<ClientsPage />} />
+                        <Route path="/portfolio" element={<PortfolioPage />} />
+                        <Route path="/products" element={<ProductsPage />} />
+                        <Route path="/funding" element={<FundingPage />} />
+                        <Route path="/learn" element={<LearnPage />} />
+                        <Route path="/messages" element={<MessagesPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
+                        <Route path="/faq" element={<FaqPage />} />
+                        <Route path="/terms-of-service" element={<PolicyPage title="Terms of Service" documentName="Terms of Service" />} />
+                        <Route path="/privacy-policy" element={<PolicyPage title="Privacy Policy" documentName="Privacy Policy" />} />
+                        <Route path="/sign-out" element={<SignOutPage />} />
+                        <Route path="*" element={<Navigate to="/home" replace />} />
+                      </Routes>
+                    </div>
+                    {!isClientsPage && <CommunityRightRail />}
+                  </div>
+                </div>
+              </main>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
-  )
+          )
 }
 
-export default App
+          export default App
