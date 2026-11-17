@@ -40,7 +40,7 @@ export function stepWindowStart(currentStart = 0, delta = 0, totalItems = 0, win
 }
 
 const PROVIDER_LOGOS = {
-  ATRAM: '/logos/atram.svg',
+  ATRAM: '/logos/atram.png',
   BDO: '/logos/bdo.svg',
   BPI: '/logos/bpi.svg',
   EASTWEST: '/logos/eastwest.svg',

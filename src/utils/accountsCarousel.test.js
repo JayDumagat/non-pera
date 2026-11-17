@@ -83,6 +83,6 @@ test('getAccountLogoSrc resolves CGSI logo for equities/others and provider logo
   assert.equal(getAccountLogoSrc({ category: 'others' }), '/cgsi-logo-mark.png')
   assert.equal(getAccountLogoSrc({ category: 'uitfs', provider: 'BDO' }), '/logos/bdo.svg')
   assert.equal(getAccountLogoSrc({ category: 'uitfs', provider: 'BPI' }), '/logos/bpi.svg')
-  assert.equal(getAccountLogoSrc({ category: 'uitfs', provider: 'ATRAM' }), '/logos/atram.svg')
+  assert.equal(getAccountLogoSrc({ category: 'uitfs', provider: 'ATRAM' }), '/logos/atram.png')
   assert.equal(getAccountLogoSrc({ category: 'mutual-fund', provider: 'EASTWEST' }), '/logos/eastwest.svg')
 })

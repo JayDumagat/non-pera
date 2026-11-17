@@ -756,20 +756,20 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
         )}
       </div>
 
-      <Card tone="soft" className="rounded-t-none border-t-0 p-3 sm:p-4">
-        <div className="flex items-start gap-2">
+      <Card tone="soft" className="rounded-t-none border-t-0 px-2 py-3 sm:px-3 sm:py-3.5">
+        <div className="flex items-start gap-1.5 sm:gap-2">
           <button
             type="button"
             aria-label="Previous accounts"
             title="Previous accounts"
             disabled={safePage <= 0}
             onClick={() => setPageIndex(Math.max(0, safePage - 1))}
-            className="mt-5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#555c6a] shadow-2xs transition hover:border-[#b9c3d4] hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-35"
+            className="mt-10 flex size-6 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#555c6a] shadow-2xs transition hover:border-[#b9c3d4] hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-35 sm:size-7"
           >
             <ChevronLeft size={14} />
           </button>
 
-          <div className="grid min-w-0 flex-1 grid-cols-1 gap-2.5 sm:grid-cols-3">
+          <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-2.5">
             {pageItems.map((account) => {
               const isSelected = selectedAccountId === account.id
               const accountCategory = categories.find((item) => item.id === account.category)
@@ -789,23 +789,23 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                         handleToggleAccount(account.id)
                       }
                     }}
-                    className={`relative z-10 w-full cursor-pointer rounded-xl border p-2.5 text-left transition ${
+                    className={`relative z-10 flex h-full w-full cursor-pointer flex-col justify-between rounded-xl border p-2.5 text-left transition sm:p-3 ${
                       isSelected
                         ? 'account-card-selected border-[#d1d5db] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.06)]'
                         : 'border-[#eceff3] bg-white hover:border-[#d5dae2] hover:bg-[#fafbfc]'
                     }`}
                   >
-                    <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-start justify-between gap-1.5">
                       <span className="flex min-w-0 flex-1 items-center gap-2">
-                        <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md border border-[#eceff3] bg-[#f8f9fb] p-0.5">
+                        <span className="flex h-8 min-w-8 max-w-[60px] shrink-0 items-center justify-center overflow-hidden rounded-lg border border-[#eceff3] bg-[#ffffff] px-1 py-1">
                           <img
                             src={logoSrc}
                             alt=""
                             aria-hidden="true"
-                            className="size-full object-contain"
+                            className="h-full w-auto max-w-full object-contain"
                           />
                         </span>
-                        <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#454b58]" title={account.name}>
+                        <span className="line-clamp-2 min-w-0 flex-1 text-[13px] font-semibold leading-snug text-[#343a48] sm:text-sm" title={account.name}>
                           {account.name}
                         </span>
                       </span>
@@ -818,18 +818,18 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                           setEditingAccount(account)
                           setEditingName(account.name)
                         }}
-                        className="flex size-5 shrink-0 items-center justify-center rounded-md text-[#8b919e] transition hover:bg-[#f2f4f7] hover:text-[#2563eb]"
+                        className="mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md text-[#8b919e] transition hover:bg-[#f2f4f7] hover:text-[#2563eb]"
                       >
-                        <Pencil size={11} />
+                        <Pencil size={13} />
                       </button>
                     </div>
 
-                    <div className="mt-1.5 flex items-center justify-between gap-1.5 tracking-tight">
-                      <span className="shrink-0 text-[8px] font-semibold uppercase" style={{ color: categoryColor }}>
+                    <div className="mt-2.5 flex items-center justify-between gap-1">
+                      <span className="shrink-0 text-[10px] font-bold uppercase tracking-tight" style={{ color: categoryColor }}>
                         {accountCategory?.label}
                       </span>
                       <span
-                        className="whitespace-nowrap text-right font-mono text-[7.5px] text-[#8f95a1]"
+                        className="whitespace-nowrap text-right text-[10px] font-medium tracking-tighter tabular-nums text-[#7c8391]"
                         title={`ACCOUNT ID: ${maskedAccountId}`}
                       >
                         ACCOUNT ID: {maskedAccountId}
@@ -837,8 +837,8 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
                     </div>
 
                     <div className="mt-2 flex items-baseline justify-between gap-2">
-                      <span className="text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
-                      <span className="text-[10.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
+                      <span className="text-base font-bold tracking-tight text-[#2d3343]">{formatPeso(account.value)}</span>
+                      <span className="text-[13px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
                     </div>
                   </div>
 
@@ -893,7 +893,7 @@ function CategoryAccountsList({ category, range, selectedAccountId, onSelectAcco
             title="Next accounts"
             disabled={safePage >= totalPages - 1}
             onClick={() => setPageIndex(Math.min(totalPages - 1, safePage + 1))}
-            className="mt-5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#555c6a] shadow-2xs transition hover:border-[#b9c3d4] hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-35"
+            className="mt-9 flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#555c6a] shadow-2xs transition hover:border-[#b9c3d4] hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-35"
           >
             <ChevronRight size={14} />
           </button>
