@@ -22,3 +22,20 @@ export function getAccountQuickActions(account) {
 
   return { primary, fixed }
 }
+
+export function getWalletQuickActions(accountId = null) {
+  const accountSuffix = accountId ? `&account=${encodeURIComponent(accountId)}` : ''
+  return [
+    { id: 'deposit', label: 'Deposit', to: `/funding?mode=deposit${accountSuffix}`, primary: true },
+    { id: 'withdraw', label: 'Withdraw', to: `/funding?mode=withdraw${accountSuffix}`, primary: false },
+    { id: 'transfer', label: 'Transfer', to: `/funding?mode=transfer${accountSuffix}`, primary: false },
+  ]
+}
+
+export function stepCategorySelection(categories, currentId, delta) {
+  if (!Array.isArray(categories) || categories.length === 0) return currentId
+  const currentIndex = categories.findIndex((item) => item.id === currentId)
+  const baseIndex = currentIndex === -1 ? 0 : currentIndex
+  const nextIndex = Math.min(categories.length - 1, Math.max(0, baseIndex + delta))
+  return categories[nextIndex].id
+}

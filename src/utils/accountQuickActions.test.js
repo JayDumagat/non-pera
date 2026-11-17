@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { getAccountQuickActions, isFundCategory } from './accountQuickActions.js'
+import { getAccountQuickActions, getWalletQuickActions, isFundCategory, stepCategorySelection } from './accountQuickActions.js'
 
 test('isFundCategory identifies UITFs and Mutual funds only', () => {
   assert.equal(isFundCategory('uitfs'), true)
@@ -47,4 +47,27 @@ test('getAccountQuickActions returns Subscribe/Redeem plus Deposit/Withdraw/Tran
     mutualFundActions.primary.map((item) => item.label),
     ['Subscribe', 'Redeem'],
   )
+})
+
+test('getWalletQuickActions returns Deposit (primary), Withdraw, and Transfer actions with optional account query', () => {
+  const defaultActions = getWalletQuickActions()
+  assert.deepEqual(defaultActions, [
+    { id: 'deposit', label: 'Deposit', to: '/funding?mode=deposit', primary: true },
+    { id: 'withdraw', label: 'Withdraw', to: '/funding?mode=withdraw', primary: false },
+    { id: 'transfer', label: 'Transfer', to: '/funding?mode=transfer', primary: false },
+  ])
+
+  const scopedActions = getWalletQuickActions('account-2')
+  assert.equal(scopedActions[0].to, '/funding?mode=deposit&account=account-2')
+  assert.equal(scopedActions[1].to, '/funding?mode=withdraw&account=account-2')
+  assert.equal(scopedActions[2].to, '/funding?mode=transfer&account=account-2')
+})
+
+test('stepCategorySelection moves up and down within category bounds', () => {
+  const items = [{ id: 'overall' }, { id: 'equities' }, { id: 'uitfs' }]
+  assert.equal(stepCategorySelection(items, 'overall', -1), 'overall')
+  assert.equal(stepCategorySelection(items, 'overall', 1), 'equities')
+  assert.equal(stepCategorySelection(items, 'equities', 1), 'uitfs')
+  assert.equal(stepCategorySelection(items, 'uitfs', 1), 'uitfs')
+  assert.equal(stepCategorySelection(items, 'uitfs', -1), 'equities')
 })

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Navigate, NavLink as RouterNavLink, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
   ArrowRight,
   ArrowUpDown,
   ArrowUpRight,
+  BarChart3,
   Bell,
   BookOpen,
   BriefcaseBusiness,
@@ -13,12 +14,18 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   CircleHelp,
   Clock,
+  Coins,
+  Download,
   ExternalLink,
+  Eye,
   FileText,
   Filter,
   Home,
+  Landmark,
+  Layers,
   LayoutGrid,
   LockKeyhole,
   LogOut,
@@ -26,6 +33,8 @@ import {
   Menu,
   MessageCircle,
   Moon,
+  Pencil,
+  PieChart,
   Plus,
   Search,
   Settings,
@@ -39,42 +48,38 @@ import {
   WalletCards,
   X,
 } from 'lucide-react'
-import { getAccountQuickActions, isFundCategory } from './utils/accountQuickActions'
+import { getAccountQuickActions, getWalletQuickActions, isFundCategory, stepCategorySelection } from './utils/accountQuickActions'
+import {
+  FUND_PROVIDERS,
+  filterAccountsByProvider,
+  getAccountLogoSrc,
+  getAccountsSectionTitle,
+  maskAccountNumber,
+  paginateItems,
+  stepWindowStart,
+} from './utils/accountsCarousel'
 import { getScopedAccountContent } from './utils/accountContent'
 import { filterProducts } from './utils/productFilters'
+import { filterReports } from './utils/reportFilters'
+import { DEFAULT_INVESTOR_PROFILE, formatInvestorProfileSubtitle } from './utils/investorProfile'
 
 const navigationSections = [
   { label: 'Overview', items: [{ id: 'home', label: 'Home', icon: 'home' }] },
-  {
-    label: 'Invest', items: [
-      { id: 'portfolio', label: 'Portfolio', icon: 'portfolio' },
-      {
-        id: 'products',
-        label: 'Products',
-        icon: 'products',
-        badge: {
-          text: 'New',
-          icon: 'sparkles',
-          title: 'New products available on the Products page',
-        },
+  { label: 'Invest', items: [
+    { id: 'portfolio', label: 'Portfolio', icon: 'portfolio' },
+    {
+      id: 'products',
+      label: 'Products',
+      icon: 'products',
+      badge: {
+        text: 'New',
+        icon: 'sparkles',
+        title: 'New products available on the Products page',
       },
-      { id: 'funding', label: 'Funding', icon: 'funding' },
-    ]
-  },
-  { label: 'Discover', items: [{ id: 'learn', label: 'Learn', icon: 'learn', badge: '2' }] },
-<<<<<<< HEAD
-  {
-    label: 'Account', items: [
-      { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
-      { id: 'profile', label: 'Profile', icon: 'profile' },
-    ]
-  },
-=======
-  { label: 'Account', items: [
-    { id: 'messages', label: 'Messages', icon: 'messages', unread: true },
-    { id: 'notifications', label: 'Notifications', icon: 'bell', badge: '2' },
+    },
+    { id: 'funding', label: 'Funding', icon: 'funding' },
+    { id: 'reports', label: 'Reports', icon: 'reports' },
   ] },
->>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
 ]
 
 const traderNavigationSections = [
@@ -82,14 +87,6 @@ const traderNavigationSections = [
 ]
 
 const navigation = navigationSections.flatMap((section) => section.items)
-
-const sidebarUtilityLinks = [
-  { id: 'settings', label: 'Settings', icon: 'settings' },
-  { id: 'faq', label: 'FAQ', icon: 'faq' },
-  { id: 'terms-of-service', label: 'Terms of Service', icon: 'terms' },
-  { id: 'privacy-policy', label: 'Privacy Policy', icon: 'privacy' },
-  { id: 'sign-out', label: 'Sign Out', icon: 'signout', danger: true },
-]
 
 const pesoFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
@@ -133,10 +130,18 @@ const accountHoldings = [
   { accountId: 'account-2', category: 'equities', ticker: 'VXUS', name: 'International ETF', type: 'Global equities', units: '24.6 shares', value: 2238, change: 2.14, color: '#707c9a' },
   { accountId: 'account-3', category: 'equities', ticker: 'AC', name: 'Ayala Corporation', type: 'PSE equity', units: '1.5 shares', value: 963, change: 7.85, color: '#60a5fa' },
   { accountId: 'account-3', category: 'equities', ticker: 'ALI', name: 'Ayala Land, Inc.', type: 'PSE equity', units: '18.6 shares', value: 636.44, change: 6.12, color: '#3b82f6' },
-  { accountId: 'account-4', category: 'uitfs', ticker: 'BDOEI', name: 'BDO Equity Index UITF', type: 'PSEi tracker', units: '21.4 units', value: 2180.5, change: 3.8, color: '#0d9488' },
-  { accountId: 'account-5', category: 'uitfs', ticker: 'BPIST', name: 'BPI Short Term UITF', type: 'Money market', units: '8.1 units', value: 1300, change: 2.4, color: '#14b8a6' },
-  { accountId: 'account-6', category: 'mutual-fund', ticker: 'ALFMG', name: 'ALFM Growth Mutual Fund', type: 'PH equity fund', units: '6.4 shares', value: 1680, change: 4.1, color: '#d97706' },
-  { accountId: 'account-7', category: 'mutual-fund', ticker: 'PEFI', name: 'Philequity Mutual Fund', type: 'PH growth fund', units: '28.5 shares', value: 1080, change: 5.6, color: '#f59e0b' },
+  { accountId: 'account-4', category: 'uitfs', ticker: 'BDOEI', name: 'BDO Equity Index UITF', type: 'PSEi tracker', units: '10.8 units', value: 1100.5, change: 3.8, color: '#0d9488' },
+  { accountId: 'account-5', category: 'uitfs', ticker: 'BPIST', name: 'BPI Short Term UITF', type: 'Money market', units: '4.9 units', value: 780, change: 2.4, color: '#14b8a6' },
+  { accountId: 'account-10', category: 'uitfs', ticker: 'ATPMM', name: 'ATRAM Peso Money Market UITF', type: 'Money market', units: '5.6 units', value: 650, change: 3.1, color: '#0f766e' },
+  { accountId: 'account-11', category: 'uitfs', ticker: 'EWBND', name: 'EastWest Peso Bond UITF', type: 'Fixed income UITF', units: '4.2 units', value: 450, change: 2.9, color: '#2dd4bf' },
+  { accountId: 'account-12', category: 'uitfs', ticker: 'MBDIV', name: 'Metrobank High Dividend UITF', type: 'PH equity UITF', units: '3.1 units', value: 300, change: 4.2, color: '#0d9488' },
+  { accountId: 'account-13', category: 'uitfs', ticker: 'RCFI', name: 'RCBC Peso Fixed Income UITF', type: 'Fixed income UITF', units: '2.0 units', value: 200, change: 2.5, color: '#14b8a6' },
+  { accountId: 'account-6', category: 'mutual-fund', ticker: 'ALFMG', name: 'ALFM Growth Mutual Fund', type: 'PH equity fund', units: '3.3 shares', value: 860, change: 4.1, color: '#d97706' },
+  { accountId: 'account-7', category: 'mutual-fund', ticker: 'ATPEF', name: 'ATRAM Philippine Equity MF', type: 'PH growth fund', units: '16.4 shares', value: 620, change: 5.6, color: '#f59e0b' },
+  { accountId: 'account-14', category: 'mutual-fund', ticker: 'BDOMF', name: 'BDO Focus Equity MF', type: 'PH equity fund', units: '4.8 shares', value: 480, change: 4.8, color: '#b45309' },
+  { accountId: 'account-15', category: 'mutual-fund', ticker: 'EWGMF', name: 'EastWest Peso Growth MF', type: 'Balanced fund', units: '3.6 shares', value: 360, change: 3.9, color: '#f59e0b' },
+  { accountId: 'account-16', category: 'mutual-fund', ticker: 'MBEMF', name: 'Metrobank Equity Opportunity MF', type: 'PH equity fund', units: '2.6 shares', value: 260, change: 4.4, color: '#d97706' },
+  { accountId: 'account-17', category: 'mutual-fund', ticker: 'RCBMF', name: 'RCBC Balanced Growth MF', type: 'Balanced fund', units: '1.8 shares', value: 180, change: 3.3, color: '#fbbf24' },
   { accountId: 'account-8', category: 'others', ticker: 'RTB30', name: 'Retail Treasury Bond 5Y', type: 'Gov. fixed income', units: '9.0 units', value: 900, change: 1.1, color: '#7c3aed' },
   { accountId: 'account-9', category: 'others', ticker: 'TRUST', name: 'CGSI Balanced Trust', type: 'Trust mandate', units: '3.0 units', value: 300, change: 2.2, color: '#8b5cf6' },
 ]
@@ -155,10 +160,18 @@ const accountActivities = [
   { accountId: 'account-4', category: 'uitfs', title: 'Deposit completed', detail: 'BDO Online · Oct 10, 2026', amount: '+₱500.00', kind: 'deposit' },
   { accountId: 'account-5', category: 'uitfs', title: 'UITF subscription', detail: 'BPI Short Term Fund · Oct 12, 2026', amount: '-₱300.00', kind: 'invest' },
   { accountId: 'account-5', category: 'uitfs', title: 'NavPU gain posted', detail: 'BPI Short Term Fund · Oct 08, 2026', amount: '+₱12.80', kind: 'income' },
+  { accountId: 'account-10', category: 'uitfs', title: 'UITF subscription', detail: 'ATRAM Peso Money Market · Oct 13, 2026', amount: '-₱350.00', kind: 'invest' },
+  { accountId: 'account-11', category: 'uitfs', title: 'UITF subscription', detail: 'EastWest Peso Bond · Oct 11, 2026', amount: '-₱250.00', kind: 'invest' },
+  { accountId: 'account-12', category: 'uitfs', title: 'UITF subscription', detail: 'Metrobank High Dividend · Oct 09, 2026', amount: '-₱150.00', kind: 'invest' },
+  { accountId: 'account-13', category: 'uitfs', title: 'UITF subscription', detail: 'RCBC Fixed Income · Oct 07, 2026', amount: '-₱100.00', kind: 'invest' },
   { accountId: 'account-6', category: 'mutual-fund', title: 'Monthly subscription', detail: 'ALFM Growth Fund · Oct 15, 2026', amount: '-₱400.00', kind: 'invest' },
   { accountId: 'account-6', category: 'mutual-fund', title: 'Deposit completed', detail: 'Auto-debit · Oct 15, 2026', amount: '+₱400.00', kind: 'deposit' },
-  { accountId: 'account-7', category: 'mutual-fund', title: 'Fund subscription', detail: 'Philequity Fund · Oct 11, 2026', amount: '-₱280.00', kind: 'invest' },
-  { accountId: 'account-7', category: 'mutual-fund', title: 'Quarterly gain', detail: 'Philequity Fund · Oct 04, 2026', amount: '+₱31.50', kind: 'income' },
+  { accountId: 'account-7', category: 'mutual-fund', title: 'Fund subscription', detail: 'ATRAM Philippine Equity MF · Oct 11, 2026', amount: '-₱280.00', kind: 'invest' },
+  { accountId: 'account-7', category: 'mutual-fund', title: 'Quarterly gain', detail: 'ATRAM Philippine Equity MF · Oct 04, 2026', amount: '+₱31.50', kind: 'income' },
+  { accountId: 'account-14', category: 'mutual-fund', title: 'Fund subscription', detail: 'BDO Focus Equity MF · Oct 10, 2026', amount: '-₱200.00', kind: 'invest' },
+  { accountId: 'account-15', category: 'mutual-fund', title: 'Fund subscription', detail: 'EastWest Peso Growth MF · Oct 09, 2026', amount: '-₱180.00', kind: 'invest' },
+  { accountId: 'account-16', category: 'mutual-fund', title: 'Fund subscription', detail: 'Metrobank Equity MF · Oct 08, 2026', amount: '-₱140.00', kind: 'invest' },
+  { accountId: 'account-17', category: 'mutual-fund', title: 'Fund subscription', detail: 'RCBC Balanced Growth MF · Oct 06, 2026', amount: '-₱100.00', kind: 'invest' },
   { accountId: 'account-8', category: 'others', title: 'Coupon credited', detail: 'Retail Treasury Bond · Oct 13, 2026', amount: '+₱14.60', kind: 'income' },
   { accountId: 'account-8', category: 'others', title: 'Bond allocation', detail: 'Margin Fixed Income · Oct 02, 2026', amount: '-₱450.00', kind: 'invest' },
   { accountId: 'account-9', category: 'others', title: 'Trust distribution', detail: 'CGSI Balanced Trust · Oct 09, 2026', amount: '+₱8.40', kind: 'income' },
@@ -190,10 +203,18 @@ const investmentAccounts = [
   { id: 'account-1', category: 'equities', name: 'Margin', accountNumber: 'JOHALEM-101-1-01-001', value: 9422.16, monthlyReturn: 5.2, color: '#2563eb' },
   { id: 'account-2', category: 'equities', name: 'Discretionary', accountNumber: 'JOHALEM-102-2-01-002', value: 6218.4, monthlyReturn: 4.4, color: '#3b82f6' },
   { id: 'account-3', category: 'equities', name: 'Broker-Assisted', accountNumber: 'JOHALEM-103-1-02-003', value: 1599.44, monthlyReturn: 7.6, color: '#60a5fa' },
-  { id: 'account-4', category: 'uitfs', name: 'BDO Equity Index Fund', accountNumber: 'JOHALEM-201-1-01-004', value: 2180.5, monthlyReturn: 3.8, color: '#0d9488' },
-  { id: 'account-5', category: 'uitfs', name: 'BPI Short Term Fund', accountNumber: 'JOHALEM-202-2-01-005', value: 1300, monthlyReturn: 2.4, color: '#14b8a6' },
-  { id: 'account-6', category: 'mutual-fund', name: 'ALFM Growth Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 1680, monthlyReturn: 4.1, color: '#d97706' },
-  { id: 'account-7', category: 'mutual-fund', name: 'Philequity Fund', accountNumber: 'JOHALEM-302-2-02-007', value: 1080, monthlyReturn: 5.6, color: '#f59e0b' },
+  { id: 'account-4', category: 'uitfs', provider: 'BDO', name: 'BDO Equity Index Fund', accountNumber: 'JOHALEM-201-1-01-004', value: 1100.5, monthlyReturn: 3.8, color: '#0d9488' },
+  { id: 'account-5', category: 'uitfs', provider: 'BPI', name: 'BPI Short Term Fund', accountNumber: 'JOHALEM-202-2-01-005', value: 780, monthlyReturn: 2.4, color: '#14b8a6' },
+  { id: 'account-10', category: 'uitfs', provider: 'ATRAM', name: 'ATRAM Peso Money Market UITF', accountNumber: 'JOHALEM-203-1-01-010', value: 650, monthlyReturn: 3.1, color: '#0f766e' },
+  { id: 'account-11', category: 'uitfs', provider: 'EASTWEST', name: 'EastWest Peso Bond UITF', accountNumber: 'JOHALEM-204-2-01-011', value: 450, monthlyReturn: 2.9, color: '#2dd4bf' },
+  { id: 'account-12', category: 'uitfs', provider: 'METROBANK', name: 'Metrobank High Dividend UITF', accountNumber: 'JOHALEM-205-1-01-012', value: 300, monthlyReturn: 4.2, color: '#0d9488' },
+  { id: 'account-13', category: 'uitfs', provider: 'RCBC', name: 'RCBC Peso Fixed Income UITF', accountNumber: 'JOHALEM-206-2-01-013', value: 200, monthlyReturn: 2.5, color: '#14b8a6' },
+  { id: 'account-6', category: 'mutual-fund', provider: 'BPI', name: 'ALFM Growth Fund', accountNumber: 'JOHALEM-301-1-01-006', value: 860, monthlyReturn: 4.1, color: '#d97706' },
+  { id: 'account-7', category: 'mutual-fund', provider: 'ATRAM', name: 'ATRAM Philippine Equity MF', accountNumber: 'JOHALEM-302-2-02-007', value: 620, monthlyReturn: 5.6, color: '#f59e0b' },
+  { id: 'account-14', category: 'mutual-fund', provider: 'BDO', name: 'BDO Focus Equity MF', accountNumber: 'JOHALEM-303-1-01-014', value: 480, monthlyReturn: 4.8, color: '#b45309' },
+  { id: 'account-15', category: 'mutual-fund', provider: 'EASTWEST', name: 'EastWest Peso Growth MF', accountNumber: 'JOHALEM-304-2-01-015', value: 360, monthlyReturn: 3.9, color: '#f59e0b' },
+  { id: 'account-16', category: 'mutual-fund', provider: 'METROBANK', name: 'Metrobank Equity Opportunity MF', accountNumber: 'JOHALEM-305-1-01-016', value: 260, monthlyReturn: 4.4, color: '#d97706' },
+  { id: 'account-17', category: 'mutual-fund', provider: 'RCBC', name: 'RCBC Balanced Growth MF', accountNumber: 'JOHALEM-306-2-01-017', value: 180, monthlyReturn: 3.3, color: '#fbbf24' },
   { id: 'account-8', category: 'others', name: 'Margin Fixed Income', accountNumber: 'JOHALEM-401-1-01-008', value: 900, monthlyReturn: 1.1, color: '#7c3aed' },
   { id: 'account-9', category: 'others', name: 'Discretionary Trust', accountNumber: 'JOHALEM-402-2-01-009', value: 300, monthlyReturn: 2.2, color: '#8b5cf6' },
 ]
@@ -296,6 +317,7 @@ const iconComponents = {
   portfolio: BriefcaseBusiness,
   products: LayoutGrid,
   funding: WalletCards,
+  reports: BarChart3,
   learn: BookOpen,
   messages: MessageCircle,
   profile: UserRound,
@@ -435,11 +457,6 @@ function Sidebar({ collapsed, onToggle, isTraderView }) {
             <div className="flex flex-col gap-1">{section.items.map((item) => <SidebarLink key={item.id} item={item} collapsed={collapsed} />)}</div>
           </div>)}
         </nav>
-        <div className="mt-auto pt-6">
-          <nav aria-label="Settings and help" className={`flex flex-col gap-1 border-t border-[#edeef0] pt-3 ${collapsed ? 'items-center' : ''}`}>
-            {sidebarUtilityLinks.map((item) => <SidebarLink key={item.id} item={item} collapsed={collapsed} />)}
-          </nav>
-        </div>
       </div>
     </aside>
   )
@@ -448,8 +465,10 @@ function Sidebar({ collapsed, onToggle, isTraderView }) {
 function Header({ darkMode, setDarkMode, isTraderView }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
-  const [roleMenuOpen, setRoleMenuOpen] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const isLearnActive = location.pathname.startsWith('/learn')
+  const isMessagesActive = location.pathname.startsWith('/messages')
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
@@ -459,87 +478,34 @@ function Header({ darkMode, setDarkMode, isTraderView }) {
         {!isTraderView && (
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-[#333948] sm:text-base">{`${greeting}, Alex`}</p>
-            <p className="hidden text-[10px] text-[#8e94a0] sm:block">Balanced risk profile · Personal Portfolio</p>
+            <p className="hidden text-[10px] text-[#8e94a0] sm:block">
+              {formatInvestorProfileSubtitle(DEFAULT_INVESTOR_PROFILE)}
+            </p>
           </div>
         )}
-
-        {/* View Switcher Dropdown */}
-        <div className="relative">
-          <button
-            type="button"
-            aria-label="Switch between Investor View and Trader/Agent View"
-            aria-expanded={roleMenuOpen}
-            onClick={() => {
-              setRoleMenuOpen(!roleMenuOpen)
-              setNotificationsOpen(false)
-              setUserOpen(false)
-            }}
-            className="flex items-center gap-1.5 rounded-xl border border-[#d2d6df] bg-[#f8f9fa] px-2.5 py-1.5 text-xs font-semibold text-[#343b49] shadow-2xs transition hover:border-[#2563eb] hover:bg-white sm:gap-2 sm:px-3 sm:py-2"
-          >
-            <span className={`size-2 shrink-0 rounded-full ${isTraderView ? 'bg-[#0f9f83]' : 'bg-[#2563eb]'}`} />
-            <span className="truncate max-w-[100px] sm:max-w-none text-[11px] sm:text-xs">
-              {isTraderView ? 'Trader / Agent View' : 'Investor View'}
-            </span>
-            <ChevronDown size={13} className="text-[#848c9b]" />
-          </button>
-
-          {roleMenuOpen && (
-            <div
-              className="absolute left-0 top-full mt-2 w-64 rounded-2xl border border-[#e4e7ed] bg-white p-2 shadow-xl z-50"
-              role="menu"
-              aria-label="Select view mode"
-            >
-              <p className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#9aa0ac]">Switch Portal View</p>
-              <button
-                type="button"
-                onClick={() => {
-                  setRoleMenuOpen(false)
-                  navigate('/home')
-                }}
-                className={`flex w-full items-start gap-3 rounded-xl p-2.5 text-left transition ${!isTraderView ? 'bg-[#eff5ff] text-[#1d4ed8]' : 'text-[#424855] hover:bg-[#f6f7f9]'}`}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#2563eb]/10 text-[#2563eb]">
-                  <UserRound size={16} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold">Investor View</span>
-                    {!isTraderView && <Check size={14} className="text-[#2563eb]" />}
-                  </div>
-                  <span className="mt-0.5 block text-[10px] text-[#868d99]">Personal portfolio, PERA &amp; cash</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setRoleMenuOpen(false)
-                  navigate('/clients')
-                }}
-                className={`mt-1 flex w-full items-start gap-3 rounded-xl p-2.5 text-left transition ${isTraderView ? 'bg-[#ecfdf5] text-[#065f46]' : 'text-[#424855] hover:bg-[#f6f7f9]'}`}
-              >
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#0f9f83]/10 text-[#0f9f83]">
-                  <BriefcaseBusiness size={16} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold">Trader / Agent View</span>
-                    {isTraderView && <Check size={14} className="text-[#059669]" />}
-                  </div>
-                  <span className="mt-0.5 block text-[10px] text-[#868d99]">Clients, advisory chat &amp; orders blotter</span>
-                </div>
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
       <div className="flex shrink-0 items-center gap-1 sm:gap-2">
         <button type="button" aria-label={darkMode ? 'Switch to day mode' : 'Switch to night mode'} aria-pressed={darkMode} onClick={() => setDarkMode(!darkMode)} className="flex size-9 items-center justify-center rounded-xl text-[#717580] transition hover:bg-[#f2f3f5] hover:text-[#2563eb] sm:size-10">
           <Icon name={darkMode ? 'sun' : 'moon'} size={19} />
         </button>
+        <button
+          type="button"
+          aria-label="Messages"
+          title="Messages"
+          aria-current={isMessagesActive ? 'page' : undefined}
+          onClick={() => {
+            setNotificationsOpen(false)
+            setUserOpen(false)
+            navigate('/messages')
+          }}
+          className={`relative flex size-9 items-center justify-center rounded-xl transition sm:size-10 ${isMessagesActive ? 'bg-[#eff6ff] text-[#2563eb]' : 'text-[#717580] hover:bg-[#f2f3f5] hover:text-[#2563eb]'}`}
+        >
+          <Icon name="messages" size={19} />
+          <span className="absolute right-2 top-2 size-2 rounded-full border-2 border-white bg-[#cb8750]" />
+        </button>
         <div className="relative">
-          <button type="button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(!notificationsOpen); setUserOpen(false); setRoleMenuOpen(false) }} className="relative flex size-9 items-center justify-center rounded-xl text-[#717580] transition hover:bg-[#f2f3f5] hover:text-[#2563eb] sm:size-10">
+          <button type="button" aria-label="Notifications" aria-expanded={notificationsOpen} onClick={() => { setNotificationsOpen(!notificationsOpen); setUserOpen(false) }} className="relative flex size-9 items-center justify-center rounded-xl text-[#717580] transition hover:bg-[#f2f3f5] hover:text-[#2563eb] sm:size-10">
             <Icon name="bell" size={19} /><span className="absolute right-2 top-2 size-2 rounded-full border-2 border-white bg-[#cb8750]" />
           </button>
           {notificationsOpen && <div className="absolute right-0 top-full mt-3 w-[290px] overflow-hidden rounded-2xl border border-[#e7e9ec] bg-white shadow-xl sm:w-[330px]" role="menu" aria-label="Notifications">
@@ -548,11 +514,31 @@ function Header({ darkMode, setDarkMode, isTraderView }) {
             <button type="button" onClick={() => { navigate(isTraderView ? '/clients' : '/portfolio'); setNotificationsOpen(false) }} className="flex w-full gap-3 p-4 text-left hover:bg-[#f8f9fa]"><span className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1e9] text-[#aa8354]"><Icon name="portfolio" size={17} /></span><span><span className="block text-xs font-semibold text-[#464c59]">{isTraderView ? 'Desk Execution Complete' : 'Your weekly summary'}</span><span className="mt-1 block text-[10px] leading-4 text-[#92969e]">{isTraderView ? 'BDO order executed for Marcus Tan.' : 'Your portfolio is up 1.2% this week.'}</span><span className="mt-1 block text-[9px] text-[#a1a4aa]">Yesterday</span></span></button>
           </div>}
         </div>
+        <button
+          type="button"
+          aria-label="Learn"
+          title="Learn"
+          aria-current={isLearnActive ? 'page' : undefined}
+          onClick={() => {
+            setNotificationsOpen(false)
+            setUserOpen(false)
+            navigate('/learn')
+          }}
+          className={`relative flex size-9 items-center justify-center rounded-xl transition sm:size-10 ${isLearnActive ? 'bg-[#eff6ff] text-[#2563eb]' : 'text-[#717580] hover:bg-[#f2f3f5] hover:text-[#2563eb]'}`}
+        >
+          <Icon name="learn" size={19} />
+        </button>
         <span aria-hidden="true" className="mx-2 h-7 w-px bg-[#e2e4e8] sm:mx-3" />
         <div className="relative">
-          <button type="button" aria-label="Open user menu" aria-expanded={userOpen} onClick={() => { setUserOpen(!userOpen); setNotificationsOpen(false); setRoleMenuOpen(false) }} className="flex items-center gap-2 rounded-xl p-1 transition hover:bg-[#f5f6f7] sm:gap-3 sm:pr-2">
-            <span className="hidden min-w-0 text-left sm:block"><span className="block max-w-32 truncate text-xs font-semibold text-[#404653]">Alex Johnson</span><span className="mt-1 block text-[10px] text-[#8f939b]">{isTraderView ? 'Broker #CRN-84920' : 'Balanced risk profile'}</span></span>
-            <Avatar className="size-9 sm:size-10" iconSize={19} />
+          <button
+            type="button"
+            aria-label="Open user menu"
+            aria-expanded={userOpen}
+            title="Alex Johnson"
+            onClick={() => { setUserOpen(!userOpen); setNotificationsOpen(false) }}
+            className="flex items-center justify-center rounded-full p-0.5 transition hover:ring-2 hover:ring-[#d5dae2] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563eb]"
+          >
+            <Avatar className="size-9 !rounded-full sm:size-10" iconSize={19} />
           </button>
           {userOpen && <div className="absolute right-0 top-full mt-3 w-[260px] rounded-2xl border border-[#e7e9ec] bg-white p-2 shadow-xl" role="menu" aria-label="User menu">
             <div className="flex items-center justify-between gap-3 border-b border-[#edeef0] px-3 py-3"><span><span className="block text-xs font-semibold text-[#404653]">Alex Johnson</span><span className="mt-1 block text-[10px] text-[#4f596c]">{isTraderView ? 'Licensed Broker · Institutional' : 'Balanced risk profile'}</span><span className="mt-1 block text-[10px] text-[#8f939b]">alex.johnson@example.com</span></span><Avatar className="size-10" /></div>
@@ -674,135 +660,294 @@ function CategoryTrendChart({ range, setRange, category, selectedAccountId, acco
   )
 }
 
-function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount, accounts: allAccounts = investmentAccounts, categories = portfolioCategories }) {
+function CategoryAccountsList({ category, range, selectedAccountId, onSelectAccount, onRenameAccount, accounts: allAccounts = investmentAccounts, categories = portfolioCategories }) {
   const navigate = useNavigate()
-  const categoryData = categories.find((item) => item.id === category) || categories[0]
-  const accounts = getCategoryAccounts(categoryData.id, allAccounts)
-  const multiplier = rangeReturnMultipliers[range]
+  const [pageIndex, setPageIndex] = useState(0)
+  const [selectedProvider, setSelectedProvider] = useState(null)
+  const [providerWindowStart, setProviderWindowStart] = useState(0)
+  const [editingAccount, setEditingAccount] = useState(null)
+  const [editingName, setEditingName] = useState('')
 
-  const handleToggleAccount = (accountId, cardElement = null) => {
+  const categoryData = categories.find((item) => item.id === category) || categories[0]
+  const showFundProviders = isFundCategory(categoryData.id)
+  const categoryAccounts = getCategoryAccounts(categoryData.id, allAccounts)
+  const scopedAccounts = showFundProviders ? filterAccountsByProvider(categoryAccounts, selectedProvider) : categoryAccounts
+  const { pageItems, safePage, totalPages } = paginateItems(scopedAccounts, pageIndex, 3)
+  const multiplier = rangeReturnMultipliers[range]
+  const sectionTitle = getAccountsSectionTitle(categoryData.id)
+  const providerWindowSize = 4
+  const maxProviderStart = Math.max(0, FUND_PROVIDERS.length - providerWindowSize)
+  const visibleProviders = FUND_PROVIDERS.slice(providerWindowStart, providerWindowStart + providerWindowSize)
+
+  const handleToggleAccount = (accountId) => {
     const nextId = selectedAccountId === accountId ? null : accountId
     onSelectAccount(nextId)
-    if (nextId && cardElement) {
-      cardElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' })
+  }
+
+  const handleToggleProvider = (provider) => {
+    const nextProvider = selectedProvider === provider ? null : provider
+    setSelectedProvider(nextProvider)
+    setPageIndex(0)
+    if (nextProvider && selectedAccountId) {
+      const activeAccount = categoryAccounts.find((item) => item.id === selectedAccountId)
+      if (!activeAccount || activeAccount.provider !== nextProvider) {
+        onSelectAccount(null)
+      }
     }
   }
 
   return (
-    <section aria-label={`${categoryData.label} accounts`}>
-      <div className="relative">
-        <div
-          className="visible-x-scrollbar flex w-full items-start snap-x snap-mandatory gap-2.5 overflow-x-scroll scroll-smooth pb-3 pt-0.5"
-          aria-label="Scrollable investment accounts"
-        >
-<<<<<<< HEAD
-          {accounts.map((account) => (
-            <button
-              key={account.id}
-              type="button"
-              aria-pressed={selectedAccountId === account.id}
-              onClick={() => onSelectAccount(selectedAccountId === account.id ? null : account.id)}
-              className={`w-[164px] shrink-0 snap-start rounded-xl border p-2 text-left transition ${selectedAccountId === account.id
-                  ? 'border-[#7aa8ff] bg-[#f2f7ff] shadow-[0_0_0_1px_rgba(59,130,246,0.12)]'
-                  : 'border-[#e9ebef] bg-white hover:border-[#c8d9f7] hover:bg-[#fbfdff]'
-                }`}
-            >
-              <span className="flex items-center gap-1.5">
-                <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: account.color }} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[11px] font-semibold text-[#454b58]">{account.name}</span>
-                  <span className="mt-0.5 block truncate text-[8.5px] font-mono tracking-tight text-[#989da7]">{account.accountNumber}</span>
-                </span>
-              </span>
-              <span className="mt-1.5 block text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
-              <span className="mt-1 flex items-center justify-between gap-1.5">
-                <span className="text-[9px] text-[#9399a5]">{range} return</span>
-                <span className="text-[9.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
-              </span>
-            </button>
-          ))}
+    <section aria-label={`${sectionTitle} container`}>
+      <div className="flex min-h-[38px] flex-wrap items-center justify-between gap-2 rounded-t-2xl border border-b-0 border-blue-600 bg-blue-600 px-3.5 py-1.5 shadow-xs">
+        <div className="flex items-center gap-2">
+          <h3 className="text-[11px] font-semibold uppercase tracking-wide text-white">{sectionTitle}</h3>
+          {totalPages > 1 && (
+            <span className="text-[10px] font-semibold text-blue-100">
+              {safePage + 1}/{totalPages}
+            </span>
+          )}
         </div>
-=======
-          {accounts.map((account) => {
-            const isSelected = selectedAccountId === account.id
-            const accountCategory = categories.find((item) => item.id === account.category)
-            const categoryColor = accountCategory?.color || account.color
-            return (
-              <div key={account.id} className="flex w-[calc((100%-10px)/2)] shrink-0 snap-start flex-col sm:w-[calc((100%-20px)/3)]">
-                <button
-                  type="button"
-                  aria-pressed={isSelected}
-                  onClick={(event) => handleToggleAccount(account.id, event.currentTarget.parentElement)}
-                  className={`relative z-10 w-full rounded-xl border p-2.5 text-left transition ${
-                    isSelected
-                      ? 'account-card-selected border-[#d1d5db] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.06)]'
-                      : 'border-[#eceff3] bg-white hover:border-[#d5dae2] hover:bg-[#fafbfc]'
-                  }`}
-                >
-                  <span className="flex items-center gap-1.5">
-                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: categoryColor }} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-[11px] font-semibold text-[#454b58]" title={account.name}>{account.name}</span>
-                      <span className="mt-0.5 flex items-center gap-1 text-[8.5px] tracking-tight">
-                        <span className="font-semibold" style={{ color: categoryColor }}>{accountCategory?.label}</span>
-                        <span className="text-[#c1c6d0]">·</span>
-                        <span className="truncate font-mono text-[#989da7]">{account.accountNumber}</span>
-                      </span>
-                    </span>
-                  </span>
-                  <span className="mt-1.5 block text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
-                  <span className="mt-1 flex items-center justify-between gap-1.5">
-                    <span className="text-[9px] text-[#9399a5]">{range} return</span>
-                    <span className="text-[9.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
-                  </span>
-                </button>
->>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
 
-                {isSelected && (() => {
-                  const quickActions = getAccountQuickActions(account)
-                  return (
-                    <div
-                      role="region"
-                      aria-label={`Quick actions for ${account.name}`}
-                      className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#e0e3e9] bg-white px-2 pb-2 pt-4 shadow-xs"
-                    >
-                      <div className="grid grid-cols-2 gap-1.5">
-                        {quickActions.primary.map((action) => (
-                          <button
-                            key={action.id}
-                            type="button"
-                            onClick={() => navigate(action.to)}
-                            className={
-                              action.primary
-                                ? 'inline-flex items-center justify-center gap-1 rounded-lg bg-[#2563eb] px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]'
-                                : 'inline-flex items-center justify-center gap-1 rounded-lg border border-[#dce1ea] bg-white px-2 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#f8f9fb]'
-                            }
-                          >
-                            {action.primary ? <Plus size={12} /> : <ArrowUpRight size={12} />}
-                            <span>{action.label}</span>
-                          </button>
-                        ))}
-                      </div>
-                      <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-[#eef0f4] pt-1.5">
-                        {quickActions.fixed.map((action) => (
-                          <button
-                            key={action.id}
-                            type="button"
-                            onClick={() => navigate(action.to)}
-                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-[#e5e8ef] bg-[#f7f8fb] px-1 py-1.5 text-[9.5px] font-semibold text-[#475063] transition hover:border-[#c9d2e3] hover:bg-[#eff3fa] hover:text-[#2563eb] sm:text-[10px]"
-                          >
-                            {action.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )
-                })()}
-              </div>
-            )
-          })}
-        </div>
+        {showFundProviders && (
+          <div className="flex items-center gap-1" role="group" aria-label="Fund provider selector">
+            <button
+              type="button"
+              aria-label="Previous fund providers"
+              title="Previous fund providers"
+              disabled={providerWindowStart <= 0}
+              onClick={() => setProviderWindowStart((prev) => stepWindowStart(prev, -1, FUND_PROVIDERS.length, providerWindowSize))}
+              className="flex size-6 shrink-0 items-center justify-center rounded-md border border-blue-400/60 bg-blue-700/60 text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronLeft size={12} />
+            </button>
+
+            <div className="flex items-center gap-1">
+              {visibleProviders.map((provider) => {
+                const isActive = selectedProvider === provider
+                return (
+                  <button
+                    key={provider}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => handleToggleProvider(provider)}
+                    className={`rounded-md border px-2 py-0.5 text-[10px] font-semibold tracking-wide transition ${
+                      isActive
+                        ? 'border-blue-50 bg-blue-50 text-blue-700 shadow-xs'
+                        : 'border-blue-400/60 bg-blue-700/50 text-white hover:bg-blue-500'
+                    }`}
+                  >
+                    {provider}
+                  </button>
+                )
+              })}
+            </div>
+
+            <button
+              type="button"
+              aria-label="Next fund providers"
+              title="Next fund providers"
+              disabled={providerWindowStart >= maxProviderStart}
+              onClick={() => setProviderWindowStart((prev) => stepWindowStart(prev, 1, FUND_PROVIDERS.length, providerWindowSize))}
+              className="flex size-6 shrink-0 items-center justify-center rounded-md border border-blue-400/60 bg-blue-700/60 text-white transition hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <ChevronRight size={12} />
+            </button>
+          </div>
+        )}
       </div>
+
+      <Card tone="soft" className="rounded-t-none border-t-0 p-3 sm:p-4">
+        <div className="flex items-start gap-2">
+          <button
+            type="button"
+            aria-label="Previous accounts"
+            title="Previous accounts"
+            disabled={safePage <= 0}
+            onClick={() => setPageIndex(Math.max(0, safePage - 1))}
+            className="mt-5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#555c6a] shadow-2xs transition hover:border-[#b9c3d4] hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            <ChevronLeft size={14} />
+          </button>
+
+          <div className="grid min-w-0 flex-1 grid-cols-1 gap-2.5 sm:grid-cols-3">
+            {pageItems.map((account) => {
+              const isSelected = selectedAccountId === account.id
+              const accountCategory = categories.find((item) => item.id === account.category)
+              const categoryColor = accountCategory?.color || account.color
+              const logoSrc = getAccountLogoSrc(account)
+              const maskedAccountId = maskAccountNumber(account.accountNumber)
+              return (
+                <div key={account.id} className="flex min-w-0 flex-col">
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isSelected}
+                    onClick={() => handleToggleAccount(account.id)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        handleToggleAccount(account.id)
+                      }
+                    }}
+                    className={`relative z-10 w-full cursor-pointer rounded-xl border p-2.5 text-left transition ${
+                      isSelected
+                        ? 'account-card-selected border-[#d1d5db] bg-white shadow-[0_3px_10px_rgba(35,45,65,0.06)]'
+                        : 'border-[#eceff3] bg-white hover:border-[#d5dae2] hover:bg-[#fafbfc]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="flex min-w-0 flex-1 items-center gap-2">
+                        <span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-md border border-[#eceff3] bg-[#f8f9fb] p-0.5">
+                          <img
+                            src={logoSrc}
+                            alt=""
+                            aria-hidden="true"
+                            className="size-full object-contain"
+                          />
+                        </span>
+                        <span className="min-w-0 flex-1 truncate text-[11px] font-semibold text-[#454b58]" title={account.name}>
+                          {account.name}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        aria-label={`Edit ${account.name}`}
+                        title={`Edit ${account.name}`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setEditingAccount(account)
+                          setEditingName(account.name)
+                        }}
+                        className="flex size-5 shrink-0 items-center justify-center rounded-md text-[#8b919e] transition hover:bg-[#f2f4f7] hover:text-[#2563eb]"
+                      >
+                        <Pencil size={11} />
+                      </button>
+                    </div>
+
+                    <div className="mt-1.5 flex items-center justify-between gap-1.5 tracking-tight">
+                      <span className="shrink-0 text-[8px] font-semibold uppercase" style={{ color: categoryColor }}>
+                        {accountCategory?.label}
+                      </span>
+                      <span
+                        className="whitespace-nowrap text-right font-mono text-[7.5px] text-[#8f95a1]"
+                        title={`ACCOUNT ID: ${maskedAccountId}`}
+                      >
+                        ACCOUNT ID: {maskedAccountId}
+                      </span>
+                    </div>
+
+                    <div className="mt-2 flex items-baseline justify-between gap-2">
+                      <span className="text-xs font-semibold tracking-tight text-[#343a48]">{formatPeso(account.value)}</span>
+                      <span className="text-[10.5px] font-semibold text-[#2563eb]">{formatReturn(account.monthlyReturn * multiplier)}</span>
+                    </div>
+                  </div>
+
+                  {isSelected && (() => {
+                    const quickActions = getAccountQuickActions(account)
+                    return (
+                      <div
+                        role="region"
+                        aria-label={`Quick actions for ${account.name}`}
+                        className="account-attached-drawer relative z-0 -mt-2.5 rounded-b-xl border border-t-0 border-[#e0e3e9] bg-white px-2 pb-2 pt-4 shadow-xs"
+                      >
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {quickActions.primary.map((action) => (
+                            <button
+                              key={action.id}
+                              type="button"
+                              onClick={() => navigate(action.to)}
+                              className={
+                                action.primary
+                                  ? 'inline-flex items-center justify-center gap-1 rounded-lg bg-[#2563eb] px-2 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]'
+                                  : 'inline-flex items-center justify-center gap-1 rounded-lg border border-[#dce1ea] bg-white px-2 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#f8f9fb]'
+                              }
+                            >
+                              {action.primary ? <Plus size={12} /> : <ArrowUpRight size={12} />}
+                              <span>{action.label}</span>
+                            </button>
+                          ))}
+                        </div>
+                        <div className="mt-1.5 grid grid-cols-3 gap-1 border-t border-[#eef0f4] pt-1.5">
+                          {quickActions.fixed.map((action) => (
+                            <button
+                              key={action.id}
+                              type="button"
+                              onClick={() => navigate(action.to)}
+                              className="inline-flex items-center justify-center whitespace-nowrap rounded-md border border-[#e5e8ef] bg-[#f7f8fb] px-1 py-1.5 text-[9.5px] font-semibold text-[#475063] transition hover:border-[#c9d2e3] hover:bg-[#eff3fa] hover:text-[#2563eb] sm:text-[10px]"
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+              )
+            })}
+          </div>
+
+          <button
+            type="button"
+            aria-label="Next accounts"
+            title="Next accounts"
+            disabled={safePage >= totalPages - 1}
+            onClick={() => setPageIndex(Math.min(totalPages - 1, safePage + 1))}
+            className="mt-5 flex size-7 shrink-0 items-center justify-center rounded-lg border border-[#dce1ea] bg-white text-[#555c6a] shadow-2xs transition hover:border-[#b9c3d4] hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            <ChevronRight size={14} />
+          </button>
+        </div>
+      </Card>
+
+      {editingAccount && (
+        <Modal title="Edit Account Name" onClose={() => setEditingAccount(null)}>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault()
+              const trimmed = editingName.trim()
+              if (trimmed && onRenameAccount) {
+                onRenameAccount(editingAccount.id, trimmed)
+              }
+              setEditingAccount(null)
+            }}
+            className="mt-3 space-y-3"
+          >
+            <div>
+              <p className="text-[11px] text-[#7c8290]">
+                ACCOUNT ID: <span className="font-mono">{maskAccountNumber(editingAccount.accountNumber)}</span>
+              </p>
+              <label className="mt-3 block text-xs font-medium text-[#525866]">
+                Account nickname
+                <input
+                  type="text"
+                  value={editingName}
+                  onChange={(event) => setEditingName(event.target.value)}
+                  placeholder="Enter account name"
+                  autoFocus
+                  className="mt-1.5 w-full rounded-xl border border-[#d6dce6] bg-white px-3 py-2 text-xs text-[#343a48] outline-none transition focus:border-[#2563eb]"
+                />
+              </label>
+            </div>
+            <div className="flex items-center justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setEditingAccount(null)}
+                className="rounded-xl border border-[#dce1ea] bg-white px-3.5 py-2 text-xs font-semibold text-[#434a58] transition hover:bg-[#f8f9fb]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={!editingName.trim()}
+                className="rounded-xl bg-[#2563eb] px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-[#1d4ed8] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Save name
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
     </section>
   )
 }
@@ -848,9 +993,11 @@ function ActivityList({ limit, items = activities }) {
 }
 
 function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCategory, selectedAccountId, setSelectedAccountId, accounts = investmentAccounts, categories = portfolioCategories }) {
+  const navigate = useNavigate()
   const selectedData = categories.find((item) => item.id === selectedCategory) || categories[0]
   const selectedPera = categoryPeraBalances[selectedCategory] || categoryPeraBalances.overall
   const selectedCash = categoryCashBalances[selectedCategory] || categoryCashBalances.overall
+  const walletQuickActions = getWalletQuickActions(selectedAccountId)
   const [balanceView, setBalanceView] = useState(() => {
     try {
       return window.localStorage.getItem('morrow-balance-view') || 'assets'
@@ -884,117 +1031,62 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
     }
   }, [showChart])
 
+  const [showPeraModal, setShowPeraModal] = useState(false)
+  const [accountAliases, setAccountAliases] = useState({})
+  const resolvedAccounts = useMemo(
+    () => accounts.map((acc) => (accountAliases[acc.id] ? { ...acc, name: accountAliases[acc.id] } : acc)),
+    [accounts, accountAliases],
+  )
+  const accountListRef = useRef(null)
+  const activeCategoryIndex = Math.max(0, categories.findIndex((item) => item.id === selectedCategory))
+
+  const handleStepAccount = (delta) => {
+    const nextId = stepCategorySelection(categories, selectedCategory, delta)
+    if (nextId === selectedCategory) return
+    setSelectedCategory(nextId)
+    setSelectedAccountId(null)
+    const targetButton = accountListRef.current?.querySelector(`[data-account-tab-id="${nextId}"]`)
+    targetButton?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }
+
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_220px] md:items-start">
-        <div className="min-w-0 space-y-4">
-<<<<<<< HEAD
-          <Card className="min-w-0 p-5 sm:p-6">
-            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <button
-                  type="button"
-                  aria-expanded={showChart}
-                  aria-label="Toggle to view chart"
-                  title="Toggle to view chart"
-                  onClick={() => setShowChart(!showChart)}
-                  className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${showChart
-                      ? 'text-[#2563eb] dark:text-[#60a5fa]'
-                      : 'text-[#555c6b] dark:text-[#9da3b1]'
-                    }`}
-                >
-                  <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
-                  <span>Toggle to view chart</span>
-                  <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
-                </button>
-              </div>
+      <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_224px] md:items-stretch">
+        <div className="min-w-0">
+          <div className="grid w-full grid-cols-2 items-end gap-0" role="tablist" aria-label="Balance view toggle">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={balanceView === 'assets'}
+              onClick={() => setBalanceView('assets')}
+              className={`relative flex items-center justify-center whitespace-nowrap rounded-tl-2xl border border-[#e9eaed] border-b-[#eceef2] px-3.5 py-2.5 text-xs font-semibold tracking-wide transition sm:px-4 ${
+                balanceView === 'assets'
+                  ? 'attached-tab-active z-10 bg-white text-[#2563eb]'
+                  : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
+              }`}
+            >
+              CASH + INVESTMENTS
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={balanceView === 'cash'}
+              onClick={() => setBalanceView('cash')}
+              className={`relative flex items-center justify-center whitespace-nowrap rounded-tr-2xl border-t border-r border-b border-[#e9eaed] border-b-[#eceef2] px-3.5 py-2.5 text-xs font-semibold tracking-wide transition sm:px-4 ${
+                balanceView === 'cash'
+                  ? 'attached-tab-active z-10 bg-white text-[#2563eb]'
+                  : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
+              }`}
+            >
+              AVAILABLE CASH
+            </button>
+          </div>
 
-              <div className="flex items-center rounded-xl bg-[#f2f4f7] p-1" role="tablist" aria-label="Balance view toggle">
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={balanceView === 'assets'}
-                  onClick={() => setBalanceView('assets')}
-                  className={`flex flex-col items-center justify-center rounded-lg px-3 py-1 text-center text-xs font-semibold leading-tight transition ${balanceView === 'assets'
-                      ? 'bg-white text-[#2563eb] shadow-sm'
-                      : 'text-[#7e8490] hover:text-[#343a48]'
-                    }`}
-                >
-                  <span>Total Assets</span>
-                  <span className={`text-[10px] font-normal ${balanceView === 'assets' ? 'text-[#2563eb]' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
-                </button>
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={balanceView === 'cash'}
-                  onClick={() => setBalanceView('cash')}
-                  className={`flex h-full items-center justify-center rounded-lg px-3 py-1.5 text-xs font-semibold transition ${balanceView === 'cash'
-                      ? 'bg-white text-[#2563eb] shadow-sm'
-                      : 'text-[#7e8490] hover:text-[#343a48]'
-                    }`}
-                >
-                  Available Cash
-                </button>
-              </div>
-=======
-          <div>
-            <div className="grid w-full grid-cols-2 items-end gap-0" role="tablist" aria-label="Balance view toggle">
-              <button
-                type="button"
-                role="tab"
-                aria-selected={balanceView === 'assets'}
-                onClick={() => setBalanceView('assets')}
-                className={`relative flex items-center justify-center gap-1.5 whitespace-nowrap rounded-tl-2xl border-l border-t border-r border-[#e9eaed] px-3.5 py-2.5 text-xs font-semibold transition sm:px-4 ${
-                  balanceView === 'assets'
-                    ? 'attached-tab-active z-10 -mb-px bg-white pb-[11px] text-[#2563eb]'
-                    : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
-                }`}
-              >
-                <span>Total Assets</span>
-                <span className={`hidden text-[10px] font-normal sm:inline ${balanceView === 'assets' ? 'text-[#2563eb]/85' : 'text-[#8b919d]'}`}>(Cash + Investments)</span>
-              </button>
-              <button
-                type="button"
-                role="tab"
-                aria-selected={balanceView === 'cash'}
-                onClick={() => setBalanceView('cash')}
-                className={`relative flex items-center justify-center whitespace-nowrap rounded-tr-2xl border-t border-r border-[#e9eaed] px-3.5 py-2.5 text-xs font-semibold transition sm:px-4 ${
-                  balanceView === 'cash'
-                    ? 'attached-tab-active z-10 -mb-px bg-white pb-[11px] text-[#2563eb]'
-                    : 'attached-tab-inactive bg-[#f2f4f7] text-[#7e8490] hover:bg-[#eaedf2] hover:text-[#343a48]'
-                }`}
-              >
-                Available Cash
-              </button>
->>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
-            </div>
-
-            <Card className="min-w-0 rounded-t-none p-5 sm:p-6">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <button
-                    type="button"
-                    aria-expanded={showChart}
-                    aria-label="Toggle to view chart"
-                    title="Toggle to view chart"
-                    onClick={() => setShowChart(!showChart)}
-                    className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
-                      showChart
-                        ? 'text-[#2563eb] dark:text-[#60a5fa]'
-                        : 'text-[#555c6b] dark:text-[#9da3b1]'
-                    }`}
-                  >
-                    <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
-                    <span>Toggle to view chart</span>
-                    <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
-                  </button>
-                </div>
-              </div>
-
+          <Card className="min-w-0 rounded-t-none border-t-0 p-5 sm:p-6">
             {balanceView === 'assets' ? (
-              <div className="grid grid-cols-2 items-start gap-3 sm:gap-6">
-                <div className="border-y border-transparent py-3.5 sm:py-5">
-                  <p className="text-xs font-medium text-[#969aa1]">
+              <div className="grid grid-cols-2 items-start justify-between gap-3 sm:gap-6">
+                <div className="border-y border-transparent py-3 text-left sm:py-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#969aa1]">
                     {selectedCategory === 'overall' ? 'Total portfolio value' : `Total ${selectedData.label} value`}
                   </p>
                   <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
@@ -1008,8 +1100,8 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-[#e5e7eb] bg-[#f4f6f8] p-3.5 text-right shadow-xs sm:p-5">
-                  <p className="text-xs font-medium text-[#969aa1]">
+                <div className="rounded-2xl border border-[#e5e7eb] bg-[#f4f6f8] p-3 text-right shadow-xs sm:p-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#969aa1]">
                     {selectedCategory === 'overall' ? 'Total PERA asset' : `Total PERA asset (${selectedData.label})`}
                   </p>
                   <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
@@ -1021,21 +1113,47 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
                       +{formatPeso(selectedPera.changeAmount)} this month
                     </span>
                   </div>
+                  <div className="mt-3 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setShowPeraModal(true)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-[#d6dce6] bg-white px-2.5 py-1.5 text-[10.5px] font-semibold tracking-wide text-blue-600 shadow-xs transition hover:border-blue-600 hover:bg-[#eff4ff]"
+                    >
+                      <span>VIEW PERA ACCOUNTS</span>
+                      <ArrowUpRight size={12} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-2 items-start gap-3 sm:gap-6">
-                <div className="border-y border-transparent py-3.5 sm:py-5">
-                  <p className="text-xs font-medium text-[#969aa1]">
-                    {selectedCategory === 'overall' ? 'Total available cash' : `Available cash (${selectedData.label})`}
+              <div className="grid grid-cols-2 items-start justify-between gap-3 sm:gap-6">
+                <div className="border-y border-transparent py-3 text-left sm:py-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#969aa1]">
+                    {selectedCategory === 'overall' ? 'ACCOUNT WALLET' : `ACCOUNT WALLET (${selectedData.label.toUpperCase()})`}
                   </p>
                   <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
                     {formatPeso(selectedCash.nonPera)}
                   </p>
+                  <div className="mt-3.5 flex flex-wrap items-center gap-1.5" role="group" aria-label="Account wallet actions">
+                    {walletQuickActions.map((action) => (
+                      <button
+                        key={action.id}
+                        type="button"
+                        onClick={() => navigate(action.to)}
+                        className={
+                          action.primary
+                            ? 'inline-flex items-center justify-center whitespace-nowrap rounded-lg bg-[#2563eb] px-2.5 py-1.5 text-[11px] font-semibold text-white shadow-xs transition hover:bg-[#1d4ed8]'
+                            : 'inline-flex items-center justify-center whitespace-nowrap rounded-lg border border-[#dce1ea] bg-[#f8f9fb] px-2.5 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#eff3fa] hover:text-[#2563eb]'
+                        }
+                      >
+                        {action.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="rounded-2xl border border-[#e5e7eb] bg-[#f4f6f8] p-3.5 text-right shadow-xs sm:p-5">
-                  <p className="text-xs font-medium text-[#969aa1]">
-                    {selectedCategory === 'overall' ? 'Total available cash (PERA)' : `Available cash (${selectedData.label} · PERA)`}
+                <div className="rounded-2xl border border-[#e5e7eb] bg-[#f4f6f8] p-3 text-right shadow-xs sm:p-4">
+                  <p className="text-xs font-medium uppercase tracking-wide text-[#969aa1]">
+                    {selectedCategory === 'overall' ? 'PERA WALLET' : `PERA WALLET (${selectedData.label.toUpperCase()})`}
                   </p>
                   <p className="mt-2 text-xl font-semibold leading-tight tracking-tight text-[#343a48] sm:text-[28px] lg:text-[32px]">
                     {formatPeso(selectedCash.pera)}
@@ -1044,41 +1162,104 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
               </div>
             )}
 
-            {showChart && (
-              <div className="mt-4 min-w-0 border-t border-[#edeef0] pt-4">
-                <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} accounts={accounts} categories={categories} />
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <button
+                  type="button"
+                  aria-expanded={showChart}
+                  aria-label="Toggle to view chart"
+                  title="Toggle to view chart"
+                  onClick={() => setShowChart(!showChart)}
+                  className={`inline-flex items-center gap-2 rounded-full border border-[#c2c7d0] bg-transparent px-3.5 py-1.5 text-xs font-medium transition hover:border-[#989fae] hover:text-[#2563eb] dark:border-[#4b5262] dark:hover:border-[#636c80] dark:hover:text-[#60a5fa] ${
+                    showChart
+                      ? 'text-[#2563eb] dark:text-[#60a5fa]'
+                      : 'text-[#555c6b] dark:text-[#9da3b1]'
+                  }`}
+                >
+                  <TrendingUp size={14} className={showChart ? 'text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'} />
+                  <span>Toggle to view chart</span>
+                  <ChevronDown size={14} className={`transition-transform duration-200 ${showChart ? 'rotate-180 text-[#2563eb] dark:text-[#60a5fa]' : 'text-[#8b919e]'}`} />
+                </button>
               </div>
-            )}
-            </Card>
-          </div>
-
-          <CategoryAccountsList category={selectedCategory} range={range} selectedAccountId={selectedAccountId} onSelectAccount={setSelectedAccountId} accounts={accounts} categories={categories} />
+            </div>
+          </Card>
         </div>
 
-        <Card className="flex flex-col p-4 sm:p-5">
-          <h3 className="mb-3 text-xs font-semibold text-[#555c6a]">Categories</h3>
-          <div role="tablist" aria-label="Portfolio categories" className="space-y-1.5">
+        <Card className="flex flex-col p-4 sm:p-5 md:h-0 md:min-h-full">
+          <div className="mb-3 flex shrink-0 items-center justify-between gap-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-[#555c6a]">ACCOUNTS</h3>
+            <div className="flex items-center gap-1" role="group" aria-label="Accounts up and down navigation">
+              <button
+                type="button"
+                aria-label="Previous account"
+                title="Previous account"
+                disabled={activeCategoryIndex <= 0}
+                onClick={() => handleStepAccount(-1)}
+                className="flex size-6 items-center justify-center rounded-md border border-[#e3e6ec] bg-[#f8f9fb] text-[#555c6a] transition hover:border-[#c2c9d6] hover:bg-white hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronUp size={13} />
+              </button>
+              <button
+                type="button"
+                aria-label="Next account"
+                title="Next account"
+                disabled={activeCategoryIndex >= categories.length - 1}
+                onClick={() => handleStepAccount(1)}
+                className="flex size-6 items-center justify-center rounded-md border border-[#e3e6ec] bg-[#f8f9fb] text-[#555c6a] transition hover:border-[#c2c9d6] hover:bg-white hover:text-[#2563eb] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                <ChevronDown size={13} />
+              </button>
+            </div>
+          </div>
+          <div ref={accountListRef} role="tablist" aria-label="Portfolio accounts" className="scroll-pane flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto">
             {categories.map((category) => {
               const isCategorySelected = selectedCategory === category.id
+              const AccountIcon = category.id === 'overall'
+                ? PieChart
+                : category.id === 'uitfs'
+                  ? Landmark
+                  : category.id === 'mutual-fund'
+                    ? Coins
+                    : Layers
               return (
                 <button
                   key={category.id}
+                  data-account-tab-id={category.id}
                   type="button"
                   role="tab"
                   aria-selected={isCategorySelected}
                   onClick={() => { setSelectedCategory(category.id); setSelectedAccountId(null) }}
                   style={isCategorySelected ? { backgroundColor: `${category.color}14`, borderColor: `${category.color}40` } : undefined}
-                  className={`flex w-full items-center justify-between gap-2 rounded-lg border border-transparent px-3 py-2.5 text-left transition ${
+                  className={`flex w-full shrink-0 items-center justify-between gap-2 rounded-lg border border-transparent px-3 py-2.5 text-left transition ${
                     isCategorySelected
                       ? ''
                       : 'text-[#777f8d] hover:bg-[#f8f9fb] hover:text-[#46536d]'
                   }`}
                 >
                   <span className="flex min-w-0 items-center gap-2.5">
-                    <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: category.color }} />
+                    {category.id === 'equities' ? (
+                      <span
+                        className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#f3f5f8] p-1"
+                        style={isCategorySelected ? { backgroundColor: `${category.color}1f` } : undefined}
+                      >
+                        <img
+                          src="/cgsi-logo-mark.png"
+                          alt=""
+                          aria-hidden="true"
+                          className="size-full object-contain"
+                        />
+                      </span>
+                    ) : (
+                      <span
+                        className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#f3f5f8]"
+                        style={isCategorySelected ? { backgroundColor: `${category.color}1f`, color: category.color } : undefined}
+                      >
+                        <AccountIcon size={15} strokeWidth={1.8} />
+                      </span>
+                    )}
                     <span className="min-w-0">
                       <span
-                        className="block truncate text-[11px] font-semibold"
+                        className="block truncate text-[11px] font-semibold uppercase tracking-wide"
                         style={isCategorySelected ? { color: category.color } : undefined}
                       >
                         {category.label}
@@ -1093,6 +1274,95 @@ function PortfolioValueCard({ range, setRange, selectedCategory, setSelectedCate
           </div>
         </Card>
       </div>
+
+      {showChart && (
+        <Card className="min-w-0 p-4 sm:p-5">
+          <CategoryTrendChart range={range} setRange={setRange} category={selectedCategory} selectedAccountId={selectedAccountId} accounts={resolvedAccounts} categories={categories} />
+        </Card>
+      )}
+
+      <CategoryAccountsList
+        key={selectedCategory}
+        category={selectedCategory}
+        range={range}
+        selectedAccountId={selectedAccountId}
+        onSelectAccount={setSelectedAccountId}
+        onRenameAccount={(accountId, nextName) => setAccountAliases((prev) => ({ ...prev, [accountId]: nextName }))}
+        accounts={resolvedAccounts}
+        categories={categories}
+      />
+
+      {showPeraModal && (
+        <Modal title="PERA Accounts" onClose={() => setShowPeraModal(false)}>
+          <p className="mt-1 text-xs text-[#7c8290]">
+            Tax-exempt Personal Equity &amp; Retirement Account (RA 9505) holdings and cash allocation.
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-2.5">
+            <div className="rounded-xl border border-[#e7e9ec] bg-[#f7f8fb] p-3">
+              <p className="text-[10px] font-medium text-[#8d929e]">Total PERA Assets</p>
+              <p className="mt-1 text-base font-semibold text-[#343a48]">{formatPeso(categoryPeraBalances.overall.value)}</p>
+            </div>
+            <div className="rounded-xl border border-[#e7e9ec] bg-[#f7f8fb] p-3">
+              <p className="text-[10px] font-medium text-[#8d929e]">PERA Wallet Cash</p>
+              <p className="mt-1 text-base font-semibold text-[#343a48]">{formatPeso(categoryCashBalances.overall.pera)}</p>
+            </div>
+          </div>
+          <div className="mt-4 divide-y divide-[#eef0f4] rounded-xl border border-[#e7e9ec]">
+            {categories
+              .filter((item) => item.id !== 'overall')
+              .map((item) => {
+                const peraItem = categoryPeraBalances[item.id]
+                const peraCashItem = categoryCashBalances[item.id]
+                if (!peraItem) return null
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => {
+                      setSelectedCategory(item.id)
+                      setSelectedAccountId(null)
+                      setShowPeraModal(false)
+                    }}
+                    className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left transition hover:bg-[#f8f9fb]"
+                  >
+                    <div className="min-w-0">
+                      <p className="text-xs font-semibold text-[#343a48]">PERA {item.label}</p>
+                      <p className="mt-0.5 text-[10.5px] text-[#8d929e]">
+                        Wallet cash: {formatPeso(peraCashItem?.pera || 0)} · {peraItem.change}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="text-xs font-semibold text-[#343a48]">{formatPeso(peraItem.value)}</p>
+                      <p className="mt-0.5 text-[10px] font-medium text-blue-600">+{formatPeso(peraItem.changeAmount)}</p>
+                    </div>
+                  </button>
+                )
+              })}
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowPeraModal(false)
+                navigate('/reports')
+              }}
+              className="rounded-xl border border-[#dce1ea] bg-white px-3.5 py-2 text-xs font-semibold text-[#434a58] transition hover:bg-[#f8f9fb]"
+            >
+              PERA Reports
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setShowPeraModal(false)
+                navigate('/funding?mode=deposit')
+              }}
+              className="rounded-xl bg-[#2563eb] px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-[#1d4ed8]"
+            >
+              Fund PERA Wallet
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }
@@ -1501,6 +1771,273 @@ function FundingPageContent({ search }) {
           <Card tone="soft" className="p-5 sm:p-6"><span className="flex size-9 items-center justify-center rounded-xl bg-white text-[#7e8695]"><Icon name="lock" size={16} /></span><h2 className="mt-4 text-sm font-semibold text-[#434a58]">Your security matters</h2><p className="mt-2 text-xs leading-5 text-[#8d919b]">Your linked account details are protected with encryption and secure verification in supported accounts.</p><button type="button" className="mt-3 text-xs font-semibold text-[#646e84]">Learn about security <span aria-hidden="true">→</span></button></Card>
         </div>
       </div>
+    </div>
+  )
+}
+
+const reportDocuments = [
+  {
+    id: 'rep-stmt-oct',
+    title: 'Monthly Portfolio Statement',
+    period: 'October 2026',
+    category: 'Statements',
+    accountScope: 'All accounts',
+    generatedAt: 'Nov 01, 2026',
+    format: 'CSV',
+    netValue: 24680.5,
+    peraValue: 18450.0,
+    cashValue: 3260.5,
+    summary: 'Consolidated holdings valuation, cash wallet ledger, and realized/unrealized monthly performance across Equities, UITFs, and Mutual funds.',
+  },
+  {
+    id: 'rep-pera-tax',
+    title: 'PERA Contribution & Tax Credit Summary',
+    period: 'FY 2026 YTD',
+    category: 'Tax & PERA',
+    accountScope: 'PERA Portfolio',
+    generatedAt: 'Oct 31, 2026',
+    format: 'CSV',
+    netValue: 18450.0,
+    peraValue: 18450.0,
+    cashValue: 1850.0,
+    summary: 'Eligible Republic Act No. 9505 PERA contributions qualifying for the 5% income tax credit certificate.',
+  },
+  {
+    id: 'rep-trades-q3',
+    title: 'Equities Trade Confirmation Ledger',
+    period: 'Q3 2026',
+    category: 'Trade Logs',
+    accountScope: 'Equities (Margin & Discretionary)',
+    generatedAt: 'Oct 15, 2026',
+    format: 'CSV',
+    netValue: 17240.0,
+    peraValue: 13100.0,
+    cashValue: 2150.0,
+    summary: 'Executed buy/sell trade confirmations, broker commissions, and PSE settlement timestamps.',
+  },
+  {
+    id: 'rep-funds-oct',
+    title: 'UITF & Mutual Fund Valuation Report',
+    period: 'October 2026',
+    category: 'Statements',
+    accountScope: 'UITFs & Mutual funds',
+    generatedAt: 'Nov 01, 2026',
+    format: 'CSV',
+    netValue: 6240.5,
+    peraValue: 4350.0,
+    cashValue: 910.5,
+    summary: 'Monthly NavPU and NAVPS unit valuation breakdown for BDO Equity Index Fund, BPI Short Term Fund, ALFM Growth Fund, and Philequity Fund.',
+  },
+  {
+    id: 'rep-dividends',
+    title: 'Dividend & Coupon Distribution Schedule',
+    period: '2026 YTD',
+    category: 'Tax & PERA',
+    accountScope: 'All accounts',
+    generatedAt: 'Oct 28, 2026',
+    format: 'CSV',
+    netValue: 1284.2,
+    peraValue: 684.2,
+    cashValue: 3260.5,
+    summary: 'Gross cash dividends, retail treasury bond coupons, and final withholding tax deductions.',
+  },
+]
+
+function ReportsPage() {
+  const [category, setCategory] = useState('All')
+  const [search, setSearch] = useState('')
+  const [previewReport, setPreviewReport] = useState(null)
+  const [downloadNotice, setDownloadNotice] = useState('')
+  const categories = ['All', 'Statements', 'Tax & PERA', 'Trade Logs']
+  const filtered = useMemo(() => filterReports(reportDocuments, { category, search }), [category, search])
+
+  const handleDownloadReport = (report) => {
+    const csvRows = [
+      ['Report Title', report.title],
+      ['Period', report.period],
+      ['Category', report.category],
+      ['Account Scope', report.accountScope],
+      ['Generated Date', report.generatedAt],
+      ['Net Asset Value (PHP)', report.netValue.toFixed(2)],
+      ['PERA Asset Value (PHP)', report.peraValue.toFixed(2)],
+      ['Available Cash (PHP)', report.cashValue.toFixed(2)],
+      ['Summary', report.summary],
+    ]
+    const csvContent = csvRows.map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(',')).join('\n')
+    try {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${report.id}.csv`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+    } catch {
+      // Fallback notification below still confirms generation
+    }
+    setDownloadNotice(`Downloaded ${report.title} (${report.period}).`)
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          ['Available statements', `${reportDocuments.length} reports`, 'Updated Nov 01, 2026'],
+          ['Total reported assets', formatPeso(24680.5), 'Non-PERA + PERA combined'],
+          ['PERA 2026 tax credit base', formatPeso(18450), 'RA 9505 eligible contributions'],
+        ].map(([label, value, detail]) => (
+          <Card key={label} className="p-5">
+            <p className="text-xs text-[#9498a0]">{label}</p>
+            <p className="mt-2.5 text-xl font-semibold tracking-tight text-[#353b48]">{value}</p>
+            <p className="mt-1 text-[11px] text-[#a0a3a9]">{detail}</p>
+          </Card>
+        ))}
+      </div>
+
+      {downloadNotice && (
+        <p role="status" className="rounded-xl bg-[#edf0f6] px-4 py-3 text-xs font-medium text-[#485674]">
+          {downloadNotice}
+        </p>
+      )}
+
+      <Card className="overflow-hidden">
+        <div className="flex flex-col gap-3 border-b border-[#edeef0] px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div role="tablist" aria-label="Report categories" className="flex gap-1 overflow-x-auto">
+            {categories.map((item) => {
+              const active = category === item
+              return (
+                <button
+                  key={item}
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setCategory(item)}
+                  type="button"
+                  className={`shrink-0 rounded-lg px-2.5 py-1.5 text-xs font-medium whitespace-nowrap transition ${
+                    active
+                      ? 'bg-[#eff4ff] font-semibold text-[#2563eb]'
+                      : 'text-[#7f8490] hover:bg-[#f6f7f9] hover:text-[#424957]'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+            })}
+          </div>
+          <label className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#e6e8eb] bg-[#fafbfc] px-2.5 py-1.5 text-[#9599a0] focus-within:border-[#9aa5b8] focus-within:bg-white">
+            <Icon name="search" size={13} />
+            <input
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search reports"
+              aria-label="Search reports"
+              className="w-full bg-transparent text-xs text-[#434855] outline-none placeholder:text-[#a8abb0] sm:w-36"
+            />
+          </label>
+        </div>
+
+        {filtered.length ? (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[600px] text-left">
+              <thead>
+                <tr className="border-b border-[#edeef0] text-[10px] font-semibold uppercase tracking-[0.07em] text-[#9ca0a8]">
+                  <th className="px-4 py-3 font-semibold sm:px-5">Report</th>
+                  {category === 'All' && <th className="px-3 py-3 font-semibold whitespace-nowrap">Category</th>}
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Scope</th>
+                  <th className="px-3 py-3 font-semibold whitespace-nowrap">Generated</th>
+                  <th className="px-4 py-3 text-right font-semibold sm:px-5">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((report) => (
+                  <tr key={report.id} className="border-b border-[#f0f1f3] transition hover:bg-[#fafbfc] last:border-b-0">
+                    <td className="px-4 py-3.5 sm:px-5">
+                      <p className="text-xs font-semibold text-[#343a48]">{report.title}</p>
+                      <p className="mt-0.5 text-[11px] text-[#8d929e]">{report.period}</p>
+                    </td>
+                    {category === 'All' && (
+                      <td className="px-3 py-3.5 text-xs text-[#6e7482] whitespace-nowrap">{report.category}</td>
+                    )}
+                    <td className="px-3 py-3.5 text-xs text-[#6e7482]">{report.accountScope}</td>
+                    <td className="px-3 py-3.5 text-xs text-[#8d929e] whitespace-nowrap">{report.generatedAt}</td>
+                    <td className="px-4 py-3.5 text-right sm:px-5">
+                      <div className="inline-flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => setPreviewReport(report)}
+                          className="inline-flex items-center gap-1 rounded-lg border border-[#dce1ea] bg-[#f8f9fb] px-2.5 py-1.5 text-[11px] font-semibold text-[#434a58] transition hover:border-[#b9c6db] hover:bg-[#eff3fa] hover:text-[#2563eb]"
+                        >
+                          <Eye size={12} />
+                          <span>Preview</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDownloadReport(report)}
+                          className="inline-flex items-center gap-1 rounded-lg bg-[#2563eb] px-2.5 py-1.5 text-[11px] font-semibold text-white transition hover:bg-[#1d4ed8]"
+                        >
+                          <Download size={12} />
+                          <span>{report.format}</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="px-6 py-10 text-center">
+            <p className="text-xs font-semibold text-[#484d59]">No reports match your filter</p>
+            <p className="mt-1 text-[11px] text-[#9599a2]">Try another category or search term.</p>
+          </div>
+        )}
+      </Card>
+
+      {previewReport && (
+        <Modal title={previewReport.title} onClose={() => setPreviewReport(null)}>
+          <div className="mt-2 space-y-4 text-xs text-[#525a6b]">
+            <p className="text-[11px] text-[#8d929e]">
+              {previewReport.period} · {previewReport.accountScope} · Generated {previewReport.generatedAt}
+            </p>
+            <p className="leading-relaxed">{previewReport.summary}</p>
+            <div className="grid grid-cols-3 gap-2.5 rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3">
+              <div>
+                <p className="text-[10px] text-[#8d929e]">Net Value</p>
+                <p className="mt-1 text-sm font-semibold text-[#343a48]">{formatPeso(previewReport.netValue)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-[#8d929e]">PERA Value</p>
+                <p className="mt-1 text-sm font-semibold text-[#343a48]">{formatPeso(previewReport.peraValue)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] text-[#8d929e]">Cash Wallet</p>
+                <p className="mt-1 text-sm font-semibold text-[#343a48]">{formatPeso(previewReport.cashValue)}</p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setPreviewReport(null)}
+                className="rounded-xl border border-[#dce1ea] px-4 py-2 text-xs font-semibold text-[#434a58] hover:bg-[#f6f7f9]"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleDownloadReport(previewReport)
+                  setPreviewReport(null)
+                }}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+              >
+                <Download size={13} />
+                <span>Download {previewReport.format}</span>
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   )
 }
@@ -2139,11 +2676,11 @@ function ClientsPage() {
       prev.map((c) =>
         c.id === selectedClient.id
           ? {
-            ...c,
-            orders: [newOrder, ...c.orders],
-            messages: [...c.messages, advisoryNote],
-            pendingOrderCount: c.pendingOrderCount + 1,
-          }
+              ...c,
+              orders: [newOrder, ...c.orders],
+              messages: [...c.messages, advisoryNote],
+              pendingOrderCount: c.pendingOrderCount + 1,
+            }
           : c
       )
     )
@@ -2157,10 +2694,10 @@ function ClientsPage() {
       prev.map((c) =>
         c.id === selectedClient.id
           ? {
-            ...c,
-            orders: c.orders.map((o) => (o.id === orderId ? { ...o, status: 'CANCELLED' } : o)),
-            pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
-          }
+              ...c,
+              orders: c.orders.map((o) => (o.id === orderId ? { ...o, status: 'CANCELLED' } : o)),
+              pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
+            }
           : c
       )
     )
@@ -2203,13 +2740,13 @@ function ClientsPage() {
       prev.map((c) =>
         c.id === selectedClient.id
           ? {
-            ...c,
-            orders: c.orders.map((o) => (o.id === order.id ? { ...o, status: 'EXECUTED' } : o)),
-            trades: [newTrade, ...(c.trades || [])],
-            messages: [...c.messages, execNote],
-            pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
-            cash: order.side === 'BUY' ? Math.max(0, c.cash - net) : c.cash + net,
-          }
+              ...c,
+              orders: c.orders.map((o) => (o.id === order.id ? { ...o, status: 'EXECUTED' } : o)),
+              trades: [newTrade, ...(c.trades || [])],
+              messages: [...c.messages, execNote],
+              pendingOrderCount: Math.max(0, c.pendingOrderCount - 1),
+              cash: order.side === 'BUY' ? Math.max(0, c.cash - net) : c.cash + net,
+            }
           : c
       )
     )
@@ -2246,13 +2783,15 @@ function ClientsPage() {
               <button
                 type="button"
                 onClick={() => setLeftTab('clients')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${leftTab === 'clients' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                  }`}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  leftTab === 'clients' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
               >
                 <Users size={13} />
                 <span>Clients</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${leftTab === 'clients' ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#4b5563]'
-                  }`}>
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${
+                  leftTab === 'clients' ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#4b5563]'
+                }`}>
                   {clients.length}
                 </span>
               </button>
@@ -2260,17 +2799,19 @@ function ClientsPage() {
               <button
                 type="button"
                 onClick={() => setLeftTab('orders')}
-                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${leftTab === 'orders' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                  }`}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  leftTab === 'orders' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
               >
                 <ArrowUpDown size={13} />
                 <span>Orders</span>
-                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${leftTab === 'orders'
+                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${
+                  leftTab === 'orders'
                     ? 'bg-[#2563eb] text-white'
                     : pendingOrdersCount > 0
-                      ? 'bg-[#fef3c7] text-[#92400e]'
-                      : 'bg-[#e5e7eb] text-[#4b5563]'
-                  }`}>
+                    ? 'bg-[#fef3c7] text-[#92400e]'
+                    : 'bg-[#e5e7eb] text-[#4b5563]'
+                }`}>
                   {allDeskOrders.length}
                 </span>
               </button>
@@ -2311,8 +2852,9 @@ function ClientsPage() {
                     key={f.id}
                     type="button"
                     onClick={() => setCategoryFilter(f.id)}
-                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${categoryFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
-                      }`}
+                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${
+                      categoryFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
+                    }`}
                   >
                     {f.label}
                   </button>
@@ -2330,8 +2872,9 @@ function ClientsPage() {
                     key={f.id}
                     type="button"
                     onClick={() => setOrderFilter(f.id)}
-                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${orderFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
-                      }`}
+                    className={`rounded-lg px-2 py-1 font-semibold transition shrink-0 ${
+                      orderFilter === f.id ? 'bg-[#2563eb] text-white' : 'bg-[#f4f5f7] text-[#6b7280] hover:bg-[#eaecee]'
+                    }`}
                   >
                     {f.label}
                   </button>
@@ -2404,21 +2947,23 @@ function ClientsPage() {
                         setSelectedOrderId(order.id)
                         setActiveTab('orders')
                       }}
-                      className={`group relative w-full text-left p-3.5 transition border-b border-[#f1f3f6] border-l-[3.5px] ${isSelected
+                      className={`group relative w-full text-left p-3.5 transition border-b border-[#f1f3f6] border-l-[3.5px] ${
+                        isSelected
                           ? 'border-l-[#2563eb] bg-[#eff6ff]/90'
                           : 'border-l-transparent bg-white hover:bg-[#f8fafc]'
-                        }`}
+                      }`}
                     >
                       {/* Top Row: Side Badge + Ticker + Type | Total Estimated Value (Primary Hierarchy) */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-1.5 min-w-0">
                           <span
-                            className={`rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${order.side === 'BUY'
+                            className={`rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wide shrink-0 ${
+                              order.side === 'BUY'
                                 ? 'bg-[#dcfce7] text-[#15803d] border border-[#bbf7d0]'
                                 : order.side === 'SELL'
-                                  ? 'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]'
-                                  : 'bg-[#e0e7ff] text-[#4338ca] border border-[#c7d2fe]'
-                              }`}
+                                ? 'bg-[#fee2e2] text-[#b91c1c] border border-[#fecaca]'
+                                : 'bg-[#e0e7ff] text-[#4338ca] border border-[#c7d2fe]'
+                            }`}
                           >
                             {order.side}
                           </span>
@@ -2442,12 +2987,13 @@ function ClientsPage() {
                           <span className="font-semibold text-[#1e293b] tabular-nums">₱{order.price.toFixed(2)}</span>
                         </div>
                         <span
-                          className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold ${order.status === 'PENDING'
+                          className={`shrink-0 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold ${
+                            order.status === 'PENDING'
                               ? 'bg-[#fef3c7] text-[#92400e] border border-[#fde68a]'
                               : order.status === 'EXECUTED'
-                                ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
-                                : 'bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]'
-                            }`}
+                              ? 'bg-[#ecfdf5] text-[#059669] border border-[#a7f3d0]'
+                              : 'bg-[#f1f5f9] text-[#64748b] border border-[#e2e8f0]'
+                          }`}
                         >
                           {order.status === 'PENDING' && (
                             <span className="size-1.5 rounded-full bg-[#d97706] animate-pulse" />
@@ -2486,8 +3032,8 @@ function ClientsPage() {
                     {searchQuery
                       ? `No orders matching "${searchQuery}"`
                       : orderFilter === 'PENDING'
-                        ? 'No pending orders waiting for execution.'
-                        : 'No orders match this filter.'}
+                      ? 'No pending orders waiting for execution.'
+                      : 'No orders match this filter.'}
                   </p>
                 </div>
               )
@@ -2499,735 +3045,710 @@ function ClientsPage() {
         <div className="flex min-w-0 flex-1 flex-col border-b border-[#edeef0] xl:border-b-0 xl:border-r">
           {/* Client Summary Top Bar - Broker-Assisted Trading Account Card */}
           <div className="border-b border-[#edeef0] bg-[#fafbfc] p-4 sm:p-5">
-                  <div className="flex items-center gap-3">
-                    <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
-                      {selectedClient.avatar}
-                    </span>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
-                        <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
-                          Broker-Assisted Account
-                        </span>
-                        <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
-                          {selectedClient.category}
-                        </span>
-                      </div>
-                      <p className="mt-0.5 text-xs text-[#8a909d]">
-                        Account #{selectedClient.accountNumber} · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Broker-Assisted Trading Stats Grid */}
-                  <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                      <div className="flex items-center justify-between">
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Buying Power</p>
-                        <span className="size-1.5 rounded-full bg-[#10b981]" title="Funds Settled" />
-                      </div>
-                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash)}</p>
-                      <p className="mt-0.5 text-[10px] text-[#059669] font-medium">Ready for immediate fill</p>
-                    </div>
-
-                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Trading Facility</p>
-                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash * 1.5 + 500000)}</p>
-                      <p className="mt-0.5 text-[10px] text-[#6b7280]">Approved intraday credit buffer</p>
-                    </div>
-
-                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">T+2 Clearing Balance</p>
-                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">
-                        {formatPeso((selectedClient.trades && selectedClient.trades[0]?.net) || 181743.60)}
-                      </p>
-                      <p className="mt-0.5 text-[10px] text-[#2563eb] font-medium">Next settlement cycle (PSE T+2)</p>
-                    </div>
-
-                    <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
-                      <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Assisted Commission</p>
-                      <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">0.25% PSE Standard</p>
-                      <p className="mt-0.5 text-[10px] text-[#d97706] font-medium">
-                        {selectedClient.orders.filter((o) => o.status === 'PENDING').length} active orders pending fill
-                      </p>
-                    </div>
-                  </div>
+            <div className="flex items-center gap-3">
+              <span className={`flex size-11 shrink-0 items-center justify-center rounded-2xl font-bold text-sm ${selectedClient.color}`}>
+                {selectedClient.avatar}
+              </span>
+              <div>
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <h2 className="text-base font-semibold text-[#242935]">{selectedClient.name}</h2>
+                  <span className="rounded-md bg-[#eff6ff] border border-[#bfdbfe] px-2 py-0.5 text-[9.5px] font-bold uppercase text-[#1d4ed8]">
+                    Broker-Assisted Account
+                  </span>
+                  <span className="rounded-md bg-[#f3f4f6] px-2 py-0.5 text-[9.5px] font-medium text-[#4b5563]">
+                    {selectedClient.category}
+                  </span>
                 </div>
+                <p className="mt-0.5 text-xs text-[#8a909d]">
+                  Account #{selectedClient.accountNumber} · Risk: <span className="font-medium text-[#475467]">{selectedClient.riskProfile}</span>
+                </p>
+              </div>
+            </div>
 
-                {/* Middle Tabs: Trades vs Orders */}
-                <div className="flex border-b border-[#edeef0] bg-[#fafbfc] px-5 text-xs font-semibold">
-                  {[
-                    { id: 'trades', label: 'Trades', badge: (selectedClient.trades || []).length },
-                    { id: 'orders', label: 'Orders', badge: (selectedClient.orders || []).length },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`relative flex items-center gap-1.5 py-3 px-3 transition ${activeTab === tab.id
-                          ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]'
-                          : 'text-[#6b7280] hover:text-[#2563eb]'
-                        }`}
-                    >
-                      <span>{tab.label}</span>
-                      <span
-                        className={`rounded-full px-1.5 py-0.2 text-[9px] ${activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'
-                          }`}
-                      >
-                        {tab.badge}
-                      </span>
-                    </button>
-                  ))}
+            {/* Broker-Assisted Trading Stats Grid */}
+            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Buying Power</p>
+                  <span className="size-1.5 rounded-full bg-[#10b981]" title="Funds Settled" />
                 </div>
-
-                {/* Middle Tab 1: Trades (Executed Trades & Confirmations) */}
-                {activeTab === 'trades' && (
-                  <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-                    <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                      <div>
-                        <h3 className="text-sm font-semibold text-[#1f2937]">Executed Trades &amp; Confirmations</h3>
-                        <p className="text-[11px] text-[#8e94a0]">
-                          Broker-assisted transaction logs, fill confirmations, and T+2 settlement records for {selectedClient.name}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => triggerToast(`Exported ${selectedClient.trades?.length || 0} trade confirmation slips for ${selectedClient.name}`)}
-                        className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9] self-start sm:self-auto"
-                      >
-                        Export Confirmations
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Traded Value</p>
-                        <p className="mt-1 text-sm font-bold text-[#1f2937]">
-                          {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.gross || 0), 0))}
-                        </p>
-                        <p className="mt-0.5 text-[10px] text-[#2563eb]">Gross turnover across {(selectedClient.trades || []).length} trades</p>
-                      </div>
-                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Commission</p>
-                        <p className="mt-1 text-sm font-bold text-[#059669]">
-                          {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.commission || 0), 0))}
-                        </p>
-                        <p className="mt-0.5 text-[10px] text-[#059669]">Broker assisted rate (0.25%)</p>
-                      </div>
-                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Settlement Status</p>
-                        <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE T+2 Standard</p>
-                        <p className="mt-0.5 text-[10px] text-[#d97706]">Clearing &amp; custody assured</p>
-                      </div>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
-                      <table className="w-full min-w-[700px] text-left">
-                        <thead>
-                          <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
-                            <th className="px-3.5 py-2.5">Trade Ref</th>
-                            <th className="px-2.5 py-2.5">Side</th>
-                            <th className="px-2.5 py-2.5">Security</th>
-                            <th className="px-2.5 py-2.5 text-right">Shares</th>
-                            <th className="px-2.5 py-2.5 text-right">Fill Price</th>
-                            <th className="px-2.5 py-2.5 text-right">Gross Value</th>
-                            <th className="px-2.5 py-2.5 text-right">Comm &amp; Fees</th>
-                            <th className="px-2.5 py-2.5 text-right">Net Settlement</th>
-                            <th className="px-2.5 py-2.5">Settlement</th>
-                            <th className="px-2.5 py-2.5">Execution Time</th>
-                            <th className="px-2.5 py-2.5">Channel</th>
-                            <th className="px-3 py-2.5 text-right">Slip</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#f2f4f6] text-xs">
-                          {(selectedClient.trades || []).map((t) => (
-                            <tr key={t.id} className="hover:bg-[#f9fafb] transition">
-                              <td className="px-3.5 py-3 font-mono text-[11px] font-bold text-[#334155]">{t.id}</td>
-                              <td className="px-2.5 py-3">
-                                <span
-                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${t.side === 'BUY' ? 'bg-[#dcfce7] text-[#15803d]' : 'bg-[#fee2e2] text-[#b91c1c]'
-                                    }`}
-                                >
-                                  {t.side}
-                                </span>
-                              </td>
-                              <td className="px-2.5 py-3">
-                                <span className="font-bold text-[#1e293b]">{t.ticker}</span>
-                                <span className="block text-[10px] text-[#8e94a0]">{t.name}</span>
-                              </td>
-                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{t.shares.toLocaleString()}</td>
-                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{t.price.toFixed(2)}</td>
-                              <td className="px-2.5 py-3 text-right text-[#475467]">{formatPeso(t.gross)}</td>
-                              <td className="px-2.5 py-3 text-right text-[11px] text-[#64748b]">₱{(t.commission + (t.fees || 0)).toFixed(2)}</td>
-                              <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(t.net)}</td>
-                              <td className="px-2.5 py-3">
-                                <span
-                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold ${t.status === 'SETTLED' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#fef3c7] text-[#92400e]'
-                                    }`}
-                                >
-                                  {t.settlement}
-                                </span>
-                              </td>
-                              <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{t.time}</td>
-                              <td className="px-2.5 py-3 text-[10px] text-[#64748b]">{t.channel}</td>
-                              <td className="px-3 py-3 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => triggerToast(`CGSI Confirmation Slip #${t.id}: ${t.side} ${t.shares.toLocaleString()} ${t.ticker} @ ₱${t.price.toFixed(2)} net ${formatPeso(t.net)}`)}
-                                  className="rounded-lg bg-[#eff6ff] px-2.5 py-1 text-[11px] font-semibold text-[#2563eb] hover:bg-[#dbeafe] transition"
-                                >
-                                  Slip
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-
-                {/* Middle Tab 2: Orders (Client Order Book) */}
-                {activeTab === 'orders' && (
-                  <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
-                    <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
-                      <div>
-                        <h3 className="text-sm font-semibold text-[#1f2937]">Client Order Book</h3>
-                        <p className="text-[11px] text-[#8e94a0]">
-                          Real-time working orders queued for execution on the PSE for {selectedClient.name}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setOrderTicker('SMPH')
-                          setOrderPrice(32.50)
-                          setOrderShares(1000)
-                          setOrderSide('BUY')
-                          setOrderModalOpen(true)
-                        }}
-                        className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition shadow-xs self-start sm:self-auto"
-                      >
-                        <Plus size={14} />
-                        <span>+ Place Client Order</span>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Pending Fills</p>
-                        <p className="mt-1 text-sm font-bold text-[#d97706]">
-                          {selectedClient.orders.filter((o) => o.status === 'PENDING').length} orders
-                        </p>
-                        <p className="mt-0.5 text-[10px] text-[#6b7280]">Awaiting price match on PSE</p>
-                      </div>
-                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Queued Capital</p>
-                        <p className="mt-1 text-sm font-bold text-[#1f2937]">
-                          {formatPeso(
-                            selectedClient.orders
-                              .filter((o) => o.status === 'PENDING')
-                              .reduce((acc, o) => acc + o.shares * o.price, 0)
-                          )}
-                        </p>
-                        <p className="mt-0.5 text-[10px] text-[#2563eb]">Committed order value</p>
-                      </div>
-                      <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
-                        <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Exchange Gateway</p>
-                        <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE Direct FIX</p>
-                        <p className="mt-0.5 text-[10px] text-[#059669]">Continuous trading session</p>
-                      </div>
-                    </div>
-
-                    <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
-                      <table className="w-full min-w-[640px] text-left">
-                        <thead>
-                          <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
-                            <th className="px-3.5 py-2.5">Order ID</th>
-                            <th className="px-2.5 py-2.5">Side</th>
-                            <th className="px-2.5 py-2.5">Ticker</th>
-                            <th className="px-2.5 py-2.5 text-right">Quantity</th>
-                            <th className="px-2.5 py-2.5 text-right">Price</th>
-                            <th className="px-2.5 py-2.5">Type</th>
-                            <th className="px-2.5 py-2.5">Status</th>
-                            <th className="px-2.5 py-2.5">Timestamp</th>
-                            <th className="px-3.5 py-2.5 text-right">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-[#f2f4f6] text-xs">
-                          {selectedClient.orders.map((o) => (
-                            <tr
-                              key={o.id}
-                              className={`transition ${o.id === selectedOrderId
-                                  ? 'bg-[#eff6ff] ring-1 ring-[#93c5fd]'
-                                  : 'hover:bg-[#f9fafb]'
-                                }`}
-                            >
-                              <td className="px-3.5 py-3 font-mono text-[11px] font-semibold text-[#475467]">{o.id}</td>
-                              <td className="px-2.5 py-3">
-                                <span
-                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${o.side === 'BUY'
-                                      ? 'bg-[#dcfce7] text-[#15803d]'
-                                      : o.side === 'SELL'
-                                        ? 'bg-[#fee2e2] text-[#b91c1c]'
-                                        : 'bg-[#e0e7ff] text-[#4338ca]'
-                                    }`}
-                                >
-                                  {o.side}
-                                </span>
-                              </td>
-                              <td className="px-2.5 py-3 font-bold text-[#1e293b]">{o.ticker}</td>
-                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{o.shares.toLocaleString()}</td>
-                              <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{o.price.toFixed(2)}</td>
-                              <td className="px-2.5 py-3 text-[#64748b]">{o.type}</td>
-                              <td className="px-2.5 py-3">
-                                <span
-                                  className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${o.status === 'EXECUTED'
-                                      ? 'bg-[#ecfdf5] text-[#059669]'
-                                      : o.status === 'PENDING'
-                                        ? 'bg-[#fef3c7] text-[#92400e]'
-                                        : 'bg-[#f1f5f9] text-[#64748b]'
-                                    }`}
-                                >
-                                  {o.status}
-                                </span>
-                              </td>
-                              <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{o.date}</td>
-                              <td className="px-3.5 py-3 text-right">
-                                {o.status === 'PENDING' ? (
-                                  <div className="flex items-center justify-end gap-1.5">
-                                    <button
-                                      type="button"
-                                      onClick={() => handleExecuteOrder(o)}
-                                      className="rounded-md bg-[#eff6ff] px-2 py-1 text-[11px] font-bold text-[#2563eb] hover:bg-[#dbeafe] transition"
-                                    >
-                                      Fill Order
-                                    </button>
-                                    <button
-                                      type="button"
-                                      onClick={() => handleCancelOrder(o.id)}
-                                      className="rounded-md bg-[#fef2f2] px-2 py-1 text-[11px] font-semibold text-[#dc2626] hover:bg-[#fee2e2] transition"
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <span className="text-[10px] font-medium text-[#9ca3af]">
-                                    {o.status === 'EXECUTED' ? '✓ Filled' : 'Cancelled'}
-                                  </span>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash)}</p>
+                <p className="mt-0.5 text-[10px] text-[#059669] font-medium">Ready for immediate fill</p>
               </div>
 
-              {/* Panel 3: Messaging Panel (Right - Similar size to Panel 1, with Historical & Live tabs) */}
-              <div className="flex flex-col bg-[#fafbfc]">
-                {/* Messaging Panel Header & Tabs */}
-                <div className="border-b border-[#edeef0] bg-white p-3.5 space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <MessageCircle size={16} className="text-[#2563eb]" />
-                      <h3 className="text-xs font-bold text-[#1e293b]">Client Messages</h3>
-                    </div>
-                  </div>
-
-                  {/* Search Field */}
-                  <label className="flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-2.5 py-1.5 text-[#9ca3af] focus-within:border-[#2563eb] focus-within:bg-white transition">
-                    <Search size={13} />
-                    <input
-                      value={messageSearch}
-                      onChange={(e) => setMessageSearch(e.target.value)}
-                      placeholder="Search messages..."
-                      className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
-                    />
-                    {messageSearch && (
-                      <button
-                        type="button"
-                        onClick={() => setMessageSearch('')}
-                        className="text-[#9ca3af] hover:text-[#4b5563]"
-                        aria-label="Clear message search"
-                      >
-                        <X size={12} />
-                      </button>
-                    )}
-                  </label>
-
-                  {/* Chat Mode Tabs: Today vs Previous */}
-                  <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
-                    <button
-                      type="button"
-                      onClick={() => setChatMode('live')}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${chatMode === 'live' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                        }`}
-                    >
-                      <MessageCircle size={12} />
-                      <span>Today</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setChatMode('historical')}
-                      className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${chatMode === 'historical' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
-                        }`}
-                    >
-                      <Clock size={12} />
-                      <span>Previous</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Chat Messages Body */}
-                <div className="scroll-pane flex-1 space-y-3 overflow-y-auto p-3.5">
-                  {(() => {
-                    const activeMessages = chatMode === 'live'
-                      ? (selectedClient.messages || [])
-                      : (selectedClient.previousMessages || [])
-
-                    const displayedMessages = messageSearch.trim()
-                      ? activeMessages.filter(
-                        (msg) =>
-                          msg.text.toLowerCase().includes(messageSearch.toLowerCase()) ||
-                          msg.sender.toLowerCase().includes(messageSearch.toLowerCase())
-                      )
-                      : activeMessages
-
-                    if (displayedMessages.length === 0) {
-                      return (
-                        <div className="p-8 text-center text-xs text-[#9ca3af]">
-                          {messageSearch
-                            ? `No messages match "${messageSearch}"`
-                            : chatMode === 'live'
-                              ? 'No messages today yet.'
-                              : 'No previous conversations recorded.'}
-                        </div>
-                      )
-                    }
-
-                    return displayedMessages.map((msg) => {
-                      const isAgent = !msg.isClient
-                      return (
-                        <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
-                          <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
-                            <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
-                            <span>·</span>
-                            <span>{msg.time}</span>
-                          </div>
-                          <div
-                            className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
-                              }`}
-                          >
-                            <p>{msg.text}</p>
-                          </div>
-                        </div>
-                      )
-                    })
-                  })()}
-                </div>
-
-                {/* Quick Reply Suggestions */}
-                {chatMode === 'live' && (
-                  <div className="border-t border-[#edeef0] bg-white px-3 py-1.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
-                    {[
-                      'Execution confirmed on PSE.',
-                      'Sending dividend forecast.',
-                      'PERA tax deduction applied.',
-                    ].map((chip) => (
-                      <button
-                        key={chip}
-                        type="button"
-                        onClick={() => setReplyText(chip)}
-                        className="shrink-0 rounded-lg border border-[#e0e4ec] bg-[#f8f9fa] px-2 py-0.5 text-[#475467] transition hover:border-[#2563eb] hover:bg-white hover:text-[#2563eb]"
-                      >
-                        {chip}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                {/* Chat Input */}
-                <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 border-t border-[#edeef0] bg-white p-2.5">
-                  <input
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                    placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Send a message...'}
-                    className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-3 py-2 text-xs text-[#374151] outline-none placeholder:text-[#a0a5ad]"
-                  />
-                  <button
-                    type="submit"
-                    aria-label="Send message"
-                    className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"
-                  >
-                    <Send size={14} />
-                  </button>
-                </form>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Trading Facility</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">{formatPeso(selectedClient.cash * 1.5 + 500000)}</p>
+                <p className="mt-0.5 text-[10px] text-[#6b7280]">Approved intraday credit buffer</p>
               </div>
-            </Card>
 
-            {/* Place Order Modal */}
-            {orderModalOpen && (
-              <Modal title={`Place Order · ${selectedClient.name}`} onClose={() => setOrderModalOpen(false)}>
-                <form onSubmit={handlePlaceOrder} className="mt-3 space-y-4">
-                  <div className="rounded-xl bg-[#f8f9fb] p-3 border border-[#e5e7eb] flex items-center justify-between text-xs">
-                    <div>
-                      <span className="text-[#8e94a0]">Client Account:</span>{' '}
-                      <span className="font-semibold text-[#1e293b]">{selectedClient.name} ({selectedClient.accountNumber})</span>
-                    </div>
-                    <span className="font-bold text-[#059669]">{formatPeso(selectedClient.cash)} Cash</span>
-                  </div>
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">T+2 Clearing Balance</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">
+                  {formatPeso((selectedClient.trades && selectedClient.trades[0]?.net) || 181743.60)}
+                </p>
+                <p className="mt-0.5 text-[10px] text-[#2563eb] font-medium">Next settlement cycle (PSE T+2)</p>
+              </div>
 
-                  {/* Side: Buy / Sell */}
-                  <div>
-                    <label className="block text-[11px] font-semibold text-[#475467] mb-1.5">Order Side</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setOrderSide('BUY')}
-                        className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'BUY' ? 'bg-[#15803d] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
-                      >
-                        BUY
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setOrderSide('SELL')}
-                        className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'SELL' ? 'bg-[#b91c1c] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
-                      >
-                        SELL
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Ticker & Shares */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">PSE Ticker Symbol</label>
-                      <select
-                        value={orderTicker}
-                        onChange={(e) => {
-                          const sym = e.target.value
-                          setOrderTicker(sym)
-                          if (sym === 'SMPH') setOrderPrice(32.80)
-                          if (sym === 'BDO') setOrderPrice(154.50)
-                          if (sym === 'ALI') setOrderPrice(34.20)
-                          if (sym === 'FMETF') setOrderPrice(108.50)
-                          if (sym === 'AC') setOrderPrice(642.00)
-                          if (sym === 'ICT') setOrderPrice(307.00)
-                          if (sym === 'NVDA') setOrderPrice(560.00)
-                          if (sym === 'BND') setOrderPrice(53.20)
-                        }}
-                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                      >
-                        <option value="SMPH">SMPH · SM Prime Holdings</option>
-                        <option value="BDO">BDO · BDO Unibank</option>
-                        <option value="ALI">ALI · Ayala Land Inc.</option>
-                        <option value="FMETF">FMETF · First Metro ETF</option>
-                        <option value="AC">AC · Ayala Corporation</option>
-                        <option value="ICT">ICT · International Container</option>
-                        <option value="NVDA">NVDA · Nvidia Corp CDR</option>
-                        <option value="BND">BND · Total Bond Fund</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">Quantity (Shares)</label>
-                      <input
-                        type="number"
-                        min="1"
-                        step="1"
-                        value={orderShares}
-                        onChange={(e) => setOrderShares(e.target.value)}
-                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Order Type & Price */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">Order Type</label>
-                      <select
-                        value={orderType}
-                        onChange={(e) => setOrderType(e.target.value)}
-                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                      >
-                        <option value="LIMIT">Limit Order</option>
-                        <option value="MARKET">Market Order</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-semibold text-[#475467] mb-1">Execution Price (₱)</label>
-                      <input
-                        type="number"
-                        min="0.01"
-                        step="0.05"
-                        value={orderPrice}
-                        onChange={(e) => setOrderPrice(e.target.value)}
-                        className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Estimated Total */}
-                  <div className="rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3 flex items-center justify-between">
-                    <span className="text-xs text-[#64748b]">Estimated Order Value</span>
-                    <span className="text-sm font-bold text-[#1e293b]">
-                      {formatPeso(Number(orderShares || 0) * Number(orderPrice || 0))}
-                    </span>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center justify-end gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setOrderModalOpen(false)}
-                      className="rounded-xl border border-[#d2d6df] px-4 py-2 text-xs font-semibold text-[#525866] hover:bg-[#f6f7f9]"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="rounded-xl bg-[#2563eb] px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1d4ed8]"
-                    >
-                      Submit Order to PSE
-                    </button>
-                  </div>
-                </form>
-              </Modal>
-            )}
+              <div className="rounded-xl border border-[#e5e7eb] bg-white p-3 shadow-2xs">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-[#9ca3af]">Assisted Commission</p>
+                <p className="mt-1 text-sm font-bold text-[#1f2937] sm:text-base">0.25% PSE Standard</p>
+                <p className="mt-0.5 text-[10px] text-[#d97706] font-medium">
+                  {selectedClient.orders.filter((o) => o.status === 'PENDING').length} active orders pending fill
+                </p>
+              </div>
+            </div>
           </div>
-          )
-}
 
-          function AnnouncementBanner() {
-  const [visible, setVisible] = useState(true)
-          const [showModal, setShowModal] = useState(false)
-
-          if (!visible) return null
-
-          return (
-          <>
-            <aside
-              aria-label="Important announcement"
-              className="mb-4 flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#dbe3f0] bg-[#f0f4fc] px-3.5 py-2 text-xs text-[#31394a] shadow-xs sm:mb-5 sm:px-4"
-            >
-              <div className="flex min-w-0 flex-1 items-center gap-2.5">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-white shadow-2xs">
-                  <Sparkles size={13} strokeWidth={2.2} />
+          {/* Middle Tabs: Trades vs Orders */}
+          <div className="flex border-b border-[#edeef0] bg-[#fafbfc] px-5 text-xs font-semibold">
+            {[
+              { id: 'trades', label: 'Trades', badge: (selectedClient.trades || []).length },
+              { id: 'orders', label: 'Orders', badge: (selectedClient.orders || []).length },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative flex items-center gap-1.5 py-3 px-3 transition ${
+                  activeTab === tab.id
+                    ? 'text-[#2563eb] font-bold border-b-2 border-[#2563eb]'
+                    : 'text-[#6b7280] hover:text-[#2563eb]'
+                }`}
+              >
+                <span>{tab.label}</span>
+                <span
+                  className={`rounded-full px-1.5 py-0.2 text-[9px] ${
+                    activeTab === tab.id ? 'bg-[#2563eb] text-white' : 'bg-[#e5e7eb] text-[#6b7280]'
+                  }`}
+                >
+                  {tab.badge}
                 </span>
-                <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
-                  <span className="rounded-md border border-[#d0dcf5] bg-white/80 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e40af]">
-                    Announcement
-                  </span>
-                  <span className="truncate font-semibold text-[#222938]">
-                    Updated 2026 PSE continuous trading schedule &amp; PERA contribution guidelines
-                  </span>
-                  <span className="hidden text-[#657085] xl:inline">
-                    — Personal Equity maximum tax-credit limits are now in effect.
-                  </span>
+              </button>
+            ))}
+          </div>
+
+          {/* Middle Tab 1: Trades (Executed Trades & Confirmations) */}
+          {activeTab === 'trades' && (
+            <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                <div>
+                  <h3 className="text-sm font-semibold text-[#1f2937]">Executed Trades &amp; Confirmations</h3>
+                  <p className="text-[11px] text-[#8e94a0]">
+                    Broker-assisted transaction logs, fill confirmations, and T+2 settlement records for {selectedClient.name}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => triggerToast(`Exported ${selectedClient.trades?.length || 0} trade confirmation slips for ${selectedClient.name}`)}
+                  className="rounded-xl border border-[#d3d7e0] bg-white px-3 py-1.5 text-xs font-semibold text-[#4b5262] transition hover:bg-[#f6f7f9] self-start sm:self-auto"
+                >
+                  Export Confirmations
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Traded Value</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">
+                    {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.gross || 0), 0))}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#2563eb]">Gross turnover across {(selectedClient.trades || []).length} trades</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Total Commission</p>
+                  <p className="mt-1 text-sm font-bold text-[#059669]">
+                    {formatPeso((selectedClient.trades || []).reduce((acc, t) => acc + (t.commission || 0), 0))}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#059669]">Broker assisted rate (0.25%)</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Settlement Status</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE T+2 Standard</p>
+                  <p className="mt-0.5 text-[10px] text-[#d97706]">Clearing &amp; custody assured</p>
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+              <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
+                <table className="w-full min-w-[700px] text-left">
+                  <thead>
+                    <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
+                      <th className="px-3.5 py-2.5">Trade Ref</th>
+                      <th className="px-2.5 py-2.5">Side</th>
+                      <th className="px-2.5 py-2.5">Security</th>
+                      <th className="px-2.5 py-2.5 text-right">Shares</th>
+                      <th className="px-2.5 py-2.5 text-right">Fill Price</th>
+                      <th className="px-2.5 py-2.5 text-right">Gross Value</th>
+                      <th className="px-2.5 py-2.5 text-right">Comm &amp; Fees</th>
+                      <th className="px-2.5 py-2.5 text-right">Net Settlement</th>
+                      <th className="px-2.5 py-2.5">Settlement</th>
+                      <th className="px-2.5 py-2.5">Execution Time</th>
+                      <th className="px-2.5 py-2.5">Channel</th>
+                      <th className="px-3 py-2.5 text-right">Slip</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f2f4f6] text-xs">
+                    {(selectedClient.trades || []).map((t) => (
+                      <tr key={t.id} className="hover:bg-[#f9fafb] transition">
+                        <td className="px-3.5 py-3 font-mono text-[11px] font-bold text-[#334155]">{t.id}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              t.side === 'BUY' ? 'bg-[#dcfce7] text-[#15803d]' : 'bg-[#fee2e2] text-[#b91c1c]'
+                            }`}
+                          >
+                            {t.side}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3">
+                          <span className="font-bold text-[#1e293b]">{t.ticker}</span>
+                          <span className="block text-[10px] text-[#8e94a0]">{t.name}</span>
+                        </td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{t.shares.toLocaleString()}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{t.price.toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-right text-[#475467]">{formatPeso(t.gross)}</td>
+                        <td className="px-2.5 py-3 text-right text-[11px] text-[#64748b]">₱{(t.commission + (t.fees || 0)).toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-right font-bold text-[#1e293b]">{formatPeso(t.net)}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-semibold ${
+                              t.status === 'SETTLED' ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-[#fef3c7] text-[#92400e]'
+                            }`}
+                          >
+                            {t.settlement}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{t.time}</td>
+                        <td className="px-2.5 py-3 text-[10px] text-[#64748b]">{t.channel}</td>
+                        <td className="px-3 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => triggerToast(`CGSI Confirmation Slip #${t.id}: ${t.side} ${t.shares.toLocaleString()} ${t.ticker} @ ₱${t.price.toFixed(2)} net ${formatPeso(t.net)}`)}
+                            className="rounded-lg bg-[#eff6ff] px-2.5 py-1 text-[11px] font-semibold text-[#2563eb] hover:bg-[#dbeafe] transition"
+                          >
+                            Slip
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Middle Tab 2: Orders (Client Order Book) */}
+          {activeTab === 'orders' && (
+            <div className="scroll-pane flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
+              <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                <div>
+                  <h3 className="text-sm font-semibold text-[#1f2937]">Client Order Book</h3>
+                  <p className="text-[11px] text-[#8e94a0]">
+                    Real-time working orders queued for execution on the PSE for {selectedClient.name}
+                  </p>
+                </div>
                 <button
                   type="button"
-                  onClick={() => setShowModal(true)}
-                  className="rounded-lg px-2 py-1 text-[11px] font-semibold text-[#2563eb] transition hover:bg-[#e2ecfd]"
+                  onClick={() => {
+                    setOrderTicker('SMPH')
+                    setOrderPrice(32.50)
+                    setOrderShares(1000)
+                    setOrderSide('BUY')
+                    setOrderModalOpen(true)
+                  }}
+                  className="flex items-center gap-1 rounded-xl bg-[#2563eb] px-3.5 py-1.5 text-xs font-semibold text-white hover:bg-[#1d4ed8] transition shadow-xs self-start sm:self-auto"
                 >
-                  Details
-                </button>
-                <span className="h-3.5 w-px bg-[#d5deed]" aria-hidden="true" />
-                <button
-                  type="button"
-                  onClick={() => setVisible(false)}
-                  aria-label="Dismiss announcement"
-                  className="flex size-6 items-center justify-center rounded-lg text-[#7c8698] transition hover:bg-[#e2ecfd] hover:text-[#202738]"
-                >
-                  <X size={14} strokeWidth={2.2} />
+                  <Plus size={14} />
+                  <span>+ Place Client Order</span>
                 </button>
               </div>
-            </aside>
 
-            {showModal && (
-              <Modal title="2026 Market & PERA Contribution Guidelines" onClose={() => setShowModal(false)}>
-                <div className="mt-2 space-y-3.5 text-xs leading-relaxed text-[#525a6b]">
-                  <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
-                    <p className="text-sm font-semibold text-[#1e293b]">Philippine Stock Exchange (PSE) Schedule</p>
-                    <p className="mt-1 text-[#64748b]">Continuous trading sessions run Monday to Friday from 9:30 AM to 3:00 PM PHT. Pre-open starts at 9:00 AM.</p>
+              <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Pending Fills</p>
+                  <p className="mt-1 text-sm font-bold text-[#d97706]">
+                    {selectedClient.orders.filter((o) => o.status === 'PENDING').length} orders
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#6b7280]">Awaiting price match on PSE</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Queued Capital</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">
+                    {formatPeso(
+                      selectedClient.orders
+                        .filter((o) => o.status === 'PENDING')
+                        .reduce((acc, o) => acc + o.shares * o.price, 0)
+                    )}
+                  </p>
+                  <p className="mt-0.5 text-[10px] text-[#2563eb]">Committed order value</p>
+                </div>
+                <div className="rounded-xl border border-[#e5e7eb] bg-[#f9fafb] p-3">
+                  <p className="text-[10px] font-semibold uppercase text-[#6b7280]">Exchange Gateway</p>
+                  <p className="mt-1 text-sm font-bold text-[#1f2937]">PSE Direct FIX</p>
+                  <p className="mt-0.5 text-[10px] text-[#059669]">Continuous trading session</p>
+                </div>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-[#edeef0]">
+                <table className="w-full min-w-[640px] text-left">
+                  <thead>
+                    <tr className="border-b border-[#edeef0] bg-[#fafbfc] text-[10px] font-semibold uppercase tracking-wider text-[#9ca3af]">
+                      <th className="px-3.5 py-2.5">Order ID</th>
+                      <th className="px-2.5 py-2.5">Side</th>
+                      <th className="px-2.5 py-2.5">Ticker</th>
+                      <th className="px-2.5 py-2.5 text-right">Quantity</th>
+                      <th className="px-2.5 py-2.5 text-right">Price</th>
+                      <th className="px-2.5 py-2.5">Type</th>
+                      <th className="px-2.5 py-2.5">Status</th>
+                      <th className="px-2.5 py-2.5">Timestamp</th>
+                      <th className="px-3.5 py-2.5 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#f2f4f6] text-xs">
+                    {selectedClient.orders.map((o) => (
+                      <tr
+                        key={o.id}
+                        className={`transition ${
+                          o.id === selectedOrderId
+                            ? 'bg-[#eff6ff] ring-1 ring-[#93c5fd]'
+                            : 'hover:bg-[#f9fafb]'
+                        }`}
+                      >
+                        <td className="px-3.5 py-3 font-mono text-[11px] font-semibold text-[#475467]">{o.id}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              o.side === 'BUY'
+                                ? 'bg-[#dcfce7] text-[#15803d]'
+                                : o.side === 'SELL'
+                                ? 'bg-[#fee2e2] text-[#b91c1c]'
+                                : 'bg-[#e0e7ff] text-[#4338ca]'
+                            }`}
+                          >
+                            {o.side}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3 font-bold text-[#1e293b]">{o.ticker}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">{o.shares.toLocaleString()}</td>
+                        <td className="px-2.5 py-3 text-right font-medium text-[#334155]">₱{o.price.toFixed(2)}</td>
+                        <td className="px-2.5 py-3 text-[#64748b]">{o.type}</td>
+                        <td className="px-2.5 py-3">
+                          <span
+                            className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                              o.status === 'EXECUTED'
+                                ? 'bg-[#ecfdf5] text-[#059669]'
+                                : o.status === 'PENDING'
+                                ? 'bg-[#fef3c7] text-[#92400e]'
+                                : 'bg-[#f1f5f9] text-[#64748b]'
+                            }`}
+                          >
+                            {o.status}
+                          </span>
+                        </td>
+                        <td className="px-2.5 py-3 text-[10px] text-[#8e94a0]">{o.date}</td>
+                        <td className="px-3.5 py-3 text-right">
+                          {o.status === 'PENDING' ? (
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleExecuteOrder(o)}
+                                className="rounded-md bg-[#eff6ff] px-2 py-1 text-[11px] font-bold text-[#2563eb] hover:bg-[#dbeafe] transition"
+                              >
+                                Fill Order
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleCancelOrder(o.id)}
+                                className="rounded-md bg-[#fef2f2] px-2 py-1 text-[11px] font-semibold text-[#dc2626] hover:bg-[#fee2e2] transition"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-[10px] font-medium text-[#9ca3af]">
+                              {o.status === 'EXECUTED' ? '✓ Filled' : 'Cancelled'}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Panel 3: Messaging Panel (Right - Similar size to Panel 1, with Historical & Live tabs) */}
+        <div className="flex flex-col bg-[#fafbfc]">
+          {/* Messaging Panel Header & Tabs */}
+          <div className="border-b border-[#edeef0] bg-white p-3.5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageCircle size={16} className="text-[#2563eb]" />
+                <h3 className="text-xs font-bold text-[#1e293b]">Client Messages</h3>
+              </div>
+            </div>
+
+            {/* Search Field */}
+            <label className="flex items-center gap-1.5 rounded-lg border border-[#e5e7eb] bg-[#f9fafb] px-2.5 py-1.5 text-[#9ca3af] focus-within:border-[#2563eb] focus-within:bg-white transition">
+              <Search size={13} />
+              <input
+                value={messageSearch}
+                onChange={(e) => setMessageSearch(e.target.value)}
+                placeholder="Search messages..."
+                className="w-full bg-transparent text-xs text-[#525763] outline-none placeholder:text-[#a7aab0]"
+              />
+              {messageSearch && (
+                <button
+                  type="button"
+                  onClick={() => setMessageSearch('')}
+                  className="text-[#9ca3af] hover:text-[#4b5563]"
+                  aria-label="Clear message search"
+                >
+                  <X size={12} />
+                </button>
+              )}
+            </label>
+
+            {/* Chat Mode Tabs: Today vs Previous */}
+            <div className="grid grid-cols-2 gap-1 rounded-xl bg-[#f2f4f7] p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setChatMode('live')}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  chatMode === 'live' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
+              >
+                <MessageCircle size={12} />
+                <span>Today</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setChatMode('historical')}
+                className={`flex items-center justify-center gap-1.5 rounded-lg py-1.5 text-[11px] transition ${
+                  chatMode === 'historical' ? 'bg-white text-[#2563eb] shadow-2xs font-bold' : 'text-[#6b7280] hover:text-[#1f2937]'
+                }`}
+              >
+                <Clock size={12} />
+                <span>Previous</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Chat Messages Body */}
+          <div className="scroll-pane flex-1 space-y-3 overflow-y-auto p-3.5">
+            {(() => {
+              const activeMessages = chatMode === 'live'
+                ? (selectedClient.messages || [])
+                : (selectedClient.previousMessages || [])
+
+              const displayedMessages = messageSearch.trim()
+                ? activeMessages.filter(
+                    (msg) =>
+                      msg.text.toLowerCase().includes(messageSearch.toLowerCase()) ||
+                      msg.sender.toLowerCase().includes(messageSearch.toLowerCase())
+                  )
+                : activeMessages
+
+              if (displayedMessages.length === 0) {
+                return (
+                  <div className="p-8 text-center text-xs text-[#9ca3af]">
+                    {messageSearch
+                      ? `No messages match "${messageSearch}"`
+                      : chatMode === 'live'
+                      ? 'No messages today yet.'
+                      : 'No previous conversations recorded.'}
                   </div>
-                  <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
-                    <p className="text-sm font-semibold text-[#1e293b]">PERA Tax-Exempt Contribution Limits</p>
-                    <p className="mt-1 text-[#64748b]">Under Republic Act No. 9505, annual contributions up to ₱200,000 for local residents (₱400,000 for Overseas Filipino Workers) qualify for a 5% income tax credit and tax-free investment earnings upon retirement.</p>
-                  </div>
-                  <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
-                    <p className="text-sm font-semibold text-[#1e293b]">Zero Custody Surcharges</p>
-                    <p className="mt-1 text-[#64748b]">Caballes-Go Securities charges zero custody maintenance fees for all verified PERA and non-PERA retail portfolios.</p>
-                  </div>
-                  <div className="flex justify-end pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowModal(false)}
-                      className="rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+                )
+              }
+
+              return displayedMessages.map((msg) => {
+                const isAgent = !msg.isClient
+                return (
+                  <div key={msg.id} className={`flex flex-col ${isAgent ? 'items-end' : 'items-start'}`}>
+                    <div className="flex items-center gap-1.5 text-[9px] text-[#8e94a0] mb-0.5">
+                      <span className="font-semibold text-[#4b5563]">{isAgent ? 'You (Agent)' : msg.sender}</span>
+                      <span>·</span>
+                      <span>{msg.time}</span>
+                    </div>
+                    <div
+                      className={`max-w-[88%] rounded-2xl p-2.5 text-xs leading-relaxed ${
+                        isAgent ? 'bg-[#2563eb] text-white rounded-tr-xs' : 'bg-white border border-[#e5e7eb] text-[#333b49] rounded-tl-xs shadow-2xs'
+                      }`}
                     >
-                      Got it
-                    </button>
+                      <p>{msg.text}</p>
+                    </div>
                   </div>
-                </div>
-              </Modal>
-            )}
-          </>
-          )
+                )
+              })
+            })()}
+          </div>
+
+          {/* Quick Reply Suggestions */}
+          {chatMode === 'live' && (
+            <div className="border-t border-[#edeef0] bg-white px-3 py-1.5 flex items-center gap-1 overflow-x-auto text-[10px] scroll-pane">
+              {[
+                'Execution confirmed on PSE.',
+                'Sending dividend forecast.',
+                'PERA tax deduction applied.',
+              ].map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => setReplyText(chip)}
+                  className="shrink-0 rounded-lg border border-[#e0e4ec] bg-[#f8f9fa] px-2 py-0.5 text-[#475467] transition hover:border-[#2563eb] hover:bg-white hover:text-[#2563eb]"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Chat Input */}
+          <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 border-t border-[#edeef0] bg-white p-2.5">
+            <input
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              placeholder={chatMode === 'live' ? `Reply to ${selectedClient.name}...` : 'Send a message...'}
+              className="min-w-0 flex-1 rounded-xl bg-[#f5f6f7] px-3 py-2 text-xs text-[#374151] outline-none placeholder:text-[#a0a5ad]"
+            />
+            <button
+              type="submit"
+              aria-label="Send message"
+              className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-[#2563eb] text-white transition hover:bg-[#1d4ed8]"
+            >
+              <Send size={14} />
+            </button>
+          </form>
+        </div>
+      </Card>
+
+      {/* Place Order Modal */}
+      {orderModalOpen && (
+        <Modal title={`Place Order · ${selectedClient.name}`} onClose={() => setOrderModalOpen(false)}>
+          <form onSubmit={handlePlaceOrder} className="mt-3 space-y-4">
+            <div className="rounded-xl bg-[#f8f9fb] p-3 border border-[#e5e7eb] flex items-center justify-between text-xs">
+              <div>
+                <span className="text-[#8e94a0]">Client Account:</span>{' '}
+                <span className="font-semibold text-[#1e293b]">{selectedClient.name} ({selectedClient.accountNumber})</span>
+              </div>
+              <span className="font-bold text-[#059669]">{formatPeso(selectedClient.cash)} Cash</span>
+            </div>
+
+            {/* Side: Buy / Sell */}
+            <div>
+              <label className="block text-[11px] font-semibold text-[#475467] mb-1.5">Order Side</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setOrderSide('BUY')}
+                  className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'BUY' ? 'bg-[#15803d] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
+                >
+                  BUY
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOrderSide('SELL')}
+                  className={`rounded-xl py-2 text-xs font-bold transition ${orderSide === 'SELL' ? 'bg-[#b91c1c] text-white shadow-xs' : 'bg-[#f3f4f6] text-[#4b5563] hover:bg-[#e5e7eb]'}`}
+                >
+                  SELL
+                </button>
+              </div>
+            </div>
+
+            {/* Ticker & Shares */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">PSE Ticker Symbol</label>
+                <select
+                  value={orderTicker}
+                  onChange={(e) => {
+                    const sym = e.target.value
+                    setOrderTicker(sym)
+                    if (sym === 'SMPH') setOrderPrice(32.80)
+                    if (sym === 'BDO') setOrderPrice(154.50)
+                    if (sym === 'ALI') setOrderPrice(34.20)
+                    if (sym === 'FMETF') setOrderPrice(108.50)
+                    if (sym === 'AC') setOrderPrice(642.00)
+                    if (sym === 'ICT') setOrderPrice(307.00)
+                    if (sym === 'NVDA') setOrderPrice(560.00)
+                    if (sym === 'BND') setOrderPrice(53.20)
+                  }}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                >
+                  <option value="SMPH">SMPH · SM Prime Holdings</option>
+                  <option value="BDO">BDO · BDO Unibank</option>
+                  <option value="ALI">ALI · Ayala Land Inc.</option>
+                  <option value="FMETF">FMETF · First Metro ETF</option>
+                  <option value="AC">AC · Ayala Corporation</option>
+                  <option value="ICT">ICT · International Container</option>
+                  <option value="NVDA">NVDA · Nvidia Corp CDR</option>
+                  <option value="BND">BND · Total Bond Fund</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Quantity (Shares)</label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={orderShares}
+                  onChange={(e) => setOrderShares(e.target.value)}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                />
+              </div>
+            </div>
+
+            {/* Order Type & Price */}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Order Type</label>
+                <select
+                  value={orderType}
+                  onChange={(e) => setOrderType(e.target.value)}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                >
+                  <option value="LIMIT">Limit Order</option>
+                  <option value="MARKET">Market Order</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-[#475467] mb-1">Execution Price (₱)</label>
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.05"
+                  value={orderPrice}
+                  onChange={(e) => setOrderPrice(e.target.value)}
+                  className="w-full rounded-xl border border-[#d2d6df] bg-white px-3 py-2 text-xs font-semibold text-[#1e293b] outline-none focus:border-[#2563eb]"
+                />
+              </div>
+            </div>
+
+            {/* Estimated Total */}
+            <div className="rounded-xl border border-[#e5e7eb] bg-[#f8f9fb] p-3 flex items-center justify-between">
+              <span className="text-xs text-[#64748b]">Estimated Order Value</span>
+              <span className="text-sm font-bold text-[#1e293b]">
+                {formatPeso(Number(orderShares || 0) * Number(orderPrice || 0))}
+              </span>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setOrderModalOpen(false)}
+                className="rounded-xl border border-[#d2d6df] px-4 py-2 text-xs font-semibold text-[#525866] hover:bg-[#f6f7f9]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-xl bg-[#2563eb] px-5 py-2 text-xs font-semibold text-white shadow-xs hover:bg-[#1d4ed8]"
+              >
+                Submit Order to PSE
+              </button>
+            </div>
+          </form>
+        </Modal>
+      )}
+    </div>
+  )
 }
 
-          function App() {
+function AnnouncementBanner() {
+  const [visible, setVisible] = useState(true)
+  const [showModal, setShowModal] = useState(false)
+
+  if (!visible) return null
+
+  return (
+    <>
+      <aside
+        aria-label="Important announcement"
+        className="mb-4 flex min-h-10 items-center justify-between gap-3 rounded-xl border border-[#dbe3f0] bg-[#f0f4fc] px-3.5 py-2 text-xs text-[#31394a] shadow-xs sm:mb-5 sm:px-4"
+      >
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-[#2563eb] text-white shadow-2xs">
+            <Sparkles size={13} strokeWidth={2.2} />
+          </span>
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
+            <span className="rounded-md border border-[#d0dcf5] bg-white/80 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#1e40af]">
+              Announcement
+            </span>
+            <span className="truncate font-semibold text-[#222938]">
+              Updated 2026 PSE continuous trading schedule &amp; PERA contribution guidelines
+            </span>
+            <span className="hidden text-[#657085] xl:inline">
+              — Personal Equity maximum tax-credit limits are now in effect.
+            </span>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="rounded-lg px-2 py-1 text-[11px] font-semibold text-[#2563eb] transition hover:bg-[#e2ecfd]"
+          >
+            Details
+          </button>
+          <span className="h-3.5 w-px bg-[#d5deed]" aria-hidden="true" />
+          <button
+            type="button"
+            onClick={() => setVisible(false)}
+            aria-label="Dismiss announcement"
+            className="flex size-6 items-center justify-center rounded-lg text-[#7c8698] transition hover:bg-[#e2ecfd] hover:text-[#202738]"
+          >
+            <X size={14} strokeWidth={2.2} />
+          </button>
+        </div>
+      </aside>
+
+      {showModal && (
+        <Modal title="2026 Market & PERA Contribution Guidelines" onClose={() => setShowModal(false)}>
+          <div className="mt-2 space-y-3.5 text-xs leading-relaxed text-[#525a6b]">
+            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+              <p className="text-sm font-semibold text-[#1e293b]">Philippine Stock Exchange (PSE) Schedule</p>
+              <p className="mt-1 text-[#64748b]">Continuous trading sessions run Monday to Friday from 9:30 AM to 3:00 PM PHT. Pre-open starts at 9:00 AM.</p>
+            </div>
+            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+              <p className="text-sm font-semibold text-[#1e293b]">PERA Tax-Exempt Contribution Limits</p>
+              <p className="mt-1 text-[#64748b]">Under Republic Act No. 9505, annual contributions up to ₱200,000 for local residents (₱400,000 for Overseas Filipino Workers) qualify for a 5% income tax credit and tax-free investment earnings upon retirement.</p>
+            </div>
+            <div className="rounded-xl border border-[#e4e9f3] bg-[#f5f7fb] p-3">
+              <p className="text-sm font-semibold text-[#1e293b]">Zero Custody Surcharges</p>
+              <p className="mt-1 text-[#64748b]">Caballes-Go Securities charges zero custody maintenance fees for all verified PERA and non-PERA retail portfolios.</p>
+            </div>
+            <div className="flex justify-end pt-2">
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="rounded-xl bg-[#2563eb] px-4 py-2 text-xs font-semibold text-white hover:bg-[#1d4ed8]"
+              >
+                Got it
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+    </>
+  )
+}
+
+function App() {
   const [darkMode, setDarkMode] = useState(() => window.localStorage.getItem('morrow-theme') === 'night')
-          const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-          const location = useLocation()
-          const isClientsPage = location.pathname.startsWith('/clients')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const location = useLocation()
+  const isClientsPage = location.pathname.startsWith('/clients')
 
   useEffect(() => {
-            window.localStorage.setItem('morrow-theme', darkMode ? 'night' : 'day')
-          }, [darkMode])
+    window.localStorage.setItem('morrow-theme', darkMode ? 'night' : 'day')
+  }, [darkMode])
 
-<<<<<<< HEAD
-          return (
-          <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
-            <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
-              <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)} isTraderView={isClientsPage} />
-              <main className="flex min-w-0 flex-1 flex-col bg-[#fbfbfc] xl:h-screen xl:min-h-0 xl:overflow-hidden">
-                <Header darkMode={darkMode} setDarkMode={setDarkMode} isTraderView={isClientsPage} />
-                <MobileNavigation isTraderView={isClientsPage} />
-                <div className="flex-1 px-5 py-6 sm:px-8 sm:py-8 lg:px-10 lg:py-9 xl:min-h-0 xl:overflow-hidden">
-                  <div className={`grid w-full items-start gap-6 xl:h-full xl:min-h-0 ${isClientsPage ? 'grid-cols-1' : 'xl:grid-cols-[minmax(0,1fr)_280px]'} xl:grid-rows-1 xl:items-stretch 2xl:gap-8`}>
-                    <div className="min-w-0 scroll-pane xl:min-h-0 xl:overflow-y-auto xl:overscroll-contain xl:pr-2">
-                      {!isClientsPage && <AnnouncementBanner />}
-                      <Routes>
-                        <Route path="/" element={<Navigate to="/home" replace />} />
-                        <Route path="/home" element={<HomePage />} />
-                        <Route path="/clients" element={<ClientsPage />} />
-                        <Route path="/portfolio" element={<PortfolioPage />} />
-                        <Route path="/products" element={<ProductsPage />} />
-                        <Route path="/funding" element={<FundingPage />} />
-                        <Route path="/learn" element={<LearnPage />} />
-                        <Route path="/messages" element={<MessagesPage />} />
-                        <Route path="/profile" element={<ProfilePage />} />
-                        <Route path="/settings" element={<SettingsPage darkMode={darkMode} setDarkMode={setDarkMode} />} />
-                        <Route path="/faq" element={<FaqPage />} />
-                        <Route path="/terms-of-service" element={<PolicyPage title="Terms of Service" documentName="Terms of Service" />} />
-                        <Route path="/privacy-policy" element={<PolicyPage title="Privacy Policy" documentName="Privacy Policy" />} />
-                        <Route path="/sign-out" element={<SignOutPage />} />
-                        <Route path="*" element={<Navigate to="/home" replace />} />
-                      </Routes>
-                    </div>
-                    {!isClientsPage && <CommunityRightRail />}
-                  </div>
-                </div>
-              </main>
-=======
   return (
     <div data-theme={darkMode ? 'night' : 'day'} className="min-h-screen bg-[#f7f8f9] text-[#333946] transition-colors duration-200">
       <div className="flex min-h-screen w-full bg-white xl:h-screen xl:overflow-hidden">
@@ -3246,6 +3767,7 @@ function ClientsPage() {
                   <Route path="/portfolio" element={<PortfolioPage />} />
                   <Route path="/products" element={<ProductsPage />} />
                   <Route path="/funding" element={<FundingPage />} />
+                  <Route path="/reports" element={<ReportsPage />} />
                   <Route path="/learn" element={<LearnPage />} />
                   <Route path="/messages" element={<MessagesPage />} />
                   <Route path="/notifications" element={<NotificationsPage />} />
@@ -3259,10 +3781,12 @@ function ClientsPage() {
                 </Routes>
               </div>
               {!isClientsPage && <CommunityRightRail />}
->>>>>>> 2ebde44c5cd2def557592666f48c0e570c4b6c48
             </div>
           </div>
-          )
+        </main>
+      </div>
+    </div>
+  )
 }
 
-          export default App
+export default App
